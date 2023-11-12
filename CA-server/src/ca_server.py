@@ -78,7 +78,7 @@ def request_certificate():
     user_info = request.get_json()
     for key, val in user_info.items():
         assert key in ["uid", "lastname", "firstname", "email"]
-        assert type(val) == str
+        assert isinstance(val, str)
 
 
     make_csr(user_info)
