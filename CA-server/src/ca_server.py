@@ -39,3 +39,32 @@ def request_certificate():
     # TODO don't forget to send cert.p12 encrypted to the backup server
     # TODO don't forget to delete the private key and cert.p12 file
     pass  # TODO
+
+
+@app.post("/revoke-certificate")
+def revoke_certificate():
+    """
+    This endpoint allows for certificate revocation.
+    The body of the request contains a JSON object with the user id (uid) whose certificate must be revoked.
+    E.g.:
+    {"uid": "lb"}
+    
+    to revoke the certificate of Lukas Bruegger.
+    Upon successful revocation, a response with status 204 No Content is sent back.
+    If the user specified in the body of the request does not currently have a valid certificate,
+    a response with status 404 Not Found is sent back.
+
+    Docs: https://openssl-ca.readthedocs.io/en/latest/certificate-revocation-lists.html
+    """
+    pass # TODO
+
+@app.get("/crl")
+def get_crl():
+    """
+    This endpoint returns the current Certificate Revocation List (crl) of the CA.
+
+    The crl is encoded in PEM format and the Content-Type is application/pkix-crl .
+    See https://en.wikipedia.org/wiki/Certificate_revocation_list .
+    """
+    # see https://flask.palletsprojects.com/en/3.0.x/api/#flask.send_file
+    pass # TODO
