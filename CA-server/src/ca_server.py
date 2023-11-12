@@ -1,6 +1,7 @@
 import subprocess
 from flask import Flask, request
 import re
+from typing import Dict
 
 app = Flask(__name__)
 
@@ -23,7 +24,7 @@ def build_subj_str(user_info: Dict[str, str]) -> str:
     email_regex = r"\w+@\w+\.\w+"
     email = user_info["email"]
     assert bool(re.match(email_regex, email)), email
-    out += f"emailAddress={email}/"
+    out += f"/emailAddress={email}/"
     
     return out
 
@@ -38,8 +39,9 @@ def make_csr(user_info: Dict[str, str]) -> None:
     cmd += ["req", "-new"]
     cmd += ["-newkey", OPENSSL_KEY_PARAMS, "-nodes", "-keyout", TMP_PRIV_KEY_PATH]
     cmd += ["-out", TMP_CSR_PATH]
+    subj_str = build_subj_str(user_info)
     cmd += ["-subj", subj_str]
-    subprocess.run(cmd) 
+    subprocess.run(cmd, check=True) 
 
 @app.post("/request-certificate")
 def request_certificate():
