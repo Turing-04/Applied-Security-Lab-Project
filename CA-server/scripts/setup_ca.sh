@@ -20,11 +20,13 @@ sudo bash -c "echo '01' > /etc/ssl/CA/serial"
 #  An additional file is needed to record certificates that have been issued:
 sudo touch /etc/ssl/CA/index.txt
 
-# TODO!!!
-#  The last file to be modified is the CA configuration file
+# "The last file to be modified is the CA configuration file
 # /etc/ssl/openssl.cnf. In the [CA_default] section of
 # the file you should modify the directory entries according to the setting of
-# your system. To do this, modify dir to point to /etc/ssl/CA.
+# your system. To do this, modify dir to point to /etc/ssl/CA."
+# To automate this, I modify the openssl.cnf in the repo, and then overwrite the 
+# default file.
+sudo cat config/openssl.cnf > /etc/ssl/openssl.cnf
 
 #  At this point, create the self-signed root certificate with the command:
 subj_str="/C=CH/O=iMovies/CN=iMovies root cert/emailAddress=ca-admin@imovies.ch/"
