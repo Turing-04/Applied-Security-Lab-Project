@@ -2,13 +2,14 @@ import subprocess
 from flask import Flask, request
 import re
 from typing import Dict
+import os
 
 app = Flask(__name__)
 
 OPENSSL_CMD = "openssl"
 OPENSSL_KEY_PARAMS = "rsa:2048"
-TMP_PRIV_KEY_PATH = "tmp.key"
-TMP_CSR_PATH = "tmp.csr"
+# TMP_PRIV_KEY_PATH = "tmp.key"
+# TMP_CSR_PATH = "tmp.csr"
 
 CERT_ORG_NAME = "iMovies"
 
@@ -39,17 +40,18 @@ def build_subj_str(user_info: Dict[str, str]) -> str:
     
     return out
 
-def make_csr(user_info: Dict[str, str]) -> None:
+def make_csr(user_info: Dict[str, str], tmp_csr_path: str, tmp_priv_key_path: str) -> None:
     """
     openssl req -new \
         -newkey rsa:2048 -nodes -keyout tmp.key \
         -out tmp.csr \
         -subj "/C=CH/O=iMovies/CN=Lukas Bruegger/emailAddress=lb@imovies.ch/"
     """
+    assert os.path.exists(tmp_csr_path) and os.path.exists(tmp_priv_key_path)
     cmd = [OPENSSL_CMD]
     cmd += ["req", "-new"]
-    cmd += ["-newkey", OPENSSL_KEY_PARAMS, "-nodes", "-keyout", TMP_PRIV_KEY_PATH]
-    cmd += ["-out", TMP_CSR_PATH]
+    cmd += ["-newkey", OPENSSL_KEY_PARAMS, "-nodes", "-keyout", tmp_priv_key_path]
+    cmd += ["-out", tmp_csr_path]
     subj_str = build_subj_str(user_info)
     cmd += ["-subj", subj_str]
     subprocess.run(cmd, check=True) 

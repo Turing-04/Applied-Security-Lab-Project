@@ -1,5 +1,7 @@
 from ca_server import *
 import pytest
+import tempfile
+import base64
 
 DUMMY_USER_INFO = {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
      "email": "lb@imovies.ch"}
@@ -19,6 +21,14 @@ def test_build_subj_str():
         build_subj_str(inj_attempt)
 
 def test_make_csr():
-    # make_csr(DUMMY_USER_INFO)
-    # TODO make tmp dir for tmp data
-    pass
+    tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+
+    make_csr(DUMMY_USER_INFO, tmp_csr.name, tmp_priv_key.name)
+
+    csr = tmp_csr.read()
+    priv_key = tmp_priv_key.read()
+
+    assert csr.startswith('-----BEGIN CERTIFICATE REQUEST-----')
+    assert priv_key.startswith('-----BEGIN PRIVATE KEY-----')
+
