@@ -1,6 +1,7 @@
 import subprocess
 from flask import Flask, request
 import re
+import tempfile
 from typing import Dict
 import os
 
@@ -8,24 +9,24 @@ app = Flask(__name__)
 
 OPENSSL_CMD = "openssl"
 OPENSSL_KEY_PARAMS = "rsa:2048"
-# TMP_PRIV_KEY_PATH = "tmp.key"
-# TMP_CSR_PATH = "tmp.csr"
 
 CERT_ORG_NAME = "iMovies"
 
-def sign_csr():
+def sign_csr(csr_path: str):
     """
     #  Now we are ready to sign certificates. Given a certificate signing request
-# (e.g., key.csr), the following command will generate a certificate signed
-# by Alice’s CA:
-sudo openssl ca -in key.csr -config /etc/ssl/openssl.cnf
-The certificate is then saved in /etc/ssl/CA/newcerts/ as
-<serial-number>.pem.
+    # (e.g., key.csr), the following command will generate a certificate signed
+    # by Alice's CA:
+    sudo openssl ca -in key.csr -config /etc/ssl/openssl.cnf
+    The certificate is then saved in /etc/ssl/CA/newcerts/ as
+    <serial-number>.pem.
     """
+    assert os.path.exists(csr_path), csr_path
+
     assert False, "TODO"
 
 def build_subj_str(user_info: Dict[str, str]) -> str:
-    out = f"/C=CH/O={CERT_ORG_NAME}"
+    out = f"/C=CH/ST=Zurich/O={CERT_ORG_NAME}"
 
     firstname = user_info["firstname"]
     lastname = user_info["lastname"]
@@ -45,7 +46,7 @@ def make_csr(user_info: Dict[str, str], tmp_csr_path: str, tmp_priv_key_path: st
     openssl req -new \
         -newkey rsa:2048 -nodes -keyout tmp.key \
         -out tmp.csr \
-        -subj "/C=CH/O=iMovies/CN=Lukas Bruegger/emailAddress=lb@imovies.ch/"
+        -subj "/C=CH/ST=Zurich/O=iMovies/CN=Lukas Bruegger/emailAddress=lb@imovies.ch/"
     """
     assert os.path.exists(tmp_csr_path) and os.path.exists(tmp_priv_key_path)
     cmd = [OPENSSL_CMD]
@@ -93,8 +94,9 @@ def request_certificate():
         assert key in ["uid", "lastname", "firstname", "email"]
         assert isinstance(val, str)
 
-
-    make_csr(user_info)
+    tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    make_csr(user_info, tmp_csr.name, tmp_priv_key.name)
 
 
     # TODO don't forget to send cert.p12 encrypted to the backup server

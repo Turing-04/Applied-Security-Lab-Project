@@ -26,11 +26,11 @@ sudo touch /etc/ssl/CA/index.txt
 # your system. To do this, modify dir to point to /etc/ssl/CA."
 # To automate this, I modify the openssl.cnf in the repo, and then overwrite the 
 # default file.
-sudo cat config/openssl.cnf > /etc/ssl/openssl.cnf
+sudo cat $SYNCED_FOLDER/config/openssl.cnf > /etc/ssl/openssl.cnf
 
 #  At this point, create the self-signed root certificate with the command:
-subj_str="/C=CH/O=iMovies/CN=iMovies root cert/emailAddress=ca-admin@imovies.ch/"
-sudo openssl req -passout file:SECRETS/ca_password.txt -new -x509 \
+subj_str="/C=CH/ST=Zurich/O=iMovies/CN=iMovies root cert/emailAddress=ca-admin@imovies.ch/"
+sudo openssl req -passout file:$SYNCED_FOLDER/SECRETS/ca_password.txt -new -x509 \
     -extensions v3_ca -keyout cakey.pem -out cacert.pem -days 3650 \
     -subj "$subj_str"
 
