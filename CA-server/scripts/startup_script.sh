@@ -1,11 +1,13 @@
 #!/bin/bash
 
-SYNCED_FOLDER="/home/vagrant/synced_folder"
+SYNCED_FOLDER="/vagrant"
 cd $SYNCED_FOLDER
 
 echo "Startup script started"
 
-# TODO do openssl CA setup
+# openssl CA setup
+echo "Starting openssl CA setup"
+bash scripts/setup_ca.sh
 
 # allows to get newer packages than the box creation (e.g. python3.11-venv)
 sudo apt update
@@ -25,3 +27,4 @@ pip install -r src/requirements.txt
 pytest src
 
 # TODO disable internet access once setup done
+# TODO delete synced folder once setup is done

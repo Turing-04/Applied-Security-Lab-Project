@@ -12,6 +12,17 @@ TMP_CSR_PATH = "tmp.csr"
 
 CERT_ORG_NAME = "iMovies"
 
+def sign_csr():
+    """
+    #  Now we are ready to sign certificates. Given a certificate signing request
+# (e.g., key.csr), the following command will generate a certificate signed
+# by Alice’s CA:
+sudo openssl ca -in key.csr -config /etc/ssl/openssl.cnf
+The certificate is then saved in /etc/ssl/CA/newcerts/ as
+<serial-number>.pem.
+    """
+    assert False, "TODO"
+
 def build_subj_str(user_info: Dict[str, str]) -> str:
     out = f"/C=CH/O={CERT_ORG_NAME}"
 
