@@ -31,6 +31,11 @@ python -m pip install -r requirements.txt
 # performing unit tests
 python -m pytest
 
+# TODO allow apache user to run ca_sign_csr.sh as sudo without entering password
+# add file to /etc/sudoers.d/ with:
+# www-data ALL=(ALL) NOPASSWD: /path/to/your/script.sh
+# see https://www.digitalocean.com/community/tutorials/how-to-edit-the-sudoers-file
+
 # TODO disable internet access once setup done
 # TODO delete synced folder once setup is done
 # TODO remove vagrant user after setup

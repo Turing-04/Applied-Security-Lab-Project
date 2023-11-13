@@ -32,3 +32,14 @@ def test_make_csr():
     assert csr.startswith('-----BEGIN CERTIFICATE REQUEST-----')
     assert priv_key.startswith('-----BEGIN PRIVATE KEY-----')
 
+def test_sign_csr():
+    tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+
+    make_csr(DUMMY_USER_INFO, tmp_csr.name, tmp_priv_key.name)
+
+    csr = tmp_csr.read()
+    priv_key = tmp_priv_key.read()
+
+    cert_path = sign_csr(tmp_csr.name)
+    print(cert_path)

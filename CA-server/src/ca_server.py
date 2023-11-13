@@ -12,7 +12,11 @@ OPENSSL_KEY_PARAMS = "rsa:2048"
 
 CERT_ORG_NAME = "iMovies"
 
-def sign_csr(csr_path: str):
+SIGN_CSR_SCRIPT_PATH = "ca_sign_csr.sh"
+CA_PATH="/etc/ssl/CA" 
+CA_PASSWORD_PATH = f"{CA_PATH}/private/ca_password.txt"
+
+def sign_csr(csr_path: str) -> str:
     """
     #  Now we are ready to sign certificates. Given a certificate signing request
     # (e.g., key.csr), the following command will generate a certificate signed
@@ -23,7 +27,9 @@ def sign_csr(csr_path: str):
     """
     assert os.path.exists(csr_path), csr_path
 
-    assert False, "TODO"
+    out = subprocess.run(["bash", SIGN_CSR_SCRIPT_PATH, csr_path, CA_PASSWORD_PATH], check=True)
+    signed_cert_path = out.stdout
+    return signed_cert_path
 
 def build_subj_str(user_info: Dict[str, str]) -> str:
     out = f"/C=CH/ST=Zurich/O={CERT_ORG_NAME}"
@@ -108,9 +114,11 @@ def request_certificate():
 def revoke_certificate():
     """
     This endpoint allows for certificate revocation.
-    The body of the request contains a JSON object with the user id (uid) whose certificate must be revoked.
+    The body of the request contains a JSON object with the user info
+    of the user whose certificate must be revoked.
     E.g.:
-    {"uid": "lb"}
+    {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
+     "email": "lb@imovies.ch"}
     
     to revoke the certificate of Lukas Bruegger.
     Upon successful revocation, a response with status 204 No Content is sent back.
