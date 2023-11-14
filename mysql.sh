@@ -34,6 +34,8 @@ mysql -u root -p imovies <  /tmp/imovies.db
 mysql -u root -p imovies 
 # we checked the types, etc of tables users, to confirm:
 # SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.Columns where table_name="users";
+# update column datatype by:
+# ALTER table MODIFY COLUMN column_name desired_datatype;
 
 CREATE TABLE certificate (
     uid varchar(64) NOT NULL,
@@ -43,5 +45,26 @@ CREATE TABLE certificate (
 );
 
 # 5. Create users in MySQL and set privileges
+# two users: webserver with read/write access to table "users" and read access to table "certificate"; and caserver with read/write access to the "certificates" table.
+# the above two users are remote users, for security TODO update ip address by replacing '%' in the following code
+CREATE USER 'webserver'@'%' IDENTIFIED BY 'webserver123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON users TO 'webserver'@'%';
+GRANT SELECT ON certificates TO 'webserver'@'%';
+
+CREAT USERS, 'caserver'@'%' IDENTIFIED BY 'caserver123';
+GRANT SELEECT, INSERT, UPDATE, DELETE ON certificates TO 'caserver'@'%';
+
+FLUSH PRIVILEGES;
+
+# configure mysql to accept remote connections:
+# edit the MySQL configuration file in /etc/mysql/. 
+# look for the line that says 'bind-address = 127.0.0.1', and change it to 'bind-address=0.0.0.0' to allow connections from any IP
+# or to specific IP address to the server, with multiple addresses separated by ','.
+
+# ensure that tthe firewall on the MySQL server allows incoming connections on the MySQL port (default 3306).
+
+# TODO___test the new users from remote machines___TODO
+# mysql -h [mysql_server_ip] -u caserver -p
+
 # 6. SSH user
 # 7. Backup user
