@@ -36,6 +36,9 @@ python -m pytest
 # www-data ALL=(ALL) NOPASSWD: /path/to/your/script.sh
 # see https://www.digitalocean.com/community/tutorials/how-to-edit-the-sudoers-file
 
+# TODO set static ip to new network interface
+# 10.0.0.3
+
 # TODO disable internet access once setup done
 # TODO delete synced folder once setup is done
 # TODO remove vagrant user after setup
