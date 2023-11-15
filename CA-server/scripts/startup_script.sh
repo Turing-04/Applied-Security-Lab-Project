@@ -8,7 +8,9 @@ echo "Startup script started"
 # openssl CA setup
 echo "Starting openssl CA setup"
 bash "$SYNCED_FOLDER/scripts/setup_ca.sh"
+echo "DONE: openssl CA setup"
 
+echo "Starting install of necessary software"
 # allows to get newer packages than the box creation (e.g. python3.11-venv)
 sudo apt update
 
@@ -24,7 +26,7 @@ cp -r "$SYNCED_FOLDER/src/" "$VAGRANT_HOME/"
 rm -r "$VAGRANT_HOME/src/__pycache__" "$VAGRANT_HOME/src/.venv"
 
 # TODO !!! grant only execute to apache user
-chmod u+x "$VAGRANT_HOME/src/ca_sign_csr.sh"
+chmod +x "$VAGRANT_HOME/src/ca_sign_csr.sh"
 
 cd "$VAGRANT_HOME/src"
 python -m venv .venv

@@ -14,15 +14,15 @@ fi
 CA_PATH="/etc/ssl/CA" 
 
 #  Create the directories that hold the CA’s certificate and related files:
-sudo mkdir "$CA_PATH"
-sudo mkdir "$CA_PATH/certs"
-sudo mkdir "$CA_PATH/newcerts"
-sudo mkdir "$CA_PATH/private"
+sudo mkdir -p "$CA_PATH"
+sudo mkdir -p "$CA_PATH/certs"
+sudo mkdir -p "$CA_PATH/newcerts"
+sudo mkdir -p "$CA_PATH/private"
 
 #  The CA needs a file to keep track of the last serial number issued by the
 # CA. For this purpose, create the file serial and enter the number 01 as
 # the first serial number:
-sudo bash -c "echo '000001' > '$CA_PATH/serial'"
+sudo bash -c "echo '01' > '$CA_PATH/serial'"
 
 #  An additional file is needed to record certificates that have been issued:
 sudo touch "$CA_PATH/index.txt"
