@@ -13,10 +13,10 @@ if [ -e "$1" ] && [ -e "$2" ]; then
     # (cannot set fine-grained permission for password file)
     yes | sudo openssl ca -in "$1" \
         -config /etc/ssl/openssl.cnf \
-        -passin file:$2
+        -passin file:$2 > /dev/null
 
     signed_cert_path="/etc/ssl/CA/newcerts/$serial.pem"
-    echo "$signed_cert_path" # TODO why does this not get output?
+    echo "$signed_cert_path"
     exit 0
 else
     echo "$1 or $2 does not exist"

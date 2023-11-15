@@ -23,6 +23,9 @@ echo "Copy src to $VAGRANT_HOME"
 cp -r "$SYNCED_FOLDER/src/" "$VAGRANT_HOME/"
 rm -r "$VAGRANT_HOME/src/__pycache__" "$VAGRANT_HOME/src/.venv"
 
+# TODO !!! grant only execute to apache user
+chmod u+x "$VAGRANT_HOME/src/ca_sign_csr.sh"
+
 cd "$VAGRANT_HOME/src"
 python -m venv .venv
 source .venv/bin/activate

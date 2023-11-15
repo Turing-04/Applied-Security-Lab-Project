@@ -12,7 +12,7 @@ OPENSSL_KEY_PARAMS = "rsa:2048"
 
 CERT_ORG_NAME = "iMovies"
 
-SIGN_CSR_SCRIPT_PATH = "ca_sign_csr.sh"
+SIGN_CSR_SCRIPT_PATH = "./ca_sign_csr.sh"
 CA_PATH="/etc/ssl/CA" 
 CA_PASSWORD_PATH = f"{CA_PATH}/private/ca_password.txt"
 
@@ -27,8 +27,10 @@ def sign_csr(csr_path: str) -> str:
     """
     assert os.path.exists(csr_path), csr_path
 
-    out = subprocess.run(["bash", SIGN_CSR_SCRIPT_PATH, csr_path, CA_PASSWORD_PATH], check=True)
-    signed_cert_path = out.stdout
+    out = subprocess.run([SIGN_CSR_SCRIPT_PATH, csr_path, CA_PASSWORD_PATH], 
+        check=True, capture_output=True, text=True)
+    
+    signed_cert_path = out.stdout.strip()
     return signed_cert_path
 
 def build_subj_str(user_info: Dict[str, str]) -> str:
@@ -83,8 +85,6 @@ def request_certificate():
         -subj "/C=CH/O=iMovies/CN=Lukas Bruegger/emailAddress=lb@imovies.ch/"
 
     sudo openssl ca -in tmp.csr -config /etc/ssl/openssl.cnf
-    TODO figure out how to not use interactive mode
-    TODO make setuid script to make the signature as root
 
     openssl pkcs12 -export -out cert.p12 -inkey tmp.key\
          -in tmp.crt
@@ -99,6 +99,8 @@ def request_certificate():
     for key, val in user_info.items():
         assert key in ["uid", "lastname", "firstname", "email"]
         assert isinstance(val, str)
+
+    # TODO check if already exists cert with exact info
 
     tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
     tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
