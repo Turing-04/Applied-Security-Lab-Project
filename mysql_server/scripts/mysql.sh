@@ -66,5 +66,41 @@ FLUSH PRIVILEGES;
 # TODO___test the new users from remote machines___TODO
 # mysql -h [mysql_server_ip] -u caserver -p
 
-# 6. SSH user
+# 6. [TO CHECK ON THE MACHINE] Create sysadmin user and add it to the sudoers group
+# 6.1. create user and set the password:
+# sudo adduser <username>
+
+# 6.2. add user to the sudo group
+# sudo usermod -aG sudo <username>
+
+# 6.3. to verify two options:
+# getent group sudo 
+# id <username>
+
+# 7. [TO CHECK ON THE MACHINE] Set ssh connection bettween the client and the server
+
+# 7.1. generate key pair on the sysadmin machine
+# ssh-keygen
+
+# 7.2. Copy public key to the remote server
+# ssh-copy-id username@remote_host
+
+# 7.3. SSH to the machine to use new authentication method
+# ssh username@remote_host
+
+# 7.4. Disable PasswordAuthentication in /etc/ssh/sshd_config
+# vim /etc/ssh/sshd_config; PasswordAuthentication no;
+
+# 7.5. Allow only sysadmin host to ssh to the machine
+# vim /etc/ssh/sshd_config; AllowUsers   sysadmin
+
+# 7.6. Disable PermitRootLogin:
+# vim /etc/ssh/sshd_config; PermitRootLogin no;
+
+# 7.7. Restart sshd on the server: 
+# sudo systemctl restart ssh
+
+# 7.8. [EXTRA STEP] it might be unnecessary but we can set up /etc/hosts.allow and deny to allow only internal IPs to ssh.
+# here is how: https://docs.rackspace.com/docs/restrict-ssh-login-to-a-specific-ip-or-host
+
 # 7. Backup user
