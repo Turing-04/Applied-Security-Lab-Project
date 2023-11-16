@@ -98,3 +98,31 @@ def test_export_many_certs():
     for i in range(12):
         test_export_pkcs12()
 
+# FLASK END-TO-END TESTS
+# https://flask.palletsprojects.com/en/2.3.x/testing/
+
+@pytest.fixture()
+def app_fixture():
+    app.config.update({
+        "TESTING": True,
+    })
+
+    # other setup can go here
+
+    return app
+
+    # clean up / reset resources here
+
+
+@pytest.fixture()
+def client(app_fixture):
+    return app.test_client()
+
+
+@pytest.fixture()
+def runner(app_fixture):
+    return app.test_cli_runner()
+
+def test_request_certificate(client):
+    response = client.post("/request-certificate", data = DUMMY_USER_INFO.copy())
+    print(response)

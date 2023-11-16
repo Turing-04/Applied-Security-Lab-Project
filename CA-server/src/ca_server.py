@@ -1,5 +1,5 @@
 import subprocess
-from flask import Flask, request
+from flask import Flask, request, after_this_request, send_file
 import re
 import tempfile
 from typing import Dict
@@ -26,7 +26,7 @@ def export_pkcs12(cert_path: str, key_path: str) -> tempfile.NamedTemporaryFile:
     assert os.path.exists(cert_path)
     assert os.path.exists(key_path)
 
-    pkcs12 = tempfile.NamedTemporaryFile()
+    pkcs12 = tempfile.NamedTemporaryFile(delete=True)
 
     cmd = [OPENSSL_CMD, "pkcs12", "-export"]
     cmd += ["-in", cert_path]
@@ -125,20 +125,31 @@ def request_certificate():
 
     # TODO check if already exists cert with exact info
 
-    tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
-    tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8', delete=True)
+    tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8', delete=True)
     make_csr(user_info, tmp_csr.name, tmp_priv_key.name)
 
     # Sign the certificate
     cert_path = sign_csr(tmp_csr.name)
-    assert os.path.exists(cert_path)
-
-
-
+    """TODO
+    File "/home/vagrant/src/ca_server.py", line 134, in request_certificate
+    assert os.path.exists(cert_path), cert_path
+AssertionError: /etc/ssl/CA/newcerts/10.pem
+    """
+    assert os.path.exists(cert_path), cert_path
+    tmp_csr.close()
 
     # TODO don't forget to send cert.p12 encrypted to the backup server
-    # TODO don't forget to delete the private key and cert.p12 file
-    pass  # TODO
+
+    cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
+    tmp_priv_key.close()
+
+    @after_this_request
+    def delete_pkcs12(response):
+        cert_and_key.close()
+        return response
+
+    return send_file(cert_and_key.name, mimetype="application/x-pkcs12", max_age=0)
 
 
 @app.post("/revoke-certificate")
