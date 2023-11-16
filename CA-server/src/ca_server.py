@@ -16,6 +16,29 @@ SIGN_CSR_SCRIPT_PATH = "./ca_sign_csr.sh"
 CA_PATH="/etc/ssl/CA" 
 CA_PASSWORD_PATH = f"{CA_PATH}/private/ca_password.txt"
 
+def export_pkcs12(cert_path: str, key_path: str) -> tempfile.NamedTemporaryFile:
+    """
+    `openssl pkcs12 -export -in /etc/ssl/CA/newcerts/02.pem -inkey tmp.key 
+        -out cert_key.p12 -passout pass:`
+    TODO this exports the private key WITHOUT encryption. Maybe we should encrypt
+    with the user password
+    """
+    assert os.path.exists(cert_path)
+    assert os.path.exists(key_path)
+
+    pkcs12 = tempfile.NamedTemporaryFile()
+
+    cmd = [OPENSSL_CMD, "pkcs12", "-export"]
+    cmd += ["-in", cert_path]
+    cmd += ["-inkey", key_path]
+    cmd += ["-out", pkcs12.name]
+    cmd += ["-passout", "pass:"] # TODO no encryption for private key?
+
+    subprocess.run(cmd, check=True)
+
+    return pkcs12
+
+
 def sign_csr(csr_path: str) -> str:
     """
     #  Now we are ready to sign certificates. Given a certificate signing request
@@ -105,6 +128,12 @@ def request_certificate():
     tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
     tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
     make_csr(user_info, tmp_csr.name, tmp_priv_key.name)
+
+    # Sign the certificate
+    cert_path = sign_csr(tmp_csr.name)
+    assert os.path.exists(cert_path)
+
+
 
 
     # TODO don't forget to send cert.p12 encrypted to the backup server

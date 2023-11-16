@@ -47,3 +47,4 @@ python -m pytest
 # TODO disable internet access once setup done
 # TODO delete synced folder once setup is done
 # TODO remove vagrant user after setup
+# TODO delete command history

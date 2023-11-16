@@ -1,5 +1,7 @@
 #!/bin/bash
 
+NEW_CERTS_DIR="/etc/ssl/CA/newcerts"
+
 if [ "$#" -ne 2 ]; then
     echo "Usage: bash $0 tmp.csr /path/to/CA/password.txt"
     exit 1
@@ -11,11 +13,13 @@ if [ -e "$1" ] && [ -e "$2" ]; then
     # we pass the password as an environment, which is safer than passing it 
     # directly as cli arg (can be seen in ps) or simply passing the file path
     # (cannot set fine-grained permission for password file)
+    signed_cert_path="$NEW_CERTS_DIR/$serial.pem"
+
     yes | sudo openssl ca -in "$1" \
         -config /etc/ssl/openssl.cnf \
-        -passin file:$2 > /dev/null
+        -passin file:$2 > /dev/null \
+        -out "$signed_cert_path"
 
-    signed_cert_path="/etc/ssl/CA/newcerts/$serial.pem"
     echo "$signed_cert_path"
     exit 0
 else

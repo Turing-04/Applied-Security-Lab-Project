@@ -61,3 +61,35 @@ def test_sign_csr():
         assert cert_str.startswith("Certificate")
         for v in user_info.values():
             assert v in cert_str
+
+def test_export_pkcs12():
+    tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+
+    user_info = DUMMY_USER_INFO.copy()
+    user_info['firstname'] = generate_random_string(10)
+
+    make_csr(user_info, tmp_csr.name, tmp_priv_key.name)
+
+    csr = tmp_csr.read()
+    priv_key = tmp_priv_key.read()
+
+    cert_path = sign_csr(tmp_csr.name)
+
+    pkcs12 = export_pkcs12(cert_path, tmp_priv_key.name)
+    assert os.path.exists(pkcs12.name)
+
+    # openssl pkcs12 -in cert_key.p12 -passin pass: -noenc
+    print(cert_path)
+    read_cmd = ["openssl", "pkcs12", "-in", cert_path, "-passin", "pass:", "-noenc"]
+    read_pkcs12 = subprocess.run(read_cmd, capture_output=True, check=False, text=True)
+
+    print(read_pkcs12.stdout, read_pkcs12.stderr)
+
+    for v in user_info.values():
+        assert v in read_pkcs12.stdout
+
+    assert "-----BEGIN CERTIFICATE-----" in read_pkcs12.stdout
+
+    assert read_pkcs12.stdout.endswith("-----END PRIVATE KEY-----")
+
