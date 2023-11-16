@@ -35,17 +35,12 @@ sudo touch "$CA_PATH/index.txt"
 # default file.
 sudo cat "$SYNCED_FOLDER/config/openssl.cnf" > /etc/ssl/openssl.cnf
 
-#  At this point, create the self-signed root certificate with the command:
-subj_str="/C=CH/ST=Zurich/O=iMovies/CN=iMovies root cert/emailAddress=ca-admin@imovies.ch/"
-sudo openssl req -passout file:$SYNCED_FOLDER/SECRETS/ca_password.txt -new -x509 \
-    -extensions v3_ca -keyout cakey.pem -out cacert.pem -days 3650 \
-    -subj "$subj_str"
+CA_SECRETS="$SYNCED_FOLDER/SECRETS/ca-server"
 
-#  Having successfully created the key and the certificate, install them into
-# the correct directory:
-sudo mv cakey.pem "$CA_PATH/private/"
-sudo mv cacert.pem "$CA_PATH/"
+# install previously generated cert and key
+sudo mv "$CA_SECRETS/cakey.pem" "$CA_PATH/private/"
+sudo mv "$CA_SECRETS/cacert.pem" "$CA_PATH/"
 
 # TODO make SECRETS/ca_password.txt a file only readable by the apache web user
 # this way, not any user can read it, but the flask app can
-sudo cp "$SYNCED_FOLDER/SECRETS/ca_password.txt" "$CA_PATH/private/ca_password.txt"
+sudo cp "$CA_SECRETS/ca_password.txt" "$CA_PATH/private/ca_password.txt"

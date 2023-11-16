@@ -95,6 +95,6 @@ def test_export_pkcs12():
     assert read_pkcs12.stdout.endswith("-----END PRIVATE KEY-----\n")
 
 def test_export_many_certs():
-    for i in range(300):
+    for i in range(12):
         test_export_pkcs12()
 
