@@ -73,7 +73,22 @@ def test_revoke_non_existing_cert(client):
     response = client.post("/revoke-certificate", data = json.dumps(user_info), headers=headers)
     assert response.status_code == 404
 
+def get_decoded_crl(client) -> str:
+    response = client.get("/crl")
+    assert response.status_code == 200
+    crl_str = response.get_data(as_text=True)
+
+    crl_file = tempfile.NamedTemporaryFile("w", encoding='utf-8')
+    crl_file.write(crl_str)
+    crl_file.flush()
+    return decode_crl(crl_file.name)
+
 def test_revoke_existing_cert(client):
+    serial = ""
+    with open("/etc/ssl/CA/serial", "r", encoding='utf-8') as serial_file:
+        serial = serial_file.read().strip()
+    assert serial != ""
+
     user_info = DUMMY_USER_INFO.copy()
     user_info['firstname'] = generate_random_string(20)
     headers = {'Content-Type': 'application/json'}
@@ -84,4 +99,32 @@ def test_revoke_existing_cert(client):
 
     response = client.post("/revoke-certificate", data = user_info_json, headers=headers)
     assert response.status_code == 200
-    print(response.get_data())
+    
+    decoded_crl = get_decoded_crl(client)
+    # Make sure that the serial number we just revoked is in the new crl
+    assert f"Serial Number: {serial}" in decoded_crl
+
+def decode_crl(crl_path: str) -> str:
+    # openssl crl -in /etc/ssl/CA/crl.pem -text
+    cmd = ["openssl", "crl"]
+    cmd += ["-in", crl_path]
+    cmd += ["-text"]
+
+    out = subprocess.run(cmd, capture_output=True, text=True)
+    return out.stdout
+
+def test_get_crl(client):
+    response = client.get("/crl")
+    assert response.status_code == 200
+
+    crl_str = response.get_data(as_text=True)
+    
+    assert crl_str.startswith("-----BEGIN X509 CRL-----")
+    assert crl_str.endswith("-----END X509 CRL-----\n")
+
+    crl_file = tempfile.NamedTemporaryFile("w", encoding='utf-8')
+    crl_file.write(crl_str)
+    crl_file.flush()
+
+    decoded_crl = decode_crl(crl_file.name)
+    assert "iMovies" in decoded_crl

@@ -10,6 +10,7 @@ from cert_utils import build_subj_str, make_csr, sign_csr, export_pkcs12, revoke
 
 CA_PATH="/etc/ssl/CA" 
 CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
+CA_CRL_PATH = f"{CA_PATH}/crl.pem"
 
 app = Flask(__name__)
 
@@ -118,4 +119,4 @@ def get_crl():
     """
     # see https://flask.palletsprojects.com/en/3.0.x/api/#flask.send_file
     
-    assert False, "TODO"
+    return send_file(CA_CRL_PATH, mimetype="application/pkix-crl")
