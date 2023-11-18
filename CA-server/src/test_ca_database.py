@@ -3,7 +3,6 @@ from ca_database import CADatabase
 def test_read_ca_database():
     ca_db = CADatabase('./test_data/index.txt').raw_db
 
-
     first = ca_db[0]
     assert first['status'] == 'R'
     assert first['expiration_date'] == '241117110611Z'

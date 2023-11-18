@@ -1,6 +1,7 @@
 from typing import List, Dict
 import os
-from ca_server import UserInfo, build_subj_str
+from cert_utils import build_subj_str
+from user_info import UserInfo
 
 CADatabaseRaw = List[Dict[str, str]]
 

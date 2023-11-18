@@ -1,102 +1,19 @@
 import subprocess
-from flask import Flask, request, after_this_request, send_file
+from flask import Flask, request, after_this_request, send_file, abort, make_response
 import re
 import tempfile
 from typing import Dict, List
 import os
+from ca_database import CADatabase
+from user_info import UserInfo, validate_user_info
+from cert_utils import build_subj_str, make_csr, sign_csr, export_pkcs12, revoke_cert, generate_crl
+
+CA_PATH="/etc/ssl/CA" 
+CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
 
 app = Flask(__name__)
 
-OPENSSL_CMD = "openssl"
-OPENSSL_KEY_PARAMS = "rsa:2048"
 
-CERT_ORG_NAME = "iMovies"
-
-SIGN_CSR_SCRIPT_PATH = "./ca_sign_csr.sh"
-CA_PATH="/etc/ssl/CA" 
-CA_PASSWORD_PATH = f"{CA_PATH}/private/ca_password.txt"
-CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
-
-UserInfo = Dict[str, str]
-"""
-e.g. {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
-     "email": "lb@imovies.ch"}
-"""
-
-def export_pkcs12(cert_path: str, key_path: str) -> tempfile.NamedTemporaryFile:
-    """
-    `openssl pkcs12 -export -in /etc/ssl/CA/newcerts/02.pem -inkey tmp.key 
-        -out cert_key.p12 -passout pass:`
-    TODO this exports the private key WITHOUT encryption. Maybe we should encrypt
-    with the user password
-    """
-    assert os.path.exists(cert_path)
-    assert os.path.exists(key_path)
-
-    pkcs12 = tempfile.NamedTemporaryFile(delete=True)
-
-    cmd = [OPENSSL_CMD, "pkcs12", "-export"]
-    cmd += ["-in", cert_path]
-    cmd += ["-inkey", key_path]
-    cmd += ["-out", pkcs12.name]
-    cmd += ["-passout", "pass:"] # TODO no encryption for private key?
-
-    subprocess.run(cmd, check=True)
-
-    return pkcs12
-
-
-def sign_csr(csr_path: str) -> str:
-    """
-    #  Now we are ready to sign certificates. Given a certificate signing request
-    # (e.g., key.csr), the following command will generate a certificate signed
-    # by Alice's CA:
-    sudo openssl ca -in key.csr -config /etc/ssl/openssl.cnf
-    The certificate is then saved in /etc/ssl/CA/newcerts/ as
-    <serial-number>.pem.
-    """
-    assert os.path.exists(csr_path), csr_path
-
-    out = subprocess.run([SIGN_CSR_SCRIPT_PATH, csr_path, CA_PASSWORD_PATH], 
-        capture_output=True, text=True, check=False)
-    if out.returncode != 0:
-        app.logger.error(out.stderr)
-    out.check_returncode()
-    
-    signed_cert_path = out.stdout.strip()
-    return signed_cert_path
-
-def build_subj_str(user_info: UserInfo) -> str:
-    out = f"/C=CH/ST=Zurich/O={CERT_ORG_NAME}"
-
-    firstname = user_info["firstname"]
-    lastname = user_info["lastname"]
-    assert firstname.isalpha(), firstname
-    assert lastname.isalpha(), lastname
-    out += f"/CN={firstname} {lastname}"
-
-    email_regex = r"\w+@\w+\.\w+"
-    email = user_info["email"]
-    assert bool(re.match(email_regex, email)), email
-    out += f"/emailAddress={email}"
-    
-    return out
-
-def make_csr(user_info: UserInfo, tmp_csr_path: str, tmp_priv_key_path: str) -> None:
-    """
-    openssl req -new \
-        -newkey rsa:2048 -nodes -keyout tmp.key \
-        -out tmp.csr \
-        -subj "/C=CH/ST=Zurich/O=iMovies/CN=Lukas Bruegger/emailAddress=lb@imovies.ch/"
-    """
-    assert os.path.exists(tmp_csr_path) and os.path.exists(tmp_priv_key_path)
-    cmd = [OPENSSL_CMD]
-    cmd += ["req", "-new"]
-    cmd += ["-newkey", OPENSSL_KEY_PARAMS, "-nodes", "-keyout", tmp_priv_key_path]
-    cmd += ["-out", tmp_csr_path]
-    subj_str = build_subj_str(user_info)
-    cmd += ["-subj", subj_str]
-    subprocess.run(cmd, check=True) 
 
 @app.post("/request-certificate")
 def request_certificate():
@@ -129,9 +46,7 @@ def request_certificate():
     to the backup server, encrypted with the master backup public key.
     """
     user_info = request.get_json()
-    for key, val in user_info.items():
-        assert key in ["uid", "lastname", "firstname", "email"]
-        assert isinstance(val, str)
+    validate_user_info(user_info)
 
     tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8', delete=True)
     tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8', delete=True)
@@ -154,8 +69,9 @@ def request_certificate():
         return response
 
     response = send_file(cert_and_key.name, mimetype="application/x-pkcs12", max_age=0)
-    print(response)
     return response
+
+
 
 
 @app.post("/revoke-certificate")
@@ -171,19 +87,26 @@ def revoke_certificate():
      "email": "lb@imovies.ch"}
     
     to revoke the certificate of Lukas Bruegger.
-    Upon successful revocation, a response with status 204 No Content is sent back.
+    Upon successful revocation, a response with status 200 OK is sent back.
     If the user specified in the body of the request does not currently have a valid certificate,
     a response with status 404 Not Found is sent back.
 
     Docs: https://openssl-ca.readthedocs.io/en/latest/certificate-revocation-lists.html
     """
+    user_info = request.get_json()
+    validate_user_info(user_info)
 
-    # sudo openssl ca -revoke /etc/ssl/CA/newcerts/03.pem -config /etc/ssl/openssl.cnf 
-    # -passin file:/etc/ssl/CA/private/ca_password.txt
+    ca_db = CADatabase(CA_DATABASE_PATH)
+    serial_nbs = ca_db.get_serial_numbers(user_info, valid_only=True)
+    if len(serial_nbs) == 0:
+        abort(404, description=f"No valid certificate for {user_info}")
 
-    # sudo openssl ca -config /etc/ssl/openssl.cnf -gencrl \
-    # -out "$CA_PATH/crl.pem" -passin file:"$CA_PATH/private/ca_password.txt"
-    assert False, "TODO"
+    for serial_nb in serial_nbs:
+        revoke_cert(serial_nb)
+    
+    generate_crl()
+
+    return make_response('Certificate successfully revocated!', 200)
 
 @app.get("/crl")
 def get_crl():
