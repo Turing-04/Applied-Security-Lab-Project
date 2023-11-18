@@ -45,19 +45,20 @@ mysql -u root -proot -e "FLUSH PRIVILEGES;"
 sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" /etc/mysql/mariadb.conf.d/50-server.cnf
 
 # 7. Enable TLS in mariadb
-# create folders for certs and keys and update paths
-# mkdir /etc/mysql/ssl
-# mkdir /etc/mysql/ssl/certs
-# mkdir /etc/mysql/ssl/private
+# TODO openSSL and SSL are both enabled, check if okay
+# Create folders for certs and keys
+mkdir /etc/mysql/ssl
+mkdir /etc/mysql/ssl/certs
+mkdir /etc/mysql/ssl/private
 
-# 7.1 [TODO: CHANGE FOLDERS] copy certificates
-cp $SYNCED_FOLDER/mysql-server-crt.pem /etc/mysql
-cp $SYNCED_FOLDER/cacert.pem /etc/mysql
-sudo chmod 644 /etc/mysql/mysql-server-crt.pem /etc/mysql/cacert.pem
+# 7.1 Copy certificates
+cp $SYNCED_FOLDER/mysql-server-crt.pem /etc/mysql/ssl/certs
+cp $SYNCED_FOLDER/cacert.pem /etc/mysql/ssl/certs
+sudo chmod 644 /etc/mysql/ssl/certs/mysql-server-crt.pem /etc/mysql/ssl/certs/cacert.pem
 
-cp $SYNCED_FOLDER/mysql-server-key.pem /etc/mysql
-sudo chmod 640 /etc/mysql/mysql-server-key.pem
-sudo chgrp mysql /etc/mysql/mysql-server-key.pem
+cp $SYNCED_FOLDER/mysql-server-key.pem /etc/mysql/ssl/private
+sudo chmod 640 /etc/mysql/ssl/private/mysql-server-key.pem
+sudo chgrp mysql /etc/mysql/ssl/private/mysql-server-key.pem
 
 # 7.2 Set TLS configuration in MariaDB
 cp $SYNCED_FOLDER/mariadb-server-tls.cnf /etc/mysql/mariadb.conf.d
