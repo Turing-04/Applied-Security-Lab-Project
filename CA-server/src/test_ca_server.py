@@ -145,7 +145,7 @@ def test_ca_state_consistent(client):
     headers = {'Content-Type': 'application/json'}
 
     user_info_json = json.dumps(user_info)
-    response = client.post("/request-certificate", data = user_info_json, headers=headers)
+    client.post("/request-certificate", data = user_info_json, headers=headers)
 
     s2 = client.get("/ca-state").get_json()
     # check state after requesting new certificate
@@ -153,7 +153,7 @@ def test_ca_state_consistent(client):
     assert s2['nb_certs_issued'] - s1['nb_certs_issued'] == 1
     assert s2['nb_certs_revoked'] == s1['nb_certs_revoked']
 
-    response = client.post("/revoke-certificate", data = user_info_json, headers=headers)
+    client.post("/revoke-certificate", data = user_info_json, headers=headers)
     
     s3 = client.get("/ca-state").get_json()
 
