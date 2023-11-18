@@ -42,6 +42,7 @@ mysql -u root -proot imovies -e "GRANT SELEECT, INSERT, UPDATE, DELETE ON certif
 mysql -u root -proot imovies -e "FLUSH PRIVILEGES;"
 
 # 6. [TODO] change bind-address from localhost to the interface in the configuration file.
+sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" 50-server.cnf
 
 # 7. [TODO] enable TLS in mariadb
 
