@@ -72,13 +72,14 @@ sudo useradd -m sysadmin -p dv8RCJruycKGyN
 sudo usermod -aG sudo sysadmin
 
 # 9. [TO CHECK ON THE MACHINE] Set ssh connection bettween the client and the server
-# COPY NECESSARY KEYS
-# This is in the sysadmin user
-# change user: su - sysadmin
-# mkdir -p ~/.ssh
-# echo $SYNCED_FOLDER/public_sysain >>  ~/.ssh/authorized_keys
-# chmod -R go= ~/.ssh
-# chown -R sysadmin:sysadmin ~/.ssh
+# 9.1. Change the user
+sudo su - sysadmin
+# 9.2. Create ssh folder for public keys 
+mkdir -p ~/.ssh
+# 9.3. Copy sysadmin public key and set correct permissions
+echo $SYNCED_FOLDER/public_sysain >>  ~/.ssh/authorized_keys
+sudo chmod -R go= ~/.ssh
+sudo chown -R sysadmin:sysadmin ~/.ssh
 # Disable PasswordAuthentication in /etc/ssh/sshd_config
 # vim /etc/ssh/sshd_config; PasswordAuthentication no;
 # 9.5. Allow only sysadmin host to ssh to the machine
