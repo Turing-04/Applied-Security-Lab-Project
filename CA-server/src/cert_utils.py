@@ -12,6 +12,7 @@ SIGN_CSR_SCRIPT_PATH = "./ca_sign_csr.sh"
 CA_PATH="/etc/ssl/CA" 
 CA_PASSWORD_PATH = f"{CA_PATH}/private/ca_password.txt"
 CA_CONFIG_PATH = "/etc/ssl/openssl.cnf"
+CA_SERIAL_PATH = f"{CA_PATH}/serial"
 
 OPENSSL_KEY_PARAMS = "rsa:2048"
 
@@ -115,3 +116,14 @@ def generate_crl():
     cmd += ["-out", f"{CA_PATH}/crl.pem"]
 
     subprocess.run(cmd, check=True)
+
+def get_current_serial_nb() -> str:
+    """
+    Gets the current value stored in /etc/ssl/CA/serial
+    """
+    serial = ""
+    with open(CA_SERIAL_PATH, 'r', encoding='utf-8') as serial_file:
+        serial = serial_file.read().strip()
+    assert serial != "", "Empty /etc/ssl/CA/serial file!"
+
+    return serial

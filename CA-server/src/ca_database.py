@@ -45,6 +45,12 @@ class CADatabase:
                 numbers.append(entry['serial_number'])
         return numbers
 
+    def nb_certs_issued(self) -> int:
+        return len(self.raw_db)
+    
+    def nb_certs_revoked(self) -> int:
+        return len(list(filter(lambda entry: entry['status'] == 'R', self.raw_db)))
+
     @staticmethod
     def read_ca_database(ca_db_path: str) -> CADatabaseRaw:
         """

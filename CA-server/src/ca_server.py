@@ -6,7 +6,8 @@ from typing import Dict, List
 import os
 from ca_database import CADatabase
 from user_info import UserInfo, validate_user_info
-from cert_utils import build_subj_str, make_csr, sign_csr, export_pkcs12, revoke_cert, generate_crl
+from cert_utils import build_subj_str, make_csr,\
+    sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb
 
 CA_PATH="/etc/ssl/CA" 
 CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
@@ -120,3 +121,29 @@ def get_crl():
     # see https://flask.palletsprojects.com/en/3.0.x/api/#flask.send_file
     
     return send_file(CA_CRL_PATH, mimetype="application/pkix-crl")
+
+@app.get("/ca-state")
+def get_ca_state():
+    """
+    ONLY THE CA ADMIN IS AUTHORIZED TO REQUEST THIS ENDPOINT.
+    THE AUTHENTICATION IS DONE BY THE WEBSERVER!!!
+    Returns a JSON object containing the CA's current state.
+    E.g.
+    {
+        "nb_certs_issued": 42,
+        "nb_certs_revoked": 5,
+        "current_serial_nb": "1F"
+    }
+
+    Note: current_serial_nb is a string representing the hexadecimal value
+    of the current serial number
+    """
+    ca_db = CADatabase(CA_DATABASE_PATH)
+    
+    state = {
+        "nb_certs_issued": ca_db.nb_certs_issued(),
+        "nb_certs_revoked": ca_db.nb_certs_revoked(),
+        "current_serial_nb": get_current_serial_nb()
+    }
+
+    return state

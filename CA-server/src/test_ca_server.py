@@ -128,3 +128,38 @@ def test_get_crl(client):
 
     decoded_crl = decode_crl(crl_file.name)
     assert "iMovies" in decoded_crl
+
+def test_get_ca_state(client):
+    state_1 = client.get("/ca-state")
+    assert state_1.status_code == 200
+    
+    state_1_json = state_1.get_json()
+    for key in ["current_serial_nb", "nb_certs_issued", "nb_certs_revoked"]:
+        assert key in state_1_json.keys()
+    
+def test_ca_state_consistent(client):
+    s1 = client.get("/ca-state").get_json()
+
+    user_info = DUMMY_USER_INFO.copy()
+    user_info['firstname'] = generate_random_string(20)
+    headers = {'Content-Type': 'application/json'}
+
+    user_info_json = json.dumps(user_info)
+    response = client.post("/request-certificate", data = user_info_json, headers=headers)
+
+    s2 = client.get("/ca-state").get_json()
+    # check state after requesting new certificate
+    assert s2['current_serial_nb'] != s1['current_serial_nb']
+    assert s2['nb_certs_issued'] - s1['nb_certs_issued'] == 1
+    assert s2['nb_certs_revoked'] == s1['nb_certs_revoked']
+
+    response = client.post("/revoke-certificate", data = user_info_json, headers=headers)
+    
+    s3 = client.get("/ca-state").get_json()
+
+    # check state after revoking certificate
+    assert s3['current_serial_nb'] == s2['current_serial_nb']
+    assert s3['nb_certs_issued'] == s2['nb_certs_issued']
+    assert s3['nb_certs_revoked'] - s2['nb_certs_revoked'] == 1
+
+    # print(s3, s2)
