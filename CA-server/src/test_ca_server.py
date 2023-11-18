@@ -72,3 +72,16 @@ def test_revoke_non_existing_cert(client):
     headers = {'Content-Type': 'application/json'}
     response = client.post("/revoke-certificate", data = json.dumps(user_info), headers=headers)
     assert response.status_code == 404
+
+def test_revoke_existing_cert(client):
+    user_info = DUMMY_USER_INFO.copy()
+    user_info['firstname'] = generate_random_string(20)
+    headers = {'Content-Type': 'application/json'}
+
+    user_info_json = json.dumps(user_info)
+    response = client.post("/request-certificate", data = user_info_json, headers=headers)
+    assert response.status_code == 200
+
+    response = client.post("/revoke-certificate", data = user_info_json, headers=headers)
+    assert response.status_code == 200
+    print(response.get_data())
