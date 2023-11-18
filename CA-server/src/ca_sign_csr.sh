@@ -17,8 +17,14 @@ if [ -e "$1" ] && [ -e "$2" ]; then
 
     yes | sudo openssl ca -in "$1" \
         -config /etc/ssl/openssl.cnf \
-        -passin file:$2 > /dev/null \
-        -out "$signed_cert_path"
+        -passin file:$2 \
+        -out "$signed_cert_path" \
+        > /dev/null
+
+    if [ ! -e "$signed_cert_path" ]; then
+        echo "FAILED_TO_SIGN_CERT_$serial"
+        exit 1
+    fi
 
     echo "$signed_cert_path"
     exit 0

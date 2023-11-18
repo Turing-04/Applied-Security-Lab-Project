@@ -4,6 +4,7 @@ import tempfile
 import base64
 import secrets
 import string
+import json
 
 DUMMY_USER_INFO = {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
      "email": "lb@imovies.ch"}
@@ -63,6 +64,13 @@ def test_sign_csr():
         for v in user_info.values():
             assert v in cert_str
 
+def decode_pkcs12(file_path: str) -> str:
+    # openssl pkcs12 -in cert_key.p12 -passin pass: -noenc
+    read_cmd = ["openssl", "pkcs12", "-in", file_path, "-passin", "pass:", "-noenc"]
+    read_pkcs12 = subprocess.run(read_cmd, capture_output=True, check=False, text=True)
+    print(read_pkcs12.stderr)
+    return read_pkcs12.stdout
+
 def test_export_pkcs12():
     tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
     tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
@@ -81,18 +89,14 @@ def test_export_pkcs12():
     pkcs12 = export_pkcs12(cert_path, tmp_priv_key.name)
     assert os.path.exists(pkcs12.name)
 
-    # openssl pkcs12 -in cert_key.p12 -passin pass: -noenc
-    read_cmd = ["openssl", "pkcs12", "-in", pkcs12.name, "-passin", "pass:", "-noenc"]
-    read_pkcs12 = subprocess.run(read_cmd, capture_output=True, check=False, text=True)
-
-    print(read_pkcs12.stdout, read_pkcs12.stderr)
+    pkcs12_str = decode_pkcs12(pkcs12.name)
 
     for v in user_info.values():
-        assert v in read_pkcs12.stdout
+        assert v in pkcs12_str
 
-    assert "-----BEGIN CERTIFICATE-----" in read_pkcs12.stdout
+    assert "-----BEGIN CERTIFICATE-----" in pkcs12_str
 
-    assert read_pkcs12.stdout.endswith("-----END PRIVATE KEY-----\n")
+    assert pkcs12_str.endswith("-----END PRIVATE KEY-----\n")
 
 def test_export_many_certs():
     for i in range(12):
@@ -124,5 +128,24 @@ def runner(app_fixture):
     return app.test_cli_runner()
 
 def test_request_certificate(client):
-    response = client.post("/request-certificate", data = DUMMY_USER_INFO.copy())
-    print(response)
+    user_info = DUMMY_USER_INFO.copy()
+    user_info['firstname'] = generate_random_string(10)
+    headers = {'Content-Type': 'application/json'}
+    response = client.post("/request-certificate", data = json.dumps(user_info), headers=headers)
+
+    assert response.status_code == 200
+    assert response.content_type == "application/x-pkcs12"
+    
+    cert_file = tempfile.NamedTemporaryFile("w+b")
+    cert_file.write(response.get_data())
+    cert_file.flush()
+
+    pkcs12_str = decode_pkcs12(cert_file.name)
+    # print(pkcs12_str)
+
+    for v in user_info.values():
+        assert v in pkcs12_str
+
+    assert "-----BEGIN CERTIFICATE-----" in pkcs12_str
+
+    assert pkcs12_str.endswith("-----END PRIVATE KEY-----\n")

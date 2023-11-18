@@ -51,7 +51,10 @@ def sign_csr(csr_path: str) -> str:
     assert os.path.exists(csr_path), csr_path
 
     out = subprocess.run([SIGN_CSR_SCRIPT_PATH, csr_path, CA_PASSWORD_PATH], 
-        check=True, capture_output=True, text=True)
+        capture_output=True, text=True, check=False)
+    if out.returncode != 0:
+        app.logger.error(out.stderr)
+    out.check_returncode()
     
     signed_cert_path = out.stdout.strip()
     return signed_cert_path
@@ -131,15 +134,11 @@ def request_certificate():
 
     # Sign the certificate
     cert_path = sign_csr(tmp_csr.name)
-    """TODO
-    File "/home/vagrant/src/ca_server.py", line 134, in request_certificate
-    assert os.path.exists(cert_path), cert_path
-AssertionError: /etc/ssl/CA/newcerts/10.pem
-    """
     assert os.path.exists(cert_path), cert_path
     tmp_csr.close()
 
     # TODO don't forget to send cert.p12 encrypted to the backup server
+    # TODO log https://flask.palletsprojects.com/en/3.0.x/logging/
 
     cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
     tmp_priv_key.close()
@@ -149,7 +148,9 @@ AssertionError: /etc/ssl/CA/newcerts/10.pem
         cert_and_key.close()
         return response
 
-    return send_file(cert_and_key.name, mimetype="application/x-pkcs12", max_age=0)
+    response = send_file(cert_and_key.name, mimetype="application/x-pkcs12", max_age=0)
+    print(response)
+    return response
 
 
 @app.post("/revoke-certificate")
@@ -169,7 +170,7 @@ def revoke_certificate():
 
     Docs: https://openssl-ca.readthedocs.io/en/latest/certificate-revocation-lists.html
     """
-    pass # TODO
+    assert False, "TODO"
 
 @app.get("/crl")
 def get_crl():
@@ -180,4 +181,5 @@ def get_crl():
     See https://en.wikipedia.org/wiki/Certificate_revocation_list .
     """
     # see https://flask.palletsprojects.com/en/3.0.x/api/#flask.send_file
-    pass # TODO
+    
+    assert False, "TODO"
