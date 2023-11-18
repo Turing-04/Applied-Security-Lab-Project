@@ -8,7 +8,7 @@ import json
 
 DUMMY_USER_INFO = {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
      "email": "lb@imovies.ch"}
-DUMMY_SUBJ_STR = "/C=CH/ST=Zurich/O=iMovies/CN=Lukas Bruegger/emailAddress=lb@imovies.ch/"
+DUMMY_SUBJ_STR = "/C=CH/ST=Zurich/O=iMovies/CN=Lukas Bruegger/emailAddress=lb@imovies.ch"
 
 def test_build_subj_str():
     assert build_subj_str(DUMMY_USER_INFO) == DUMMY_SUBJ_STR
@@ -102,8 +102,10 @@ def test_export_many_certs():
     for i in range(12):
         test_export_pkcs12()
 
+
+
 # FLASK END-TO-END TESTS
-# https://flask.palletsprojects.com/en/2.3.x/testing/
+# https://flask.palletsprojects.com/en/3.0.x/testing/
 
 @pytest.fixture()
 def app_fixture():

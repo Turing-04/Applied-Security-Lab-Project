@@ -1,0 +1,15 @@
+R	241117110611Z	231118111002Z	01	unknown	/C=CH/ST=Zurich/O=iMovies/CN=oCGOKWInVzuqXiWiQkVhpnWKHGVaIsXwPJfQEjkpCGQtsOaLbi Bruegger/emailAddress=lb@imovies.ch
+R	241117110611Z	231118113330Z	02	unknown	/C=CH/ST=Zurich/O=iMovies/CN=vYiyiiVhjh Bruegger/emailAddress=lb@imovies.ch
+R	241117110612Z	231118113619Z	03	unknown	/C=CH/ST=Zurich/O=iMovies/CN=gYXCIzeJnR Bruegger/emailAddress=lb@imovies.ch
+V	241117110612Z		04	unknown	/C=CH/ST=Zurich/O=iMovies/CN=DBPdJyXvGC Bruegger/emailAddress=lb@imovies.ch
+V	241117110613Z		05	unknown	/C=CH/ST=Zurich/O=iMovies/CN=LRaraSEsvr Bruegger/emailAddress=lb@imovies.ch
+V	241117110614Z		06	unknown	/C=CH/ST=Zurich/O=iMovies/CN=tsLeQanXNv Bruegger/emailAddress=lb@imovies.ch
+V	241117110615Z		07	unknown	/C=CH/ST=Zurich/O=iMovies/CN=eTFkTDrPDD Bruegger/emailAddress=lb@imovies.ch
+V	241117110615Z		08	unknown	/C=CH/ST=Zurich/O=iMovies/CN=RruHYjfLqO Bruegger/emailAddress=lb@imovies.ch
+V	241117110617Z		09	unknown	/C=CH/ST=Zurich/O=iMovies/CN=SGKJwBJzhv Bruegger/emailAddress=lb@imovies.ch
+V	241117110618Z		0A	unknown	/C=CH/ST=Zurich/O=iMovies/CN=XykiRDkCSp Bruegger/emailAddress=lb@imovies.ch
+V	241117110618Z		0B	unknown	/C=CH/ST=Zurich/O=iMovies/CN=VuUfItfBnT Bruegger/emailAddress=lb@imovies.ch
+V	241117110618Z		0C	unknown	/C=CH/ST=Zurich/O=iMovies/CN=VfOnrgOgDG Bruegger/emailAddress=lb@imovies.ch
+V	241117110619Z		0D	unknown	/C=CH/ST=Zurich/O=iMovies/CN=yvKHwIhimg Bruegger/emailAddress=lb@imovies.ch
+V	241117110619Z		0E	unknown	/C=CH/ST=Zurich/O=iMovies/CN=zEKpauOAem Bruegger/emailAddress=lb@imovies.ch
+V	241117110620Z		0F	unknown	/C=CH/ST=Zurich/O=iMovies/CN=WTmEgFRuvb Bruegger/emailAddress=lb@imovies.ch

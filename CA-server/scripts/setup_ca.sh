@@ -44,3 +44,11 @@ sudo mv "$CA_SECRETS/cacert.pem" "$CA_PATH/"
 # TODO make SECRETS/ca_password.txt a file only readable by the apache web user
 # this way, not any user can read it, but the flask app can
 sudo cp "$CA_SECRETS/ca_password.txt" "$CA_PATH/private/ca_password.txt"
+
+# setup CRL
+# see: https://jamielinux.com/docs/openssl-certificate-authority/certificate-revocation-lists.html
+# First, init the crlnumber
+sudo bash -c "echo '00' > '$CA_PATH/crlnumber'"
+# Then, create the initial crl.pem
+sudo openssl ca -config /etc/ssl/openssl.cnf -gencrl \
+    -out "$CA_PATH/crl.pem" -passin file:"$CA_PATH/private/ca_password.txt"

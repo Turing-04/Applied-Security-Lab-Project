@@ -2,7 +2,7 @@ import subprocess
 from flask import Flask, request, after_this_request, send_file
 import re
 import tempfile
-from typing import Dict
+from typing import Dict, List
 import os
 
 app = Flask(__name__)
@@ -15,6 +15,13 @@ CERT_ORG_NAME = "iMovies"
 SIGN_CSR_SCRIPT_PATH = "./ca_sign_csr.sh"
 CA_PATH="/etc/ssl/CA" 
 CA_PASSWORD_PATH = f"{CA_PATH}/private/ca_password.txt"
+CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
+
+UserInfo = Dict[str, str]
+"""
+e.g. {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
+     "email": "lb@imovies.ch"}
+"""
 
 def export_pkcs12(cert_path: str, key_path: str) -> tempfile.NamedTemporaryFile:
     """
@@ -59,7 +66,7 @@ def sign_csr(csr_path: str) -> str:
     signed_cert_path = out.stdout.strip()
     return signed_cert_path
 
-def build_subj_str(user_info: Dict[str, str]) -> str:
+def build_subj_str(user_info: UserInfo) -> str:
     out = f"/C=CH/ST=Zurich/O={CERT_ORG_NAME}"
 
     firstname = user_info["firstname"]
@@ -71,11 +78,11 @@ def build_subj_str(user_info: Dict[str, str]) -> str:
     email_regex = r"\w+@\w+\.\w+"
     email = user_info["email"]
     assert bool(re.match(email_regex, email)), email
-    out += f"/emailAddress={email}/"
+    out += f"/emailAddress={email}"
     
     return out
 
-def make_csr(user_info: Dict[str, str], tmp_csr_path: str, tmp_priv_key_path: str) -> None:
+def make_csr(user_info: UserInfo, tmp_csr_path: str, tmp_priv_key_path: str) -> None:
     """
     openssl req -new \
         -newkey rsa:2048 -nodes -keyout tmp.key \
@@ -126,8 +133,6 @@ def request_certificate():
         assert key in ["uid", "lastname", "firstname", "email"]
         assert isinstance(val, str)
 
-    # TODO check if already exists cert with exact info
-
     tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8', delete=True)
     tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8', delete=True)
     make_csr(user_info, tmp_csr.name, tmp_priv_key.name)
@@ -159,6 +164,8 @@ def revoke_certificate():
     This endpoint allows for certificate revocation.
     The body of the request contains a JSON object with the user info
     of the user whose certificate must be revoked.
+    All the valid certificates who match the exact information given will
+    be revoked (should normally be exactly 1).
     E.g.:
     {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
      "email": "lb@imovies.ch"}
@@ -170,6 +177,12 @@ def revoke_certificate():
 
     Docs: https://openssl-ca.readthedocs.io/en/latest/certificate-revocation-lists.html
     """
+
+    # sudo openssl ca -revoke /etc/ssl/CA/newcerts/03.pem -config /etc/ssl/openssl.cnf 
+    # -passin file:/etc/ssl/CA/private/ca_password.txt
+
+    # sudo openssl ca -config /etc/ssl/openssl.cnf -gencrl \
+    # -out "$CA_PATH/crl.pem" -passin file:"$CA_PATH/private/ca_password.txt"
     assert False, "TODO"
 
 @app.get("/crl")
