@@ -39,7 +39,7 @@ mysql -u root -proot imovies  -e "GRANT SELECT ON certificates TO 'webserver'@'%
 mysql -u root -proot imovies -e "CREAT USERS, 'caserver'@'%' IDENTIFIED BY 'caserver123';"
 mysql -u root -proot imovies -e "GRANT SELEECT, INSERT, UPDATE, DELETE ON certificates TO 'caserver'@'%';"
 
-mysql -u root -proot imovies -e "FLUSH PRIVILEGES;"
+mysql -u root -proot -e "FLUSH PRIVILEGES;"
 
 # 6. change bind-address from localhost to the interface in the configuration file.
 sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" /etc/mysql/mariadb.conf.d/50-server.cnf
