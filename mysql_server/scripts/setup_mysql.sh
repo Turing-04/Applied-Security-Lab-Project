@@ -44,8 +44,13 @@ mysql -u root -proot -e "FLUSH PRIVILEGES;"
 # 6. change bind-address from localhost to the interface in the configuration file.
 sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" /etc/mysql/mariadb.conf.d/50-server.cnf
 
-# 7. [TODO] enable TLS in mariadb
-# 7.1 [CHECK FOLDERS] cp[y certificates
+# 7. Enable TLS in mariadb
+# create folders for certs and keys and update paths
+# mkdir /etc/mysql/ssl
+# mkdir /etc/mysql/ssl/certs
+# mkdir /etc/mysql/ssl/private
+
+# 7.1 [TODO: CHANGE FOLDERS] copy certificates
 cp $SYNCED_FOLDER/mysql-server-crt.pem /etc/mysql
 cp $SYNCED_FOLDER/cacert.pem /etc/mysql
 sudo chmod 644 /etc/mysql/mysql-server-crt.pem /etc/mysql/cacert.pem
@@ -54,7 +59,7 @@ cp $SYNCED_FOLDER/mysql-server-key.pem /etc/mysql
 sudo chmod 640 /etc/mysql/mysql-server-key.pem
 sudo chgrp mysql /etc/mysql/mysql-server-key.pem
 
-# 7.2 [CHECK PATH] set tls configuration in MariaDB
+# 7.2 Set TLS configuration in MariaDB
 cp $SYNCED_FOLDER/mariadb-server-tls.cnf /etc/mysql/mariadb.conf.d
 sudo systemctl restart mariadb
 
@@ -67,15 +72,21 @@ sudo usermod -aG sudo sysadmin
 
 # 9. [TO CHECK ON THE MACHINE] Set ssh connection bettween the client and the server
 # COPY NECESSARY KEYS
-# 9.4. Disable PasswordAuthentication in /etc/ssh/sshd_config
+# This is in the sysadmin user
+# change user: su - sysadmin
+# mkdir -p ~/.ssh
+# echo $SYNCED_FOLDER/public_sysain >>  ~/.ssh/authorized_keys
+# chmod -R go= ~/.ssh
+# chown -R sysadmin:sysadmin ~/.ssh
+# Disable PasswordAuthentication in /etc/ssh/sshd_config
 # vim /etc/ssh/sshd_config; PasswordAuthentication no;
-
 # 9.5. Allow only sysadmin host to ssh to the machine
 # vim /etc/ssh/sshd_config; AllowUsers   sysadmin
 
 # 9.6. Disable PermitRootLogin:
 # vim /etc/ssh/sshd_config; PermitRootLogin no;
 
+# back to sudo
 # 9.7. Restart sshd on the server: 
 # sudo systemctl restart ssh
 
