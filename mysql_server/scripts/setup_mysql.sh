@@ -41,10 +41,22 @@ mysql -u root -proot imovies -e "GRANT SELEECT, INSERT, UPDATE, DELETE ON certif
 
 mysql -u root -proot imovies -e "FLUSH PRIVILEGES;"
 
-# 6. [TODO] change bind-address from localhost to the interface in the configuration file.
-sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" 50-server.cnf
+# 6. change bind-address from localhost to the interface in the configuration file.
+sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" /etc/mysql/mariadb.conf.d/50-server.cnf
 
 # 7. [TODO] enable TLS in mariadb
+# 7.1 [CHECK FOLDERS] cp[y certificates
+cp $SYNCED_FOLDER/mysql-server-crt.pem /etc/mysql
+cp $SYNCED_FOLDER/cacert.pem /etc/mysql
+sudo chmod 644 /etc/mysql/mysql-server-crt.pem /etc/mysql/cacert.pem
+
+cp $SYNCED_FOLDER/mysql-server-key.pem /etc/mysql
+sudo chmod 640 /etc/mysql/mysql-server-key.pem
+sudo chgrp mysql /etc/mysql/mysql-server-key.pem
+
+# 7.2 [CHECK PATH] set tls configuration in MariaDB
+cp $SYNCED_FOLDER/mariadb-server-tls.cnf /etc/mysql/mariadb.conf.d
+sudo systemctl restart mariadb
 
 # 8. Create sysadmin user and add it to the sudoers group
 # 8.1. create user and set the password:
