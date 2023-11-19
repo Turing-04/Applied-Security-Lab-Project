@@ -1,4 +1,4 @@
-from cert_utils import build_subj_str, make_csr, sign_csr, export_pkcs12
+from cert_utils import build_subj_str, make_csr, sign_csr, export_pkcs12, get_current_serial_nb
 import string
 import os
 import secrets
@@ -101,3 +101,8 @@ def test_export_pkcs12():
 def test_export_many_certs():
     for i in range(12):
         test_export_pkcs12()
+
+def test_get_current_serial_nb():
+    serial = get_current_serial_nb()
+    assert serial != ""
+    print(serial)

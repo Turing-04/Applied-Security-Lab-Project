@@ -52,9 +52,6 @@ cp "$SYNCED_FOLDER/scripts/startup_server.sh" "$CA_SERVER_ROOT"
 
 sudo chown --recursive ca-server "$CA_SERVER_ROOT"
 
-# Grant execute permission for ca sign script to ca-server user
-sudo chmod u+x "$CA_SERVER_ROOT/src/ca_sign_csr.sh"
-
 sudo chmod u+x "$CA_SERVER_ROOT/startup_server.sh"
 sudo -u ca-server "$CA_SERVER_ROOT/startup_server.sh"
 

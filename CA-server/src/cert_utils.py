@@ -7,12 +7,11 @@ import subprocess
 
 OPENSSL_CMD = "openssl"
 
-SIGN_CSR_SCRIPT_PATH = "./ca_sign_csr.sh"
-
 CA_PATH="/etc/ssl/CA" 
 CA_PASSWORD_PATH = f"{CA_PATH}/private/ca_password.txt"
 CA_CONFIG_PATH = "/etc/ssl/openssl.cnf"
 CA_SERIAL_PATH = f"{CA_PATH}/serial"
+CA_NEWCERTS_PATH = f"{CA_PATH}/newcerts"
 
 OPENSSL_KEY_PARAMS = "rsa:2048"
 
@@ -54,6 +53,8 @@ def export_pkcs12(cert_path: str, key_path: str) -> tempfile.NamedTemporaryFile:
 
     return pkcs12
 
+def cert_path_from_serial(serial: str) -> str:
+    return f'{CA_NEWCERTS_PATH}/{serial}.pem'
 
 def sign_csr(csr_path: str) -> str:
     """
@@ -66,15 +67,20 @@ def sign_csr(csr_path: str) -> str:
     """
     assert os.path.exists(csr_path), csr_path
 
-    out = subprocess.run([SIGN_CSR_SCRIPT_PATH, csr_path, CA_PASSWORD_PATH], 
-        capture_output=True, text=True, check=False)
-    assert out.returncode == 0, f"Failed to sign {csr_path}"
-    out.check_returncode()
-    
-    signed_cert_path = out.stdout.strip()
+    serial = get_current_serial_nb()
+    signed_cert_path = cert_path_from_serial(serial)
+
+    openssl_cmd = [
+        'sudo', OPENSSL_CMD, 'ca',
+        '-in', csr_path,
+        '-config', CA_CONFIG_PATH,
+        '-passin', f'file:{CA_PASSWORD_PATH}',
+        '-out', signed_cert_path
+    ]
+
+    subprocess.run(openssl_cmd, check=False, input='y\n'*2, text=True)
+
     return signed_cert_path
-
-
 
 def make_csr(user_info: UserInfo, tmp_csr_path: str, tmp_priv_key_path: str) -> None:
     """
@@ -98,7 +104,7 @@ def revoke_cert(serial_nb: str):
     # -passin file:/etc/ssl/CA/private/ca_password.txt
     """
     cmd = ["sudo", OPENSSL_CMD, "ca"]
-    cmd += ["-revoke", f"{CA_PATH}/newcerts/{serial_nb}.pem"]
+    cmd += ["-revoke", cert_path_from_serial(serial_nb)]
     cmd += ["-config", CA_CONFIG_PATH]
     cmd += ["-passin", f"file:{CA_PASSWORD_PATH}"]
 
