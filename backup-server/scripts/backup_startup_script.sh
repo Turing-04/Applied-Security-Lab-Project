@@ -8,3 +8,10 @@ echo "Startup script started"
 echo "Starting install of necessary software"
 # allows to get newer packages than the box creation (e.g. python3.11-venv)
 sudo apt update
+
+# install duplicity
+sudo apt install duplicity -y 
+
+# copy keypairs to ~/.ssh
+
+
