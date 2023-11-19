@@ -151,5 +151,4 @@ def get_ca_state():
 @app.get("/ping")
 def ping():
     # For testing
-    import getpass
-    return getpass.getuser()
+    return "pong"
