@@ -44,6 +44,7 @@ cp "$SYNCED_FOLDER/SECRETS/ca-server-https/ca-server-https.key" /etc/ssl/private
 echo "Copy apache2 config file"
 cp "$SYNCED_FOLDER/config/ca-server.conf" /etc/apache2/sites-available/
 cp "$SYNCED_FOLDER/config/apache2.conf" /etc/apache2/apache2.conf
+cp "$SYNCED_FOLDER/config/envvars" /etc/apache2/envvars
 
 echo "Copy src to $CA_SERVER_ROOT"
 mkdir -p "$CA_SERVER_ROOT"
