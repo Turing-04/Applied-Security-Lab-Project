@@ -1,9 +1,15 @@
 #!/bin/bash
 
 export SYNCED_FOLDER="/vagrant"
-export VAGRANT_HOME="/home/vagrant"
+CA_SERVER_ROOT="/var/www/ca-server"
+CA_USER_PASSWORD="LGiiyt8pQ^f!Nyew2t2UZCX7ID^aYiXmt#gNn3#4e&P0N4mA8K"
 
 echo "Startup script started"
+
+# add user which runs the webserver
+sudo useradd ca-server
+echo "ca-server:$CA_USER_PASSWORD" | sudo chpasswd
+
 
 # openssl CA setup
 echo "Starting openssl CA setup"
@@ -21,17 +27,24 @@ sudo apt install -y python3-pip
 # python is python 3
 sudo ln -s /usr/bin/python3 /usr/bin/python
 
-echo "Copy src to $VAGRANT_HOME"
-cp -r "$SYNCED_FOLDER/src/" "$VAGRANT_HOME/"
-rm -r "$VAGRANT_HOME/src/__pycache__" "$VAGRANT_HOME/src/.venv"
+# install apache2
+# TODO enable
+# sudo apt install -y apache2 apache-dev
+
+echo "Copy src to $CA_SERVER_ROOT"
+mkdir -p "$CA_SERVER_ROOT"
+cp -r "$SYNCED_FOLDER/src/" "$CA_SERVER_ROOT/"
+rm -r "$CA_SERVER_ROOT/src/__pycache__" "$CA_SERVER_ROOT/src/.venv"
 
 # TODO !!! grant only execute to apache user
-chmod +x "$VAGRANT_HOME/src/ca_sign_csr.sh"
+chmod +x "$CA_SERVER_ROOT/src/ca_sign_csr.sh"
 
-cd "$VAGRANT_HOME/src"
+cd "$CA_SERVER_ROOT/src"
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
+# TODO enable
+# python -m pip install mod_wsgi
 
 # performing unit tests
 python -m pytest
