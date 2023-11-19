@@ -71,7 +71,7 @@ def sign_csr(csr_path: str) -> str:
     signed_cert_path = cert_path_from_serial(serial)
 
     openssl_cmd = [
-        'sudo', OPENSSL_CMD, 'ca',
+        OPENSSL_CMD, 'ca',
         '-in', csr_path,
         '-config', CA_CONFIG_PATH,
         '-passin', f'file:{CA_PASSWORD_PATH}',

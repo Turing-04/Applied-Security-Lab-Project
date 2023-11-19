@@ -11,7 +11,7 @@ sudo useradd ca-server --create-home
 # set his password
 echo "ca-server:$CA_USER_PASSWORD" | sudo chpasswd
 # allow him to run openssl without entering a password
-sudo echo "ca-server ALL=(ALL) NOPASSWD: /usr/bin/openssl" > /etc/sudoers.d/ca-server
+sudo echo "ca-server ALL=NOPASSWD: /usr/bin/openssl" > /etc/sudoers.d/ca-server
 
 
 # openssl CA setup
@@ -43,6 +43,7 @@ cp "$SYNCED_FOLDER/SECRETS/ca-server-https/ca-server-https.key" /etc/ssl/private
 
 echo "Copy apache2 config file"
 cp "$SYNCED_FOLDER/config/ca-server.conf" /etc/apache2/sites-available/
+cp "$SYNCED_FOLDER/config/apache2.conf" /etc/apache2/apache2.conf
 
 echo "Copy src to $CA_SERVER_ROOT"
 mkdir -p "$CA_SERVER_ROOT"

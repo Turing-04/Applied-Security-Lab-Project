@@ -2,12 +2,12 @@
 See: https://flask.palletsprojects.com/en/3.0.x/deploying/mod_wsgi/
 """
 import sys
-server_path = "/var/www/ca-server/src"
-if server_path not in sys.path:
-    sys.path.insert(0, server_path)
+SERVER_SRC_PATH = "/var/www/ca-server/src"
+if SERVER_SRC_PATH not in sys.path:
+    sys.path.insert(0, SERVER_SRC_PATH)
 
 # https://stackoverflow.com/a/62097197
-sys.path.insert(0,"/var/www/ca-server/src/.venv/lib/python3.11/site-packages")
+sys.path.insert(0,f"{SERVER_SRC_PATH}/.venv/lib/python3.11/site-packages")
 
 from ca_server import app
 

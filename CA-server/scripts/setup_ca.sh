@@ -52,3 +52,8 @@ sudo bash -c "echo '00' > '$CA_PATH/crlnumber'"
 # Then, create the initial crl.pem
 sudo openssl ca -config /etc/ssl/openssl.cnf -gencrl \
     -out "$CA_PATH/crl.pem" -passin file:"$CA_PATH/private/ca_password.txt"
+
+
+# TODO useful?
+# Finally, we need to make the ca-server user own everything
+# sudo chown --recursive ca-server "$CA_PATH"
