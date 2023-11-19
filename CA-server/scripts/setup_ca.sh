@@ -38,8 +38,8 @@ sudo cat "$SYNCED_FOLDER/config/openssl.cnf" > /etc/ssl/openssl.cnf
 CA_SECRETS="$SYNCED_FOLDER/SECRETS/ca-server"
 
 # install previously generated cert and key
-sudo mv "$CA_SECRETS/cakey.pem" "$CA_PATH/private/"
-sudo mv "$CA_SECRETS/cacert.pem" "$CA_PATH/"
+sudo cp "$CA_SECRETS/cakey.pem" "$CA_PATH/private/"
+sudo cp "$CA_SECRETS/cacert.pem" "$CA_PATH/"
 
 # TODO make SECRETS/ca_password.txt a file only readable by the apache web user
 # this way, not any user can read it, but the flask app can

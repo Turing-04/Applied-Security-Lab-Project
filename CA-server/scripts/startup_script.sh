@@ -31,8 +31,18 @@ sudo apt install -y python3-pip
 sudo ln -s /usr/bin/python3 /usr/bin/python
 
 # install apache2
-# TODO enable
-# sudo apt install -y apache2 apache-dev
+sudo apt install -y apache2 apache2-dev libapache2-mod-wsgi-py3
+# enable wsgi for flask
+sudo a2enmod wsgi
+
+echo "Copy keys for https"
+# SSLCertificateFile      /etc/ssl/certs/ca-server-https.crt
+# SSLCertificateKeyFile   /etc/ssl/private/ca-server-https.key
+cp "$SYNCED_FOLDER/SECRETS/ca-server-https/ca-server-https.crt" /etc/ssl/certs/ca-server-https.crt
+cp "$SYNCED_FOLDER/SECRETS/ca-server-https/ca-server-https.key" /etc/ssl/private/ca-server-https.key
+
+echo "Copy apache2 config file"
+cp "$SYNCED_FOLDER/config/ca-server.conf" /etc/apache2/sites-available/
 
 echo "Copy src to $CA_SERVER_ROOT"
 mkdir -p "$CA_SERVER_ROOT"
@@ -47,6 +57,16 @@ sudo chmod u+x "$CA_SERVER_ROOT/src/ca_sign_csr.sh"
 
 sudo chmod u+x "$CA_SERVER_ROOT/startup_server.sh"
 sudo -u ca-server "$CA_SERVER_ROOT/startup_server.sh"
+
+sudo a2enmod ssl
+sudo systemctl restart apache2
+echo "Check apache config file for errors"
+sudo apachectl configtest
+sudo a2ensite ca-server
+sudo systemctl restart apache2
+
+# Check if server is up
+wget --no-check-certificate -O - https://localhost:443/ping
 
 # TODO disable internet access once setup done
 # TODO delete synced folder once setup is done

@@ -147,3 +147,8 @@ def get_ca_state():
     }
 
     return state
+
+@app.get("/ping")
+def ping():
+    # For testing
+    return "Pong"
