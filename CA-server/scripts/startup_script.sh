@@ -7,8 +7,11 @@ CA_USER_PASSWORD="LGiiyt8pQ^f!Nyew2t2UZCX7ID^aYiXmt#gNn3#4e&P0N4mA8K"
 echo "Startup script started"
 
 # add user which runs the webserver
-sudo useradd ca-server
+sudo useradd ca-server --create-home
+# set his password
 echo "ca-server:$CA_USER_PASSWORD" | sudo chpasswd
+# allow him to run openssl without entering a password
+sudo echo "ca-server ALL=(ALL) NOPASSWD: /usr/bin/openssl" > /etc/sudoers.d/ca-server
 
 
 # openssl CA setup
@@ -35,27 +38,15 @@ echo "Copy src to $CA_SERVER_ROOT"
 mkdir -p "$CA_SERVER_ROOT"
 cp -r "$SYNCED_FOLDER/src/" "$CA_SERVER_ROOT/"
 rm -r "$CA_SERVER_ROOT/src/__pycache__" "$CA_SERVER_ROOT/src/.venv"
+cp "$SYNCED_FOLDER/scripts/startup_server.sh" "$CA_SERVER_ROOT"
 
-# TODO !!! grant only execute to apache user
-chmod +x "$CA_SERVER_ROOT/src/ca_sign_csr.sh"
+sudo chown --recursive ca-server "$CA_SERVER_ROOT"
 
-cd "$CA_SERVER_ROOT/src"
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-# TODO enable
-# python -m pip install mod_wsgi
+# Grant execute permission for ca sign script to ca-server user
+sudo chmod u+x "$CA_SERVER_ROOT/src/ca_sign_csr.sh"
 
-# performing unit tests
-python -m pytest
-
-# TODO allow apache user to run ca_sign_csr.sh as sudo without entering password
-# add file to /etc/sudoers.d/ with:
-# www-data ALL=(ALL) NOPASSWD: /path/to/your/script.sh
-# see https://www.digitalocean.com/community/tutorials/how-to-edit-the-sudoers-file
-
-# TODO set static ip to new network interface
-# 10.0.0.3
+sudo chmod u+x "$CA_SERVER_ROOT/startup_server.sh"
+sudo -u ca-server "$CA_SERVER_ROOT/startup_server.sh"
 
 # TODO disable internet access once setup done
 # TODO delete synced folder once setup is done

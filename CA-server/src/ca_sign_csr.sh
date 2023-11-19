@@ -7,7 +7,10 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-if [ -e "$1" ] && [ -e "$2" ]; then
+CSR_PATH="$1"
+CA_PASSWORD_PATH="$2"
+
+if [ -e "$CSR_PATH" ] && [ -e "$CA_PASSWORD_PATH" ]; then
     serial=$(</etc/ssl/CA/serial)
     # yes is required to confirm that we want to sign
     # we pass the password as an environment, which is safer than passing it 
@@ -15,9 +18,9 @@ if [ -e "$1" ] && [ -e "$2" ]; then
     # (cannot set fine-grained permission for password file)
     signed_cert_path="$NEW_CERTS_DIR/$serial.pem"
 
-    yes | sudo openssl ca -in "$1" \
+    yes | sudo openssl ca -in "$CSR_PATH" \
         -config /etc/ssl/openssl.cnf \
-        -passin file:$2 \
+        -passin file:$CA_PASSWORD_PATH \
         -out "$signed_cert_path" \
         > /dev/null
 
@@ -29,6 +32,6 @@ if [ -e "$1" ] && [ -e "$2" ]; then
     echo "$signed_cert_path"
     exit 0
 else
-    echo "$1 or $2 does not exist"
+    echo "$CSR_PATH or $CA_PASSWORD_PATH does not exist"
     exit 1
 fi
