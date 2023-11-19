@@ -1,0 +1,7 @@
+[mariadb]
+ssl_ca = /etc/mysql/ssl/certs/cacert.pem 
+ssl_cert = /etc/mysql/ssl/certs/mysql-server-crt.pem 
+ssl_key = /etc/mysql/ssl/private/mysql-server-key.pem
+require_secure_transport = on
+tls_version = TLSv1.3
+

@@ -72,25 +72,27 @@ sudo useradd -m sysadmin -p dv8RCJruycKGyN
 sudo usermod -aG sudo sysadmin
 
 # 9. [TO CHECK ON THE MACHINE] Set ssh connection bettween the client and the server
-# 9.1. Change the user
-sudo su - sysadmin
-# 9.2. Create ssh folder for public keys 
-mkdir -p ~/.ssh
+
+# 9.1.In sysadmin home: create ssh folder for public keys 
+mkdir -p /home/sysadmin/.ssh && touch /home/sysadmin/.ssh/authorized_keys
+
 # 9.3. Copy sysadmin public key and set correct permissions
-echo $SYNCED_FOLDER/public_sysain >>  ~/.ssh/authorized_keys
-sudo chmod -R go= ~/.ssh
-sudo chown -R sysadmin:sysadmin ~/.ssh
-# Disable PasswordAuthentication in /etc/ssh/sshd_config
-# vim /etc/ssh/sshd_config; PasswordAuthentication no;
-# 9.5. Allow only sysadmin host to ssh to the machine
-# vim /etc/ssh/sshd_config; AllowUsers   sysadmin
+cat $SYNCED_FOLDER/sysadmin-ssh.pub >>  /home/sysadmin/.ssh/authorized_keys
+sudo chmod -R go= /home/sysadmin/.ssh
+sudo chown -R sysadmin:sysadmin /home/sysadmin/.ssh
 
-# 9.6. Disable PermitRootLogin:
-# vim /etc/ssh/sshd_config; PermitRootLogin no;
+# 9.4. Disable PermitRootLogin in /etc/ssh/sshd_config
+sudo sed -i "s/.*PermitRootLogin.*/PermitRootLogin no/" /etc/ssh/sshd_config
 
-# back to sudo
-# 9.7. Restart sshd on the server: 
-# sudo systemctl restart ssh
+# 9.5. Allow PubkeyAuthentication in /etc/ssh/sshd_config
+sudo sed -i "s/.*PubkeyAuthentication.*/PubkeyAuthentication yes/" /etc/ssh/sshd_config
+sudo sed -i "s/.*AuthorizedKeysFile.*/AuthorizedKeysFile .ssh\/authorized_keys/" /etc/ssh/sshd_config
+
+# 9.6. Allow only sysadmin host to ssh to the machine
+sudo echo "AllowUsers sysadmin" >> /etc/ssh/sshd_config
+
+# 9.7. Restart sshd
+sudo systemctl restart sshd
 
 # 9.8. [EXTRA STEP] it might be unnecessary but we can set up /etc/hosts.allow and deny to allow only internal IPs to ssh.
 # here is how: https://docs.rackspace.com/docs/restrict-ssh-login-to-a-specific-ip-or-host
