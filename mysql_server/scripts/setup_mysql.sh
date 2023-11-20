@@ -18,7 +18,7 @@ y
 y
 EOF
 
-# 2.Login into mysql: https://www.digitalocean.com/community/tutorials/how-to-import-and-export-databases-in-mysql-or-mariadb#step-2-mdash-importing-a-mysql-or-mariadb-database
+# 2. Login into mysql: https://www.digitalocean.com/community/tutorials/how-to-import-and-export-databases-in-mysql-or-mariadb#step-2-mdash-importing-a-mysql-or-mariadb-database
 mysql -u root -proot -e "CREATE DATABASE imovies;"
 
 # 3. Create database and load data
@@ -41,17 +41,17 @@ mysql -u root -proot imovies -e "GRANT SELEECT, INSERT, UPDATE, DELETE ON certif
 
 mysql -u root -proot -e "FLUSH PRIVILEGES;"
 
-# 6. change bind-address from localhost to the interface in the configuration file.
+# 6. Change bind-address from localhost to the interface in the configuration file.
 sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" /etc/mysql/mariadb.conf.d/50-server.cnf
 
 # 7. Enable TLS in mariadb
-# TODO openSSL and SSL are both enabled, check if okay
-# Create folders for certs and keys
+# [TODO] openSSL and SSL are both enabled, check if okay
+# 7.1 Create folders for certs and keys
 mkdir /etc/mysql/ssl
 mkdir /etc/mysql/ssl/certs
 mkdir /etc/mysql/ssl/private
 
-# 7.1 Copy certificates
+# 7.2 Copy certificates and set permissions
 cp $SYNCED_FOLDER/mysql-server-crt.pem /etc/mysql/ssl/certs
 cp $SYNCED_FOLDER/cacert.pem /etc/mysql/ssl/certs
 sudo chmod 644 /etc/mysql/ssl/certs/mysql-server-crt.pem /etc/mysql/ssl/certs/cacert.pem
@@ -60,40 +60,35 @@ cp $SYNCED_FOLDER/mysql-server-key.pem /etc/mysql/ssl/private
 sudo chmod 640 /etc/mysql/ssl/private/mysql-server-key.pem
 sudo chgrp mysql /etc/mysql/ssl/private/mysql-server-key.pem
 
-# 7.2 Set TLS configuration in MariaDB
+# 7.3 Set TLS configuration in MariaDB
 cp $SYNCED_FOLDER/mariadb-server-tls.cnf /etc/mysql/mariadb.conf.d
 sudo systemctl restart mariadb
 
-# 8. Create sysadmin user and add it to the sudoers group
-# 8.1. create user and set the password:
+# 8 Create sysadmin user and add it to the sudoers group
 sudo useradd -m sysadmin -p dv8RCJruycKGyN
-
-# 8.2. add user to the sudo group
 sudo usermod -aG sudo sysadmin
 
-# 9. [TO CHECK ON THE MACHINE] Set ssh connection bettween the client and the server
+# 9. Set SSH configuration on the server
 
-# 9.1.In sysadmin home: create ssh folder for public keys 
+# 9.1 In sysadmin home: create SSH folder for public keys 
 mkdir -p /home/sysadmin/.ssh && touch /home/sysadmin/.ssh/authorized_keys
 
-# 9.3. Copy sysadmin public key and set correct permissions
-cat $SYNCED_FOLDER/sysadmin-ssh.pub >>  /home/sysadmin/.ssh/authorized_keys
+# 9.2 Copy sysadmin public key and set correct permissions
+ssh-keygen -f $SYNCED_FOLDER/sysadmin-ssh.pub -i -m PKCS8 &>  /home/sysadmin/.ssh/authorized_keys
 sudo chmod -R go= /home/sysadmin/.ssh
 sudo chown -R sysadmin:sysadmin /home/sysadmin/.ssh
 
-# 9.4. Disable PermitRootLogin in /etc/ssh/sshd_config
+# 9.3 Disable PermitRootLogin in /etc/ssh/sshd_config
 sudo sed -i "s/.*PermitRootLogin.*/PermitRootLogin no/" /etc/ssh/sshd_config
 
-# 9.5. Allow PubkeyAuthentication in /etc/ssh/sshd_config
+# 9.4 Allow PubkeyAuthentication in /etc/ssh/sshd_config
 sudo sed -i "s/.*PubkeyAuthentication.*/PubkeyAuthentication yes/" /etc/ssh/sshd_config
 sudo sed -i "s/.*AuthorizedKeysFile.*/AuthorizedKeysFile .ssh\/authorized_keys/" /etc/ssh/sshd_config
 
-# 9.6. Allow only sysadmin host to ssh to the machine
+# 9.5 [TODO check if it works] Allow only sysadmin host to ssh to the machine
 sudo echo "AllowUsers sysadmin" >> /etc/ssh/sshd_config
 
-# 9.7. Restart sshd
+# 9.6 Restart sshd
 sudo systemctl restart sshd
 
-# 9.8. [EXTRA STEP] it might be unnecessary but we can set up /etc/hosts.allow and deny to allow only internal IPs to ssh.
-# here is how: https://docs.rackspace.com/docs/restrict-ssh-login-to-a-specific-ip-or-host
-
+# [TODO] ssh client host pk
