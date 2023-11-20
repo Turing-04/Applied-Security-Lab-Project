@@ -3,8 +3,8 @@ import sys
 
 MYSQL_HOST = "10.0.0.5"
 MYSQL_PORT = 3306
-MYSQL_USER = "ca-server"
-MYSQL_PASSWORD = "caserver123" # TODO maybe this will change...
+MYSQL_USER = "caserver"
+MYSQL_PASSWORD = "cn9@1kbka;}=(iPgEMO1&{XW"
 MYSQL_DATABASE = "imovies"
 MYSQL_CLIENT_CERT_PATH="/etc/ssl/certs/ca-server-intranet.crt"
 MYSQL_CLIENT_KEY_PATH="/etc/ssl/private/ca-server-intranet.key"
