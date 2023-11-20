@@ -34,9 +34,9 @@ mysql -u root -proot imovies -e "CREATE TABLE certificates (uid varchar(64) NOT 
 # [TODO] update ip address by replacing '%' in the following code
 mysql -u root -proot imovies -e "CREATE USER 'webserver'@'%' IDENTIFIED BY '}DqG3mZ8neKPp?#Uc?49K&W2';"
 mysql -u root -proot imovies -e "GRANT SELECT, INSERT, UPDATE, DELETE ON users TO 'webserver'@'%';"
-mysql -u root -proot imovies  -e "GRANT SELECT ON certificates TO 'webserver'@'%';"
+mysql -u root -proot imovies -e "GRANT SELECT ON certificates TO 'webserver'@'%';"
 
-mysql -u root -proot imovies -e "CREATE USER, 'caserver'@'%' IDENTIFIED BY 'cn9@1kbka;}=(iPgEMO1&{XW';"
+mysql -u root -proot imovies -e "CREATE USER 'caserver'@'%' IDENTIFIED BY 'cn9@1kbka;}=(iPgEMO1&{XW';"
 mysql -u root -proot imovies -e "GRANT SELECT, INSERT, UPDATE, DELETE ON certificates TO 'caserver'@'%';"
 
 mysql -u root -proot -e "FLUSH PRIVILEGES;"
