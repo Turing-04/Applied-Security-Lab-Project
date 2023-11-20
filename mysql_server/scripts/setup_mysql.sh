@@ -26,7 +26,7 @@ mysql -u root -proot -e "CREATE DATABASE imovies;"
 mysql -u root -proot imovies < $SYNCED_FOLDER/imovies_users.db
 
 # 4. Create certificates table
-mysql -u root -proot imovies -e "CREATE TABLE certificates (uid varchar(64) NOT NULL, certificate varchar(6000) NOT NULL);"
+mysql -u root -proot imovies -e "CREATE TABLE certificates (uid varchar(64) NOT NULL, certificate varchar(6000) NOT NULL, PRIMARY KEY (uid));"
 
 # 5. Create users in MySQL and set privileges
 # webserver with read/write access to table "users" and read access to table "certificate";
