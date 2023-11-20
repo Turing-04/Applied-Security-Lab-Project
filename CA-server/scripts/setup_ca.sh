@@ -11,7 +11,10 @@ if [ -z "$SYNCED_FOLDER" ]; then
     exit 1
 fi
 
-CA_PATH="/etc/ssl/CA" 
+CA_PATH="/etc/ssl/CA"
+CA_PASSWORD_PATH="$CA_PATH/private/ca_password.txt"
+CA_CERT_PATH="$CA_PATH/cacert.pem"
+CA_KEY_PATH="$CA_PATH/private/cakey.pem"
 
 #  Create the directories that hold the CA’s certificate and related files:
 sudo mkdir -p "$CA_PATH"
@@ -38,12 +41,12 @@ sudo cat "$SYNCED_FOLDER/config/openssl.cnf" > /etc/ssl/openssl.cnf
 CA_SECRETS="$SYNCED_FOLDER/SECRETS/ca-server"
 
 # install previously generated cert and key
-sudo cp "$CA_SECRETS/cakey.pem" "$CA_PATH/private/"
-sudo cp "$CA_SECRETS/cacert.pem" "$CA_PATH/"
+sudo cp "$CA_SECRETS/cakey.pem" $CA_KEY_PATH
+sudo cp "$CA_SECRETS/cacert.pem" $CA_CERT_PATH
 
 # TODO make SECRETS/ca_password.txt a file only readable by the apache web user
 # this way, not any user can read it, but the flask app can
-sudo cp "$CA_SECRETS/ca_password.txt" "$CA_PATH/private/ca_password.txt"
+sudo cp "$CA_SECRETS/ca_password.txt" $CA_PASSWORD_PATH
 
 # setup CRL
 # see: https://jamielinux.com/docs/openssl-certificate-authority/certificate-revocation-lists.html
@@ -51,8 +54,23 @@ sudo cp "$CA_SECRETS/ca_password.txt" "$CA_PATH/private/ca_password.txt"
 sudo bash -c "echo '00' > '$CA_PATH/crlnumber'"
 # Then, create the initial crl.pem
 sudo openssl ca -config /etc/ssl/openssl.cnf -gencrl \
-    -out "$CA_PATH/crl.pem" -passin file:"$CA_PATH/private/ca_password.txt"
+    -out "$CA_PATH/crl.pem" -passin file:$CA_PASSWORD_PATH
 
 
 # Finally, we need to make the ca-server user own the CA dir
 sudo chown --recursive ca-server "$CA_PATH"
+
+#  recursively remove read, write, and execute permissions for the group and others 
+# on all files within a directory
+chmod -R u=rw,go= "$CA_PATH"
+# The user needs execute permission on the directory to be able to
+# list files in it
+find "$CA_PATH" -type d -exec chmod u+x {} +
+
+
+read_only_files=($CA_PASSWORD_PATH $CA_KEY_PATH $CA_CERT_PATH)
+
+for file in "${read_only_files[@]}"; do
+  chmod u=r,go= $file
+done
+
