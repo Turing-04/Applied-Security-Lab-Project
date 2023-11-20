@@ -8,6 +8,7 @@ from ca_database import CADatabase
 from user_info import UserInfo, validate_user_info
 from cert_utils import build_subj_str, make_csr,\
     sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb
+from mysql_utils import mysql_update_certificate
 
 CA_PATH="/etc/ssl/CA" 
 CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
@@ -59,7 +60,10 @@ def request_certificate():
     assert os.path.exists(cert_path), cert_path
     tmp_csr.close()
 
-    # TODO update mysql db with new signed cert
+    # update mysql db with new signed cert
+    with open(cert_path, "r", encoding='utf-8') as cert_file:
+        cert_str = cert_file.read()
+        mysql_update_certificate(user_info["uid"], cert_str)
 
     # TODO don't forget to send cert.p12 encrypted to the backup server
     # TODO log https://flask.palletsprojects.com/en/3.0.x/logging/

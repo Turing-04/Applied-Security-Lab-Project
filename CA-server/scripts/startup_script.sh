@@ -40,6 +40,20 @@ echo "Copy keys for https"
 # SSLCertificateKeyFile   /etc/ssl/private/ca-server-https.key
 cp "$SYNCED_FOLDER/SECRETS/ca-server-https/ca-server-https.crt" /etc/ssl/certs/ca-server-https.crt
 cp "$SYNCED_FOLDER/SECRETS/ca-server-https/ca-server-https.key" /etc/ssl/private/ca-server-https.key
+chown ca-server /etc/ssl/certs/ca-server-https.crt
+chmod u=r,go= /etc/ssl/certs/ca-server-https.crt
+# set permissions for private key
+chown ca-server /etc/ssl/private/ca-server-https.key
+chmod u=r,go= /etc/ssl/private/ca-server-https.key
+
+echo "Copy ca-server-intranet crt and key"
+cp "$SYNCED_FOLDER/SECRETS/ca-server-intranet/ca-server-intranet.crt" /etc/ssl/certs/ca-server-intranet.crt
+cp "$SYNCED_FOLDER/SECRETS/ca-server-intranet/ca-server-intranet.key" /etc/ssl/private/ca-server-intranet.key
+chown ca-server /etc/ssl/certs/ca-server-intranet.crt
+chmod u=r,go= /etc/ssl/certs/ca-server-intranet.crt
+# set permissions for private key
+chown ca-server /etc/ssl/private/ca-server-intranet.key
+chmod u=r,go= /etc/ssl/private/ca-server-intranet.key
 
 echo "Copy apache2 config file"
 cp "$SYNCED_FOLDER/config/ca-server.conf" /etc/apache2/sites-available/
