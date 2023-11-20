@@ -19,6 +19,7 @@ CA_KEY_PATH="$CA_PATH/private/cakey.pem"
 #  Create the directories that hold the CA’s certificate and related files:
 sudo mkdir -p "$CA_PATH"
 sudo mkdir -p "$CA_PATH/certs"
+sudo rm -r "$CA_PATH/newcerts" # allows tests to pass with provision on running machine
 sudo mkdir -p "$CA_PATH/newcerts"
 sudo mkdir -p "$CA_PATH/private"
 
@@ -28,6 +29,7 @@ sudo mkdir -p "$CA_PATH/private"
 sudo bash -c "echo '01' > '$CA_PATH/serial'"
 
 #  An additional file is needed to record certificates that have been issued:
+sudo rm "$CA_PATH/index.txt"
 sudo touch "$CA_PATH/index.txt"
 
 # "The last file to be modified is the CA configuration file

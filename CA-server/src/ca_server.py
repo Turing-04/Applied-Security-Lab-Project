@@ -59,6 +59,8 @@ def request_certificate():
     assert os.path.exists(cert_path), cert_path
     tmp_csr.close()
 
+    # TODO update mysql db with new signed cert
+
     # TODO don't forget to send cert.p12 encrypted to the backup server
     # TODO log https://flask.palletsprojects.com/en/3.0.x/logging/
 
