@@ -12,6 +12,7 @@ sudo apt update
 # install duplicity
 sudo apt install duplicity -y 
 
-# copy keypairs to ~/.ssh
-
+# copy backup private key for ssh connection to ~/.ssh
+cp $SYNCED_FOLDER/../SECRETS/backup-server/backup-server.key /home/.ssh/backup-server.key
+cp $SYNCED_FOLDER/../SECRETS/
 
