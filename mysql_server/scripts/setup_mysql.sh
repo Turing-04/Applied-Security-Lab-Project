@@ -4,6 +4,7 @@ sudo apt update
 sudo apt upgrade -y
 
 # 1. Install MariaDB: https://linuxgenie.net/how-to-install-mariadb-on-debian-12-bookworm-distribution/
+# [TODO] update root password
 # Notes: remove remote connection to root, only localhost, add the root password during the isntallation process.
 sudo apt install mariadb-server -y
 mysql_secure_installation <<EOF
