@@ -50,13 +50,13 @@ mkdir /etc/mysql/ssl/certs
 mkdir /etc/mysql/ssl/private
 
 # 7.2 Copy certificates and set permissions
-cp $SYNCED_FOLDER/mysql-server-crt.pem /etc/mysql/ssl/certs
-cp $SYNCED_FOLDER/cacert.pem /etc/mysql/ssl/certs
-sudo chmod 644 /etc/mysql/ssl/certs/mysql-server-crt.pem /etc/mysql/ssl/certs/cacert.pem
+cp $SYNCED_FOLDER/SECRETS/mysql-server/mysql-server.crt /etc/mysql/ssl/certs
+cp $SYNCED_FOLDER/SECRETS/ca-server/cacert.pem /etc/mysql/ssl/certs
+sudo chmod 644 /etc/mysql/ssl/certs/mysql-server.crt /etc/mysql/ssl/certs/cacert.pem
 
-cp $SYNCED_FOLDER/mysql-server-key.pem /etc/mysql/ssl/private
-sudo chmod 640 /etc/mysql/ssl/private/mysql-server-key.pem
-sudo chown root:mysql /etc/mysql/ssl/private/mysql-server-key.pem
+cp $SYNCED_FOLDER/SECRETS/mysql-server/mysql-server.key /etc/mysql/ssl/private
+sudo chmod 640 /etc/mysql/ssl/private/mysql-server.key
+sudo chown root:mysql /etc/mysql/ssl/private/mysql-server.key
 
 # 7.3 Set TLS configuration in MariaDB
 cp $SYNCED_FOLDER/mariadb-server-tls.cnf /etc/mysql/mariadb.conf.d
