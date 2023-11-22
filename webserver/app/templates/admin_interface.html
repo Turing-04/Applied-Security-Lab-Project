@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>Certificate manager - Login page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+        <!-- Show the number of issued certificates, number of revoked ones and their current serial number-->
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Certificate manager</h1>
+                <p>Number of issued certificates: {{ info['nb_issued_certs'] }}</p>
+                <p>Number of revoked certificates: {{ info['nb_revoked_certs'] }}</p>
+                <p>Current serial number: {{info['serial_nb']}}</p>
+            </div>
+
+    </div> 
+  </body>
+</html>

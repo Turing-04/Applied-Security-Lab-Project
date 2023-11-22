@@ -14,6 +14,11 @@
           request.form.password }}">
         <input class="btn btn-default" type="submit" value="Login">
       </form>
+      <br> 
+      <p> To connect using a certificate, please import your certificate in your 
+        browser and click on the following link: <a href="/cert-login">Login with certificate</a></p>
+      <br>
+      <p> Administrator login with certificate: <a href="/admin-interface">here.</a></p>
       {% if error %}
         <p class="error"><strong>Error:</strong> {{ error }}
       {% endif %}

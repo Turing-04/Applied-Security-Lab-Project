@@ -73,6 +73,9 @@ def login():
             
             print("Succesfully logged in")
             return redirect(url_for('default'))
+    
+    # destroy session if user sends a GET request to /login
+    session.pop('uid', None)
 
     return render_template('login.html', error=error_msg)
 
@@ -184,6 +187,25 @@ def new_certificate():
         flash("Could not get new certificate")
         return redirect(url_for('home'))
     
+@app.route("/admin-interface", methods=['GET'])
+def admin_interface():
+    # CA Admin interface should only be accessible with admin certificate
+    # TODO: check if user is admin
+    resp = check_admin_certificate()
+    
+    #TODO: fetch administration info from CA server
+    #resp = requests.get("http://"+CA_IP+"/admin")
+    
+    resp = {'nb_issued_certs': 10, 'nb_revoked_certs': 2, 'serial_nb': 5}
+    return render_template('admin_interface.html', info=resp)
+
+@app.route("/cert-login", methods=['GET'])
+def cert_login():
+    # TODO: check authentication with certificate
+    resp = check_certificate()
+    return "TODO"
+
+    
 #TODO: check if it's a good idea to have a separate route for downloading certificate
     
 @app.route("/revoke_certificate", methods=['GET'])
@@ -191,6 +213,14 @@ def new_certificate():
 def revoke_certificate():
     resp = db_revoke_cert()
     
+#TODO: check certificate
+def check_certificate():
+    return True
+
+# TODO: check CA admin certificate
+def check_admin_certificate():
+    return True
+
     
 #TODO: communication with DB and CA 
 def db_revoke_cert():
