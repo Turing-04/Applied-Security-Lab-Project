@@ -29,7 +29,7 @@ DB_KEY = "BLA"
 # create the application object
 app = Flask(__name__)
 
-# TODO : set secret key to confidential value stored in vagrant as env variable (or in a file)
+# TODO : set secret key to confidential value stored in vagrant as env variable (SECRET_KEY)
 app.secret_key = "super secret key"
 
 
@@ -216,6 +216,8 @@ def revoke_certificate():
     
 #TODO: check certificate
 def check_certificate():
+    client_cert = request.environ.get('SSL_CLIENT_CERT')
+    #TODO: check if certificate is valid along with CA server ? 
     return True
 
 # TODO: check CA admin certificate
@@ -264,6 +266,7 @@ def ca_download_cert(username):
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
+    # TODO: add ssl_context='adhoc' to use HTTPS
     app.run(debug=True)
     
     
