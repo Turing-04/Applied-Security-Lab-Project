@@ -132,6 +132,8 @@ def revoke_certificate():
     
     generate_crl()
 
+    app.logger.info(f"Successfully revoked cert for {user_info}")
+
     return make_response('Certificate successfully revocated!', 200)
 
 @app.get("/crl")
