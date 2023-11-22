@@ -1,19 +1,56 @@
-<html>
-  <head>
-    <title>Certificate manager - Login page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body>
-    <div class="container">
-        <!-- Show the number of issued certificates, number of revoked ones and their current serial number-->
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Certificate manager</h1>
-                <p>Number of issued certificates: {{ info['nb_issued_certs'] }}</p>
-                <p>Number of revoked certificates: {{ info['nb_revoked_certs'] }}</p>
-                <p>Current serial number: {{info['serial_nb']}}</p>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Interface</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
 
-    </div> 
-  </body>
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .col-md-12 {
+      width: 100%;
+    }
+
+    p {
+      margin-top: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Show the number of issued certificates, number of revoked ones, and their current serial number-->
+    <div class="row">
+      <div class="col-md-12">
+        <h1>CA's current state:</h1>
+        <p>Number of issued certificates: {{ info['nb_issued_certs'] }}</p>
+        <p>Number of revoked certificates: {{ info['nb_revoked_certs'] }}</p>
+        <p>Current serial number: {{ info['serial_nb'] }}</p>
+      </div>
+    </div>
+  </div>
+</body>
 </html>

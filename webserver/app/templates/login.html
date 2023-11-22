@@ -1,27 +1,100 @@
-<html>
-  <head>
-    <title>Certificate manager - Login page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body>
-    <div class="container">
-      <h1>Please login</h1>
-      <br>
-      <form action="" method="post">
-        <input type="text" placeholder="Email" name="username" value="{{
-          request.form.username }}">
-         <input type="password" placeholder="Password" name="password" value="{{
-          request.form.password }}">
-        <input class="btn btn-default" type="submit" value="Login">
-      </form>
-      <br> 
-      <p> To connect using a certificate, please import your certificate in your 
-        browser and click on the following link: <a href="/cert-login">Login with certificate</a></p>
-      <br>
-      <p> Administrator login with certificate: <a href="/admin-interface">here.</a></p>
-      {% if error %}
-        <p class="error"><strong>Error:</strong> {{ error }}
-      {% endif %}
-    </div>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate Manager - Login Page</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .btn {
+      width: 100%; /* Set the width to 100% for both buttons */
+      background-color: #4caf50;
+      color: white;
+      padding: 12px 0; /* Adjusted padding to center text vertically */
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+
+    p {
+      margin-top: 20px;
+      color: #666;
+    }
+
+    a {
+      color: #1e90ff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Please Login</h1>
+    <br>
+    <form action="" method="post">
+      <input type="text" placeholder="Email" name="username" value="{{ request.form.username }}">
+      <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}">
+      <button class="btn" type="submit">Login</button>
+    </form>
+
+    {% if error %}
+      <p class="error"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+
+    <br> 
+    <p>To connect using a certificate, please import your certificate in your browser and click the button below:</p>
+    <a href="/cert-login"><button class="btn">Login with certificate</button></a>
+    <br>
+    <p>Administrator login with certificate: <a href="/admin-interface">here.</a></p>
+  </div>
+</body>
 </html>

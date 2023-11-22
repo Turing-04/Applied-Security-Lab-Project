@@ -208,10 +208,11 @@ def cert_login():
     
 #TODO: check if it's a good idea to have a separate route for downloading certificate
     
-@app.route("/revoke_certificate", methods=['GET'])
+@app.route("/revoke", methods=['GET'])
 @login_required
 def revoke_certificate():
     resp = db_revoke_cert()
+    return "TODO"
     
 #TODO: check certificate
 def check_certificate():
