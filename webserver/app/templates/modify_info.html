@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <title>Modify User Information</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Please update the fields you want then press submit </h1>
+      <br>
+      <form action="" method="post">
+        <input type="text" placeholder="Firstname" name="firstname" value="{{
+          user_info['firstname'] }}"> <br><br>
+         <input type="text" placeholder="Lastname" name="lastname" value="{{
+            user_info['lastname'] }}"><br><br>
+          <input type="text" placeholder="Email" name="email" value="{{
+            user_info['email'] }}"> <br><br>
+        <input class="btn btn-default" type="submit" value="update">
+      </form>
+        <br>
+  
+    {% for message in get_flashed_messages() %}
+        {{ message }}
+      {% endfor %}
+
+      <p> go back to <a href="{{ url_for('home') }}">home</a></p>
+
+    </div>
+  </body>
+</html>

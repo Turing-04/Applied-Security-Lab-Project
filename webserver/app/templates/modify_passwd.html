@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <title>Modify password</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Please fill the fields to update your password </h1>
+      <br>
+      <form action="" method="post">
+        <input type="password" placeholder="Old password" name="old_passwd" value="{{
+          request.form.old_passwd }}"> <br><br>
+         <input type="password" placeholder="New password" name="new_passwd" value="{{
+            request.form.new_passwd }}"><br><br>
+          <input type="password" placeholder="Confirm new password" name="new_passwd_conf" value="{{
+            request.form.new_passwd_conf }}"> <br><br>
+        <input class="btn btn-default" type="submit" value="submit">
+      </form>
+        <br>
+  
+    {% for message in get_flashed_messages() %}
+        {{ message }}
+      {% endfor %}
+
+      <p> go back to <a href="{{ url_for('home') }}">home</a></p>
+
+    </div>
+  </body>
+</html>

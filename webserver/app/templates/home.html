@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> Home page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome {{user}}!</h2>
+      <br>
+      <h4>To change your user information, please click <a href="/modify_info">here</a></h4>
+      <br>
+      <h4>To change your password, please click <a href="/modify_passwd">here</a></h4>
+      <br>
+      <h2>Manage Certificates </h2>
+      <h4>To receive a new certificate, please click <a href="/new_certificate">here</a></h4>
+
+      <p> Please note that issuing a new certificate will automatically revoke all previous certificates</p>
+      <br>
+      <h4>To revoke a certificate, please click <a href="/revoke">here</a></h4>
+      <br>
+      <h4> The current revokation list is : </h4>
+      <p> {{revoked}}</p>
+      <br>
+
+     
+      <p> To logout, please click <a href="/logout">here</a></p>
+
+
+
+      
+    </div>
+  </body>
+</html>
