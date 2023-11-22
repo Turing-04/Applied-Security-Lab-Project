@@ -1,0 +1,19 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "debian/bookworm64"
+
+    config.vm.network "private_network", ip: "10.0.0.1",
+      virtualbox__intnet: "intranet"
+
+    config.vm.network "private_network", ip: "10.0.1.1",
+      virtualbox__intnet: "dmz"
+
+    config.vm.network "private_network", ip: "1.2.3.4",
+      virtualbox__intnet: "internet"
+
+    # config.trigger.before [:up, :provision] do |trigger|
+    #   trigger.info = "Copying global secrets into local folder..."
+    #   trigger.run = {path: "./scripts/copy_global_secrets.sh"}
+    # end
+  
+    config.vm.provision "shell", path: "scripts/startup_script.sh"
+  end
