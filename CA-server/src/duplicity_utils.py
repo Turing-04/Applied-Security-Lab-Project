@@ -1,12 +1,13 @@
 import subprocess
 import time
+from logging import Logger
 
 BKP_SERVER_IP="10.0.0.4"
 BKP_SERVER_USER="caserver"
 BKP_CERTS_PATH="/srv/duplicity/caserver/certificates"
 ENCRYPT_KEY_ID = "master-backup-key@imovies.ch"
 
-def backup_pkcs12(source_file_path: str, uid: str):
+def backup_pkcs12(source_file_path: str, uid: str, logger: Logger):
     """
     Perform a backup of a PKCS12 file using Duplicity.
 
@@ -52,6 +53,6 @@ def backup_pkcs12(source_file_path: str, uid: str):
     # Execute the Duplicity command
     try:
         subprocess.run(duplicity_command, check=True)
-        print("Backup completed successfully.")
+        logger.info("Backup completed successfully.")
     except subprocess.CalledProcessError as e:
-        print(f"Backup failed with error: {e}")
+        logger.error(f"Backup failed with error: {e}")

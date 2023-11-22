@@ -10,14 +10,29 @@ from cert_utils import build_subj_str, make_csr,\
     sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb
 from mysql_utils import mysql_update_certificate
 from duplicity_utils import backup_pkcs12
+from logging.config import dictConfig
 
 CA_PATH="/etc/ssl/CA" 
 CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
 CA_CRL_PATH = f"{CA_PATH}/crl.pem"
 
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
 app = Flask(__name__)
-
-
 
 @app.post("/request-certificate")
 def request_certificate():
@@ -61,17 +76,16 @@ def request_certificate():
     assert os.path.exists(cert_path), cert_path
     tmp_csr.close()
 
+    app.logger.info(f"Signed new certificate for {user_info['uid']}")
+
     # update mysql db with new signed cert
     with open(cert_path, "r", encoding='utf-8') as cert_file:
         cert_str = cert_file.read()
-        mysql_update_certificate(user_info["uid"], cert_str)
-
-
-    # TODO log https://flask.palletsprojects.com/en/3.0.x/logging/
+        mysql_update_certificate(user_info["uid"], cert_str, app.logger)
 
     cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
     # send cert.p12 encrypted to the backup server
-    backup_pkcs12(cert_and_key.name, user_info["uid"])
+    backup_pkcs12(cert_and_key.name, user_info["uid"], app.logger)
 
     tmp_priv_key.close()
 
@@ -161,4 +175,5 @@ def get_ca_state():
 @app.get("/ping")
 def ping():
     # For testing
+    app.logger.info("pong")
     return "pong"
