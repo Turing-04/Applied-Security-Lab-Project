@@ -2,9 +2,22 @@
 
 sudo apt update
 sudo apt upgrade -y
+
 # 1. Install rsyslog
 sudo apt install -y rsyslog
 
+# 2 Copy certificates and set permissions
+sudo mkdir /etc/rsyslog.d/ssl
+sudo mkdir /etc/rsyslog.d/ssl/certs
+sudo mkdir /etc/rsyslog.d/ssl/private
+
+cp $SYNCED_FOLDER/SECRETS/backup-server/backup-server.crt /etc/rsyslog.d/ssl/certs
+cp $SYNCED_FOLDER/SECRETS/ca-server/cacert.pem /etc/rsyslog.d/ssl/certs
+sudo chmod 644 /etc/rsyslog.d/ssl/certs/backup-server.crt /etc/rsyslog.d/ssl/certs/cacert.pem
+
+cp $SYNCED_FOLDER/SECRETS/rsyslog.d/backup-server.key /etc/rsyslog.d/ssl/private
+sudo chmod 640 /etc/rsyslog.d/ssl/private/backup-server.key
+#sudo chown root:mysql /etc/mysql/ssl/private/mysql-server.key
 
 # 8 Create sysadmin user and add it to the sudoers group
 sudo useradd -m sysadmin -p dv8RCJruycKGyN
