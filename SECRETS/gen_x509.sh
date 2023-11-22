@@ -1,12 +1,13 @@
 #!/bin/bash
 
+CAKEY_PATH="./ca-server/cakey.pem"
+CACERT_PATH="./ca-server/cacert.pem"
+
 # Function to generate a new certificate and key for a given entity
 generate_certificate() {
     entity="$1"
-    cacert_path="$2"
-    cakey_path="$3"
-    ca_password_path="$4"
-    common_name="$5"
+    ca_password_path="$2"
+    common_name="$3"
     tmp_csr=$(mktemp)
     
     mkdir -p "$entity"
@@ -16,13 +17,13 @@ generate_certificate() {
         -subj "/C=CH/ST=Zurich/O=iMovies/CN=$common_name/emailAddress=$entity@imovies.ch/"
 
     sudo openssl x509 -req -in $tmp_csr -out "$entity/$entity.crt" \
-        -CA $cacert_path -CAkey $cakey_path -passin file:$ca_password_path -CAcreateserial -days 365
+        -CA $CACERT_PATH -CAkey $CAKEY_PATH -passin file:$ca_password_path -CAcreateserial -days 365
 
     # display generated cert
-    openssl x509 -in "$entity/$entity.crt" -text
+    # openssl x509 -in "$entity/$entity.crt" -text
 
-    # verify cert
-    openssl verify -CAfile $cacert_path "$entity/$entity.crt"
+    # # verify cert
+    # openssl verify -CAfile $cacert_path "$entity/$entity.crt"
 }
 
 USAGE="Usage: $0 [--regen-all | --gen-new <new_cert_name> <common_name>] /path/to/ca_password.txt"
@@ -33,22 +34,29 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-cakey_path="./ca-server/cakey.pem"
-cacert_path="./ca-server/cacert.pem"
+
 
 
 case "$1" in
     --regen-all)
-        ca_password_path=$2
+        ca_password_path="$2"
+        if [ -z "$ca_password_path" ]; then
+            echo $USAGE
+            exit 1
+        fi
         # Regenerate all certificates, including the CA cert
-        sudo rm -rf "./ca-server" && mkdir "./ca-server"
+        mkdir -p "./ca-server"
         sudo openssl req -passout file:"$ca_password_path" -new -x509 \
-            -extensions v3_ca -keyout $cakey_path -out $cacert_path -days 3650 \
+            -extensions v3_ca -keyout $CAKEY_PATH -out $CACERT_PATH -days 3650 \
             -subj "/C=CH/ST=Zurich/O=iMovies/CN=iMovies root cert/emailAddress=ca-admin@imovies.ch/"
-        entities=("mysql-server" "webserver-intranet" "backup-master-key"
-            "backup-server" "ca-server-intranet" "ca-admin" "sysadmin-ssh")
-        for entity in "${entities[@]}"; do
-            generate_certificate $entity $cacert_path $cakey_path $ca_password_path $entity
+
+        entities=("webserver-mysql" "webserver-https" "ca-server-https" "ca-server-mysql" "mysql-server" "ca-admin")
+        common_names=("10.0.1.2" "1.2.3.4" "10.0.0.3" "10.0.0.3" "10.0.0.5" "ca-admin")
+
+        for ((i=0; i<${#entities[@]}; i++)); do
+            entity="${entities[$i]}"
+            common_name="${common_names[$i]}"
+            generate_certificate "$entity" "$ca_password_path" "$common_name"
         done
         ;;
     --gen-new)
@@ -60,7 +68,7 @@ case "$1" in
         entity="$2"
         common_name="$3"
         ca_password_path="$4"
-        generate_certificate $entity $cacert_path $cakey_path $ca_password_path $common_name
+        generate_certificate $entity $ca_password_path $common_name
         ;;
     *)
         echo $USAGE

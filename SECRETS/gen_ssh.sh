@@ -1,7 +1,15 @@
 #!/bin/bash
 
-DST_PRIV_KEY="./sysadmin-ssh/sysadmin-ssh"
-SSH_PASSPHRASE="flail-dandelion-concierge"
-COMMENT="sysadmin@imovies.ch"
 
-ssh-keygen -t rsa -N "$SSH_PASSPHRASE" -f "$DST_PRIV_KEY" -C "$COMMENT"
+entities=("ca-server-ssh" "mysql-server-ssh" "sysadmin-ssh")
+passphrases=("" "" "flail-dandelion-concierge")
+
+for ((i=0; i<${#entities[@]}; i++)); do
+    entity="${entities[$i]}"
+    mkdir -p "./$entity"
+    dst_priv_key="./$entity/$entity"
+    comment="${entity}@imovies.ch"
+    passphrase="${passphrases[$i]}"
+    ssh-keygen -t rsa -N "$passphrase" -f "$dst_priv_key" -C "$comment"
+done
+
