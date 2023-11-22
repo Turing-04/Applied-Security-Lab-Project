@@ -33,8 +33,9 @@
 ├── webserver-https : Certificate and key to allow the webserver to serve the external facing webapp over HTTPS.
 │   ├── webserver-https.crt
 │   └── webserver-https.key
-└── webserver-mysql : : certificate and key for TLS client authentication when webserver connects to MySQL db.
+└── webserver-mysql : certificate and key for TLS client authentication when webserver connects to MySQL db.
     ├── webserver-mysql.crt
     └── webserver-mysql.key
-
-11 directories, 28 files
+└── logging-rsyslog : cert + key for TLS server authentication to encrypt logs when using rsyslog (see https://rsyslog.readthedocs.io/en/latest/tutorials/tls.html)
+    ├── logging-rsyslog.crt
+    └── logging-rsyslog.key
