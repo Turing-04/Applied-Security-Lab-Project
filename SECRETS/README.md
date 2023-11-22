@@ -36,10 +36,5 @@
 └── webserver-mysql : : certificate and key for TLS client authentication when webserver connects to MySQL db.
     ├── webserver-mysql.crt
     └── webserver-mysql.key
-├── ssh-authorized-keys : files that can directly be copied into ~/.ssh/authorized_keys on the relevant target machines. Don't forget to rename to exactly `~/.ssh/authorized_keys` !
-    ├── backup-server_authorized_keys
-    ├── ca-server_authorized_keys
-    ├── mysql-server_authorized_keys
-    └── webserver_authorized_keys
 
 11 directories, 28 files
