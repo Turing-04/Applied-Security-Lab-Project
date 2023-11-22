@@ -26,10 +26,10 @@ su - ca-server -c "gpg --list-keys"
 echo "Install ssh private key for ca-server"
 mkdir -p /home/ca-server/.ssh
 cp -r "$SYNCED_FOLDER/SECRETS/ca-server-ssh/" /home/ca-server/.ssh
-ssh_config="Host 10.0.0.4
-    User caserver
-    IdentityFile /home/ca-server/.ssh/ca-server-ssh/ca-server-ssh"
-echo $ssh_config >> /home/ca-server/.ssh/config
+ssh_config="/home/ca-server/.ssh/config"
+echo "Host 10.0.0.4" >> $ssh_config
+echo -e "\tUser caserver" >> $ssh_config
+echo -e "\tIdentityFile /home/ca-server/.ssh/ca-server-ssh/ca-server-ssh" >> $ssh_config
 sudo chown --recursive ca-server /home/ca-server/.ssh
 
 
@@ -83,6 +83,9 @@ echo "DONE: openssl CA setup"
 echo "Starting install of necessary software"
 # allows to get newer packages than the box creation (e.g. python3.11-venv)
 sudo apt update
+
+# For precise time, necessary for certificate dates to be accurate
+sudo apt install ntp
 
 echo "install gpg"
 sudo apt install gpg

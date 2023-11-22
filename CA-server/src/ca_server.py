@@ -9,6 +9,7 @@ from user_info import UserInfo, validate_user_info
 from cert_utils import build_subj_str, make_csr,\
     sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb
 from mysql_utils import mysql_update_certificate
+from duplicity_utils import backup_pkcs12
 
 CA_PATH="/etc/ssl/CA" 
 CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
@@ -65,10 +66,13 @@ def request_certificate():
         cert_str = cert_file.read()
         mysql_update_certificate(user_info["uid"], cert_str)
 
-    # TODO don't forget to send cert.p12 encrypted to the backup server
+
     # TODO log https://flask.palletsprojects.com/en/3.0.x/logging/
 
     cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
+    # send cert.p12 encrypted to the backup server
+    backup_pkcs12(cert_and_key.name, user_info["uid"])
+
     tmp_priv_key.close()
 
     @after_this_request
