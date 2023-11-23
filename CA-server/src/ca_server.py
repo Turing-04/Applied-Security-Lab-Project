@@ -11,6 +11,7 @@ from cert_utils import build_subj_str, make_csr,\
 from mysql_utils import mysql_update_certificate, mysql_connect
 from duplicity_utils import backup_pkcs12
 from logging.config import dictConfig
+from mysql.connector import MySQLConnection
 
 CA_PATH="/etc/ssl/CA" 
 CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
@@ -33,6 +34,18 @@ dictConfig({
 })
 
 app = Flask(__name__)
+
+global_mysql_cnx: MySQLConnection = None
+
+@app.before_request
+def connect_mysql():
+    global global_mysql_cnx
+    if global_mysql_cnx is None:
+        global_mysql_cnx = mysql_connect(app.logger)
+    elif not global_mysql_cnx.is_connected():
+        global_mysql_cnx.close()
+        global_mysql_cnx = mysql_connect(app.logger)
+
 
 @app.post("/request-certificate")
 def request_certificate():
@@ -81,9 +94,8 @@ def request_certificate():
     # update mysql db with new signed cert
     with open(cert_path, "r", encoding='utf-8') as cert_file:
         cert_str = cert_file.read()
-        # TODO setup MySQL connection!!!
-        cnx = mysql_connect(app.logger)
-        mysql_update_certificate(cnx, user_info["uid"], cert_str, app.logger)
+        assert not cert_str is None
+        mysql_update_certificate(global_mysql_cnx, user_info["uid"], cert_str, app.logger)
 
     cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
     # send cert.p12 encrypted to the backup server
@@ -132,7 +144,9 @@ def revoke_certificate():
     for serial_nb in serial_nbs:
         revoke_cert(serial_nb)
 
-    # TODO update db!
+    # update mysql db to revoke certificate
+    mysql_update_certificate(global_mysql_cnx, user_info["uid"], 
+        new_certificate=None, logger=app.logger)
     
     generate_crl()
 
