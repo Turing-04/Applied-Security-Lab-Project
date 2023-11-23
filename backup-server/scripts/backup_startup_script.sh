@@ -82,6 +82,9 @@ fi
 # disable password authentication
 sudo sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication no" /etc/ssh/sshd_config
 
+# add authorized keys file
+sudo sed -i "s/.*AuthorizedKeysFile.*/AuthorizedKeysFile      \/home\/caserver\/.ssh\/authorized_keys/ \/home\/mysql\/.ssh\/authorized_keys \/home\/sysadmin\/.ssh\/authorized_keys" /etc/ssh/sshd_config
+
 # restart sshd
 sudo systemctl restart ssh
 
