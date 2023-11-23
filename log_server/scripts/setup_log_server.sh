@@ -5,19 +5,23 @@ sudo apt upgrade -y
 
 # 1. Install rsyslog
 sudo apt install -y rsyslog
+sudo apt install -y rsyslog-gnutls
 
-# 2 Copy certificates and set permissions
+# 2. Copy certificates and set permissions
 sudo mkdir /etc/rsyslog.d/ssl
 sudo mkdir /etc/rsyslog.d/ssl/certs
 sudo mkdir /etc/rsyslog.d/ssl/private
 
-cp $SYNCED_FOLDER/SECRETS/backup-server/backup-server.crt /etc/rsyslog.d/ssl/certs
-cp $SYNCED_FOLDER/SECRETS/ca-server/cacert.pem /etc/rsyslog.d/ssl/certs
-sudo chmod 644 /etc/rsyslog.d/ssl/certs/backup-server.crt /etc/rsyslog.d/ssl/certs/cacert.pem
+sudo cp $SYNCED_FOLDER/SECRETS/logging-rsyslog/logging-rsyslog.crt /etc/rsyslog.d/ssl/certs
+sudo cp $SYNCED_FOLDER/SECRETS/ca-server/cacert.pem /etc/rsyslog.d/ssl/certs
+sudo chmod 644 /etc/rsyslog.d/ssl/certs/logging-rsyslog.crt /etc/rsyslog.d/ssl/certs/cacert.pem
 
-cp $SYNCED_FOLDER/SECRETS/rsyslog.d/backup-server.key /etc/rsyslog.d/ssl/private
-sudo chmod 640 /etc/rsyslog.d/ssl/private/backup-server.key
+cp $SYNCED_FOLDER/SECRETS/logging-rsyslog/logging-rsyslog.key /etc/rsyslog.d/ssl/private
+sudo chmod 640 /etc/rsyslog.d/ssl/private/logging-rsyslog.key
 #sudo chown root:mysql /etc/mysql/ssl/private/mysql-server.key
+
+# 3. Copy configuration file to the rsyslog.d
+sudo cp $SYNCED_FOLDER/rsyslog_server.cnf /etc/rsyslog.d
 
 # 8 Create sysadmin user and add it to the sudoers group
 sudo useradd -m sysadmin -p dv8RCJruycKGyN
@@ -29,7 +33,7 @@ sudo usermod -aG sudo sysadmin
 mkdir -p /home/sysadmin/.ssh && touch /home/sysadmin/.ssh/authorized_keys
 
 # 9.2 Copy sysadmin public key and set correct permissions
-ssh-keygen -f $SYNCED_FOLDER/sysadmin-ssh.pub -i -m PKCS8 &>  /home/sysadmin/.ssh/authorized_keys
+ssh-keygen -f $SYNCED_FOLDER/SECRETS/sysadmin-ssh/sysadmin-ssh.pub -i -m PKCS8 &>  /home/sysadmin/.ssh/authorized_keys
 sudo chmod -R go= /home/sysadmin/.ssh
 sudo chown -R sysadmin:sysadmin /home/sysadmin/.ssh
 
