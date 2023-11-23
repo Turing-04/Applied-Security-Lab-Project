@@ -39,6 +39,7 @@ mysql -u root -proot imovies -e "GRANT SELECT ON certificates TO 'webserver'@'%'
 
 mysql -u root -proot imovies -e "CREATE USER 'caserver'@'10.0.0.3' IDENTIFIED BY 'cn9@1kbka;}=(iPgEMO1&{XW' REQUIRE X509;"
 mysql -u root -proot imovies -e "GRANT SELECT, INSERT, UPDATE, DELETE ON certificates TO 'caserver'@'10.0.0.3';"
+mysql -u root -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'H6Mue92MeNNnvFRpJ67V';"
 
 mysql -u root -proot -e "FLUSH PRIVILEGES;"
 # 6. Change bind-address from localhost to the interface in the configuration file.
