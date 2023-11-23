@@ -4,7 +4,6 @@ sudo apt update
 sudo apt upgrade -y
 
 # 1. Install MariaDB: https://linuxgenie.net/how-to-install-mariadb-on-debian-12-bookworm-distribution/
-# [TODO] update root password
 # Notes: remove remote connection to root, only localhost, add the root password during the isntallation process.
 sudo apt install mariadb-server -y
 mysql_secure_installation <<EOF
@@ -27,7 +26,7 @@ mysql -u root -proot -e "CREATE DATABASE imovies;"
 mysql -u root -proot imovies < $SYNCED_FOLDER/imovies_users.db
 
 # 4. Create certificates table
-mysql -u root -proot imovies -e "CREATE TABLE certificates (uid varchar(64) NOT NULL, certificate varchar(6000) NOT NULL, PRIMARY KEY (uid));"
+mysql -u root -proot imovies -e "CREATE TABLE certificates (uid varchar(64) NOT NULL, certificate varchar(6000), PRIMARY KEY (uid));"
 
 # 5. Create users in MySQL and set privileges
 # webserver with read/write access to table "users" and read access to table "certificate";
@@ -39,9 +38,12 @@ mysql -u root -proot imovies -e "GRANT SELECT ON certificates TO 'webserver'@'%'
 
 mysql -u root -proot imovies -e "CREATE USER 'caserver'@'10.0.0.3' IDENTIFIED BY 'cn9@1kbka;}=(iPgEMO1&{XW' REQUIRE X509;"
 mysql -u root -proot imovies -e "GRANT SELECT, INSERT, UPDATE, DELETE ON certificates TO 'caserver'@'10.0.0.3';"
-mysql -u root -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'H6Mue92MeNNnvFRpJ67V';"
 
 mysql -u root -proot -e "FLUSH PRIVILEGES;"
+
+# [TODO] to check  whether the passowrd is changed
+# mysql -u root -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'H6Mue92MeNNnvFRpJ67V';"
+
 # 6. Change bind-address from localhost to the interface in the configuration file.
 sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" /etc/mysql/mariadb.conf.d/50-server.cnf
 
@@ -75,6 +77,7 @@ sudo systemctl restart mariadb
 # This parameter on the lcient side gives an error. Soemthing is wrong with the server authenctication.
 
 #ssl-verify-server-cert
+
 # 8 Create sysadmin user and add it to the sudoers group
 sudo useradd -m sysadmin -p dv8RCJruycKGyN
 sudo usermod -aG sudo sysadmin
