@@ -16,16 +16,18 @@
 
 #!/bin/bash
 
+export VAGRANT_HOME="/home/vagrant"
 WEBSERVER_DIR="/var/www/webserver"
 
 
 echo "Starting script for webserver setup"
 
+#sudo hostnamectl set-hostname webserver
+
 # need to handle user creation and rights
 # probably need to create a user with sudo rights and then delete the vagrant user
 sudo useradd webserver --create-home --shell /bin/bash
-sudo usermod -aG sudo webserver
-sudo userdel -r vagrant
+sudo usermod -aG sudo webserver # should it be sudo or www-data ?
 
 sudo apt update -y && sudo apt upgrade -y
 sudo apt install -y python3 python3-pip python3-venv python3-dev
@@ -34,10 +36,10 @@ sudo apt install -y apache2 apache2-dev
 sudo apt install -y openssl libssl-dev
 sudo apt install -y ssh
 
-# setup Apache2
+# setup Apache2 - TODO
 sudo a2enmod ssl
 sudo a2enmod proxy
-sudo a2enmod wsgi
+# sudo a2enmod wsgi
 
 # need to handle the keys here
 
@@ -49,7 +51,6 @@ sudo a2enmod wsgi
 sudo systemctl start apache2
 sudo systemctl enable apache2
 
-
 # setup ssh
 # TODO: handle keys
 # TODO: disable password login
@@ -60,8 +61,9 @@ sudo systemctl enable ssh
 # sudo crontab -e
 
 # delete command history
-sudo rm ~/.bash_history && history -c
+rm ~/.bash_history && history -c
 
+echo $(whoami)
 
 # TODO: setup firewall
 # TODO: setup encryption of the disk
@@ -69,5 +71,4 @@ sudo rm ~/.bash_history && history -c
 # TODO: delete vagrant user
 # TODO: setup fail2ban
 # TODO: disable internet access 
-
 

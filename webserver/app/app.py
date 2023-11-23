@@ -29,6 +29,9 @@ DB_KEY = "BLA"
 # create the application object
 app = Flask(__name__)
 
+# disabling caching 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
 # TODO : set secret key to confidential value stored in vagrant as env variable (SECRET_KEY)
 app.secret_key = "super secret key"
 
@@ -94,7 +97,7 @@ def home():
     revoked = "revoked list"
     return render_template('home.html', user=user_info, revoked=revoked)  
 
-
+    
 @app.route('/logout')
 @login_required
 def logout():
