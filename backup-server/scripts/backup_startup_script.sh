@@ -70,7 +70,7 @@ sudo chown -R mysql:mysql /srv/duplicity/mysql
 # Step 3: configure sshd for uni-directional ssh connection: only from clients to backup server
 #--------------------------------------------
 # disable root login
-sudo sed -i "s/.*PermitRootLogin.*/PermitRootLogin no" /etc/ssh/sshd_config
+sudo sed -i "s/.*PermitRootLogin.*/PermitRootLogin no/" /etc/ssh/sshd_config
 
 # specify allowed users
 if sudo grep -q "AllowUsers" /etc/ssh/sshd_config; then
@@ -80,10 +80,10 @@ else
 fi
 
 # disable password authentication
-sudo sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication no" /etc/ssh/sshd_config
+sudo sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication no/" /etc/ssh/sshd_config
 
 # add authorized keys file
-sudo sed -i "s/.*AuthorizedKeysFile.*/AuthorizedKeysFile      \/home\/caserver\/.ssh\/authorized_keys/ \/home\/mysql\/.ssh\/authorized_keys \/home\/sysadmin\/.ssh\/authorized_keys" /etc/ssh/sshd_config
+sudo sed -i "s/.*AuthorizedKeysFile.*/AuthorizedKeysFile      \/home\/caserver\/.ssh\/authorized_keys/ \/home\/mysql\/.ssh\/authorized_keys \/home\/sysadmin\/.ssh\/authorized_keys/" /etc/ssh/sshd_config
 
 # restart sshd
 sudo systemctl restart ssh
