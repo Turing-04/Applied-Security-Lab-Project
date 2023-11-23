@@ -23,6 +23,13 @@ echo "Installing bkp-master-key-public.gpg"
 su - ca-server -c "gpg --import '$SYNCED_FOLDER/SECRETS/bkp-master-key-public.gpg'"
 su - ca-server -c "gpg --list-keys"
 
+GPG_PUBLIC="/home/ca-server/gpg-public"
+mkdir -p $GPG_PUBLIC
+cp "$SYNCED_FOLDER/SECRETS/bkp-master-key-public.gpg" "$GPG_PUBLIC/bkp-master-key-public.gpg"
+chown --recursive ca-server "$GPG_PUBLIC"
+
+
+
 echo "Install ssh private key for ca-server"
 mkdir -p /home/ca-server/.ssh
 cp -r "$SYNCED_FOLDER/SECRETS/ca-server-ssh/" /home/ca-server/.ssh

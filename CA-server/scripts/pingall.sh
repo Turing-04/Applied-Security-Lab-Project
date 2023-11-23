@@ -13,8 +13,8 @@ for ((i=0; i<$length; i++)); do
 
     # Ping the machine
     if ping -c 1 -W 1 $ip > /dev/null 2>&1; then
-        echo "$name ($ip) is UP"
+        echo "UP: $name ($ip)"
     else
-        echo "$name ($ip) is DOWN"
+        echo "DOWN: $name ($ip)"
     fi
 done

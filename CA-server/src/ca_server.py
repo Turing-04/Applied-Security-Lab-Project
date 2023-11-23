@@ -9,7 +9,7 @@ from user_info import UserInfo, validate_user_info
 from cert_utils import build_subj_str, make_csr,\
     sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb
 from mysql_utils import mysql_update_certificate, mysql_connect
-from duplicity_utils import backup_pkcs12
+from backup_utils import backup_pkcs12
 from logging.config import dictConfig
 from mysql.connector import MySQLConnection
 
@@ -99,7 +99,7 @@ def request_certificate():
 
     cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
     # send cert.p12 encrypted to the backup server
-    # backup_pkcs12(cert_and_key.name, user_info["uid"], app.logger)
+    # backup_pkcs12(ssh_cnx, cert_and_key.name, user_info["uid"], app.logger)
 
     tmp_priv_key.close()
 
