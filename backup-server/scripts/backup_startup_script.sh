@@ -29,10 +29,10 @@ sudo useradd -m caserver -p TUsZNJZR4Nlx9Du1nN
 mkdir -p /home/caserver/.ssh && sudo chmod 700 /home/caserver/.ssh
 touch /home/caserver/.ssh/authorized_keys && sudo chmod 600 /home/caserver/.ssh/authorized_keys
 
-# # create webserver user
-# sudo useradd -m webserver -p dFP9s2ohTsCSXBHTmt
-# mkdir -p /home/webserver/.ssh && sudo chmod 700 /home/webserver/.ssh
-# touch /home/webserver/.ssh/authorized_keys && sudo chmod 600 /home/webserver/.ssh/authorized_keys
+# create webserver user
+sudo useradd -m webserver -p dFP9s2ohTsCSXBHTmt
+mkdir -p /home/webserver/.ssh && sudo chmod 700 /home/webserver/.ssh
+touch /home/webserver/.ssh/authorized_keys && sudo chmod 600 /home/webserver/.ssh/authorized_keys
 
 # create mysql user
 sudo useradd -m mysql -p bUDvwzw5cVaETMBrIo
@@ -47,7 +47,7 @@ touch /home/sysadmin/.ssh/authorized_keys && sudo chmod 600 /home/sysadmin/.ssh/
 
 
 
-# Step 2: copy public keys to authorized_keys files
+# Step 2: copy public keys to authorized_keys files for ssh connections
 #--------------------------------------------
 echo "copying public keys to authorized_keys files..."
 
@@ -69,56 +69,60 @@ cat $SYNCED_FOLDER/SECRETS/sysadmin-ssh/sysadmin-ssh.pub >> /home/sysadmin/.ssh/
 #--------------------------------------------
 echo "preparing backup directory..."
 
-# create configuaration directory and set permissions
-mkdir -p /srv/config/router /srv/config/webserver /srv/config/caserver /srv/config/mysql /srv/config/backup
+# create router directory and set permissions
+mkdir -p /backup/router/config /backup/router/logs
 
-sudo chown -R router:router /srv/config/router
-sudo chmod 700 /srv/config/router
+sudo chown -R router:router /backup/router/config
+sudo chmod 700 /backup/router/config
 
-sudo chown -R webserver:webserver /srv/config/webserver
-sudo chmod 700 /srv/config/webserver
+sudo chown -R router:router /backup/router/logs
+sudo chmod 700 /backup/router/logs
 
-sudo chown -R caserver:caserver /srv/config/caserver
-sudo chmod 700 /srv/config/caserver
+# create webserver directory and set permissions
+mkdir -p /backup/webserver/config /backup/webserver/logs
 
-sudo chown -R mysql:mysql /srv/config/mysql
-sudo chmod 700 /srv/config/mysql
+sudo chown -R webserver:webserver /backup/webserver/config
+sudo chmod 700 /backup/webserver/config
 
-sudo chown -R backupusr:backupusr /srv/config/backup
-sudo chmod 700 /srv/config/backup
+sudo chown -R webserver:webserver /backup/webserver/logs
+sudo chmod 700 /backup/webserver/logs
 
-# create duplicity directory and set permissions
-mkdir -p /srv/duplicity/caserver /srv/duplicity/mysql
+# create caserver directory and set permissions
+mkdir -p /backup/caserver/config /backup/caserver/logs /backup/caserver/internal_database /backup/caserver/keys_certs /backup/caserver/logs
 
-sudo chown -R caserver:caserver /srv/duplicity/caserver
-sudo chmod 700 /srv/duplicity/caserver
+sudo chown -R caserver:caserver /backup/caserver/config
+sudo chmod 700 /backup/caserver/config
 
-sudo chown -R mysql:mysql /srv/duplicity/mysql
-sudo chmod 700 /srv/duplicity/mysql
+sudo chown -R caserver:caserver /backup/caserver/internal_database
+sudo chmod 700 /backup/caserver/internal_database
 
-# create sftp directory and set permissions
-mkdir -p /srv/sftp/caserver
+sudo chown -R caserver:caserver /backup/caserver/keys_certs
+sudo chmod 700 /backup/caserver/keys_certs
 
-sudo chown -R caserver:caserver /srv/sftp/caserver
-sudo chmod 700 /srv/sftp/caserver
+sudo chown -R caserver:caserver /backup/caserver/logs
+sudo chmod 700 /backup/caserver/logs
 
-# create log directory and set permissions
-mkdir -p /srv/logging/router /srv/logging/webserver /srv/logging/caserver /srv/logging/mysql /srv/logging/backup
 
-sudo chown -R router:router /srv/logging/router
-sudo chmod 700 /srv/logging/router
+# create mysql directory and set permissions
+mkdir -p /backup/mysql/config /backup/mysql/mariadb /backup/mysql/logs
 
-sudo chown -R webserver:webserver /srv/logging/webserver
-sudo chmod 700 /srv/logging/webserver
+sudo chown -R mysql:mysql /backup/mysql/config
+sudo chmod 700 /backup/mysql/config
 
-sudo chown -R caserver:caserver /srv/logging/caserver
-sudo chmod 700 /srv/logging/caserver
+sudo chown -R mysql:mysql /backup/mysql/mariadb
+sudo chmod 700 /backup/mysql/mariadb
 
-sudo chown -R mysql:mysql /srv/logging/mysql
-sudo chmod 700 /srv/logging/mysql
+sudo chown -R mysql:mysql /backup/mysql/logs
+sudo chmod 700 /backup/mysql/logs
 
-sudo chown -R backupusr:backupusr /srv/logging/backup
-sudo chmod 700 /srv/logging/backup
+# create backupsrv directory and set permissions
+mkdir -p /backup/backupsrv/config /backup/backupsrv/logs
+
+sudo chown -R backupusr:backupusr /backup/backupsrv/config
+sudo chmod 700 /backup/backupsrv/config
+
+sudo chown -R backupusr:backupusr /backup/backupsrv/logs
+sudo chmod 700 /backup/backupsrv/logs
 
 
 # Step 3: configure sshd for uni-directional ssh connection: only from clients to backup server
