@@ -191,6 +191,10 @@ sudo systemctl restart apache2
 # Check if server is up
 wget --no-check-certificate -O - https://localhost:443/ping
 
+echo
+echo "Checking which machines are reachable"
+bash "$SYNCED_FOLDER/scripts/pingall.sh"
+
 # TODO disable internet access once setup done
 # TODO delete synced folder once setup is done
 # TODO remove vagrant user after setup
