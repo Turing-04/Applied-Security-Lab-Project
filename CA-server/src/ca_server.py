@@ -8,7 +8,7 @@ from ca_database import CADatabase
 from user_info import UserInfo, validate_user_info
 from cert_utils import build_subj_str, make_csr,\
     sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb
-from mysql_utils import mysql_update_certificate
+from mysql_utils import mysql_update_certificate, mysql_connect
 from duplicity_utils import backup_pkcs12
 from logging.config import dictConfig
 
@@ -82,7 +82,8 @@ def request_certificate():
     with open(cert_path, "r", encoding='utf-8') as cert_file:
         cert_str = cert_file.read()
         # TODO setup MySQL connection!!!
-        mysql_update_certificate(user_info["uid"], cert_str, app.logger)
+        cnx = mysql_connect(app.logger)
+        mysql_update_certificate(cnx, user_info["uid"], cert_str, app.logger)
 
     cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
     # send cert.p12 encrypted to the backup server
