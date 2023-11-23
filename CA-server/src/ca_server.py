@@ -81,6 +81,7 @@ def request_certificate():
     # update mysql db with new signed cert
     with open(cert_path, "r", encoding='utf-8') as cert_file:
         cert_str = cert_file.read()
+        # TODO setup MySQL connection!!!
         mysql_update_certificate(user_info["uid"], cert_str, app.logger)
 
     cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
@@ -129,6 +130,8 @@ def revoke_certificate():
 
     for serial_nb in serial_nbs:
         revoke_cert(serial_nb)
+
+    # TODO update db!
     
     generate_crl()
 

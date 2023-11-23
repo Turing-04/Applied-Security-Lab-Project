@@ -1,3 +1,4 @@
+from mysql.connector import MySQLConnection
 import mysql.connector
 import sys
 from logging import Logger
@@ -12,25 +13,27 @@ MYSQL_CLIENT_CERT_PATH="/etc/ssl/certs/ca-server-mysql.crt"
 MYSQL_CLIENT_KEY_PATH="/etc/ssl/private/ca-server-mysql.key"
 CA_CERT_PATH="/etc/ssl/CA/cacert.pem"
 
+def mysql_connect(logger: Logger) -> MySQLConnection:
+    # Connect to the server
+    cnx = mysql.connector.connect(
+        host=MYSQL_HOST,
+        port=MYSQL_PORT,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        database=MYSQL_DATABASE,
+        ssl_ca=CA_CERT_PATH, # File containing the SSL certificate authority.
+        ssl_cert=MYSQL_CLIENT_CERT_PATH, # File containing the SSL certificate file.
+        ssl_key=MYSQL_CLIENT_KEY_PATH, # File containing the SSL key.
+        ssl_verify_cert=True, # When set to True, checks the server certificate 
+        # against the certificate file specified by the ssl_ca option. 
+        # Any mismatch causes a ValueError exception.
+    )
+    return cnx
 
-def mysql_update_certificate(uid: str, new_certificate: str, logger: Logger):
-    cnx = None
+
+def mysql_update_certificate(cnx: MySQLConnection, uid: str, new_certificate: str, logger: Logger):
+    assert cnx != None
     try:
-        # Connect to the server
-        cnx = mysql.connector.connect(
-            host=MYSQL_HOST,
-            port=MYSQL_PORT,
-            user=MYSQL_USER,
-            password=MYSQL_PASSWORD,
-            database=MYSQL_DATABASE,
-            ssl_ca=CA_CERT_PATH, # File containing the SSL certificate authority.
-            ssl_cert=MYSQL_CLIENT_CERT_PATH, # File containing the SSL certificate file.
-            ssl_key=MYSQL_CLIENT_KEY_PATH, # File containing the SSL key.
-            ssl_verify_cert=True, # When set to True, checks the server certificate 
-            # against the certificate file specified by the ssl_ca option. 
-            # Any mismatch causes a ValueError exception.
-        )
-
         # Get a cursor
         cur = cnx.cursor()
 
