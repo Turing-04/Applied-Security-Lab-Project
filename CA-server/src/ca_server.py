@@ -87,7 +87,7 @@ def request_certificate():
 
     cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
     # send cert.p12 encrypted to the backup server
-    backup_pkcs12(cert_and_key.name, user_info["uid"], app.logger)
+    # backup_pkcs12(cert_and_key.name, user_info["uid"], app.logger)
 
     tmp_priv_key.close()
 

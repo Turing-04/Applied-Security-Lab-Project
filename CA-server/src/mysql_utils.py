@@ -39,6 +39,7 @@ def mysql_update_certificate(cnx: MySQLConnection, uid: str, new_certificate: st
 
         # Update the certificate for the given UID
         update_query = "UPDATE certificates SET certificate = %s WHERE uid = %s"
+        # update_query = "INSERT INTO certificates (certificate, uid) VALUES (%s, %s)"
         cur.execute(update_query, (new_certificate, uid))
 
         # Commit the changes

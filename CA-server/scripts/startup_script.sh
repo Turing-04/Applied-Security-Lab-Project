@@ -149,7 +149,8 @@ cp "$SYNCED_FOLDER/SECRETS/ca-server-mysql/ca-server-mysql.key" /etc/ssl/private
 chown ca-server /etc/ssl/certs/ca-server-mysql.crt
 chmod u=r,go= /etc/ssl/certs/ca-server-mysql.crt
 # set permissions for private key
-chown ca-server /etc/ssl/private/ca-server-mysql.key
+chown --recursive ca-server /etc/ssl/private
+chmod u+x /etc/ssl/private
 chmod u=r,go= /etc/ssl/private/ca-server-mysql.key
 
 #  ______ _           _               _               
