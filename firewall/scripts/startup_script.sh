@@ -5,9 +5,24 @@ echo "Start setup"
 echo "Install packages"
 sudo apt update
 
+echo "Setup network interfaces"
+cp /vagrant/config/interfaces /etc/network/interfaces
+sudo chown root /etc/network/interfaces
+# -rw-r--r-- 1 root root 845 Nov 24 18:50 /etc/network/interfaces
+sudo chmod 644 /etc/network/interfaces
+sudo ifup -a # restart interfaces
+
+
+# =>> https://netfilter.org/documentation/HOWTO/NAT-HOWTO-3.html
+mkdir -p /etc/iptables
 touch /etc/iptables/rules.v4
 touch /etc/iptables/rules.v6
 sudo apt install iptables-persistent
+sudo iptables-restore /vagrant/config/rules.v4
+echo "*************************************************"
+echo "*            CURRENT IPTABLES RULES              *"
+echo "*************************************************"
+sudo iptables-save # to display the rules
 
 echo "Enable ipv4 forwarding"
 echo "# FROM startup_script.sh" | sudo tee -a /etc/sysctl.conf
@@ -15,7 +30,4 @@ echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
 sudo sysctl --load=/etc/sysctl.conf
 
 
-# TODO: https://linuxconfig.org/how-to-make-iptables-rules-persistent-after-reboot-on-linux
-# https://www.digitalocean.com/community/tutorials/how-to-implement-a-basic-firewall-template-with-iptables-on-ubuntu-20-04
-# https://www.digitalocean.com/community/tutorials/how-to-forward-ports-through-a-linux-gateway-with-iptables
-echo "Enable port forwarding from the internet to the webserver"
+bash /vagrant/scripts/pingall.sh
