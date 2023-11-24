@@ -23,8 +23,8 @@ sudo chmod 640 /etc/syslog-ng/ssl/private/logging-rsyslog.key
 
 # 3. Replace rsyslog configuration file
 #sudo rm /etc/rsyslog.conf
-#sudo cp $SYNCED_FOLDER/rsyslog-tls-new.conf /etc/syslog-ng
-#sudo systemctl restart rsyslog
+sudo cp $SYNCED_FOLDER/syslog-ng.conf /etc/syslog-ng
+sudo systemctl restart syslog-ng
 
 # 8 Create sysadmin user and add it to the sudoers group
 sudo useradd -m sysadmin -p dv8RCJruycKGyN
