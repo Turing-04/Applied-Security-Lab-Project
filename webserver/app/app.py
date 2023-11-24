@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from functools import wraps
 from time import sleep
 import requests
+from mysql_utils import db_auth, db_update_info, db_update_passwd
 
 #use flask sessions to handle users (pop once logout or problem)
 # session["uid"] = <uid fetched from DB for a given email/passwd
@@ -118,7 +119,7 @@ def modify_info():
         print("Updated info : ", firstname, lastname, email)
         
         #TODO: update info on DB
-        # resp = db_update_info(firstname, lastname, email)
+        # resp = db_update_info(firstname, lastname, email, session['username'])
         resp= True
         
         if resp:
@@ -148,7 +149,7 @@ def modify_passwd():
             flash('New password and confirmation password do not match')
         if auth and new_passwd == new_passwd_conf:
             # TODO: update passwd on DB side
-            #resp = db_update_passwd(new_passwd)
+            #resp = db_update_passwd(new_passwd, session['username'])
             resp = True
             print("updated passwd", old_passwd, new_passwd)
             if resp:
@@ -214,7 +215,7 @@ def cert_login():
 @app.route("/revoke", methods=['GET'])
 @login_required
 def revoke_certificate():
-    resp = db_revoke_cert()
+    resp = ca_revoke_cert()
     return "TODO"
     
 #TODO: check certificate
@@ -229,31 +230,13 @@ def check_admin_certificate():
 
     
 #TODO: communication with DB and CA 
-def db_revoke_cert():
+def ca_revoke_cert():
     payload = {'key': DB_KEY}
     url = "http://"+DB_IP+"/revoke"
     return True
-
-def db_auth(uname, passwd):
-    payload = {'username': uname, 'password': passwd, 'key': DB_KEY}
-    url = "http://"+DB_IP+"/auth"
-    try:
-        r = requests.post(url, data=payload)
-        return r.json()
-    except:
-        print("Could not authenticate user")
-        return None
     
     
-def db_update_info(firstname, lastname):
-    payload = {'firstname': firstname, 'lastname': lastname, 'key': DB_KEY}
-    url = "http://"+DB_IP+"/update"
-    try:
-        r = requests.post(url, data=payload)
-        return r.json()
-    except:
-        print("Could not update user info")
-        return None
+    
     
 def ca_download_cert(username):
     url = "http://"+CA_IP+"/download?username="+username
