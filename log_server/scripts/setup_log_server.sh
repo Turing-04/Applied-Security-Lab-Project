@@ -1,14 +1,10 @@
 #!/bin/bash
-
 sudo apt update
 sudo apt upgrade -y
 
-# 1. Install rsyslog
-#sudo apt install rsyslog -y
-#sudo apt install rsyslog-gnutls -y
+# 1. Install syslog-ng
 sudo apt install syslog-ng -y 
-sudo apt install tcpdump -y
-sudo apt install vim -y
+
 # 2. Copy certificates and set permissions
 sudo mkdir /etc/syslog-ng/ssl
 sudo mkdir /etc/syslog-ng/ssl/certs
@@ -22,7 +18,6 @@ cp $SYNCED_FOLDER/SECRETS/logging-rsyslog/logging-rsyslog.key /etc/syslog-ng/ssl
 sudo chmod 640 /etc/syslog-ng/ssl/private/logging-rsyslog.key
 
 # 3. Replace rsyslog configuration file
-#sudo rm /etc/rsyslog.conf
 sudo cp $SYNCED_FOLDER/syslog-ng.conf /etc/syslog-ng
 sudo systemctl restart syslog-ng
 
@@ -52,4 +47,3 @@ sudo echo "AllowUsers sysadmin" >> /etc/ssh/sshd_config
 
 # 9.6 Restart sshd
 sudo systemctl restart sshd
-
