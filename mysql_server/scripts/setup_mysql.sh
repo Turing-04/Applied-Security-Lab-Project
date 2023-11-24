@@ -3,8 +3,7 @@
 sudo apt update
 sudo apt upgrade -y
 
-# 1. Install MariaDB: https://linuxgenie.net/how-to-install-mariadb-on-debian-12-bookworm-distribution/
-# Notes: remove remote connection to root, only localhost, add the root password during the isntallation process.
+# 1. Install MariaDB
 sudo apt install mariadb-server -y
 mysql_secure_installation <<EOF
 
@@ -18,18 +17,17 @@ y
 y
 EOF
 
-# 2. Login into mysql: https://www.digitalocean.com/community/tutorials/how-to-import-and-export-databases-in-mysql-or-mariadb#step-2-mdash-importing-a-mysql-or-mariadb-database
+# 2. Create database and load data
 mysql -u root -proot -e "CREATE DATABASE imovies;"
 
-# 3. Create database and load data
-# Think about the schema to remove vulneratibilities
+# [TODO] Think about the schema to remove vulneratibilities
 mysql -u root -proot imovies < $SYNCED_FOLDER/imovies_users.db
 
-# 4. Create certificates table
+# 3. Create certificates table
 mysql -u root -proot imovies -e "CREATE TABLE certificates (uid varchar(64) NOT NULL, certificate varchar(6000), PRIMARY KEY (uid));"
 mysql -u root -proot imovies -e "INSERT INTO certificates (uid) SELECT uid FROM users;"
 
-# 5. Create users in MySQL and set privileges
+# 4. Create users in MySQL and set privileges
 # webserver with read/write access to table "users" and read access to table "certificate";
 # caserver with read/write access to the "certificates" table.
 # [TODO] update ip address of web server
@@ -42,8 +40,8 @@ mysql -u root -proot imovies -e "GRANT SELECT, INSERT, UPDATE, DELETE ON certifi
 
 mysql -u root -proot -e "FLUSH PRIVILEGES;"
 
-# [TODO] to check  whether the passowrd is changed
-# mysql -u root -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'H6Mue92MeNNnvFRpJ67V';"
+# 5. Change password for the root user
+mysql -u root -proot -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'H6Mue92MeNNnvFRpJ67V';"
 
 # 6. Change bind-address from localhost to the interface in the configuration file.
 sudo sed -i "s/.*bind-address.*/bind-address = 10.0.0.5/" /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -65,6 +63,8 @@ sudo chown root:mysql /etc/mysql/ssl/private/mysql-server.key
 
 # 7.3 Set TLS configuration in MariaDB
 cp $SYNCED_FOLDER/mariadb-server-tls.cnf /etc/mysql/mariadb.conf.d
+
+# 8. Restart mysql
 sudo systemctl restart mariadb
 
 # 7.4 [TODO on WEBSERVER and CASERVER] Set Client certificate authentication on the client machine
@@ -75,35 +75,31 @@ sudo systemctl restart mariadb
 #ssl_ca = /etc/my.cnf.d/certificates/ca.pem
 
 # 7.5 Enable server authentication om the client side
-# This parameter on the lcient side gives an error. Soemthing is wrong with the server authenctication.
-
 #ssl-verify-server-cert
 
-# 8 Create sysadmin user and add it to the sudoers group
+# 9. Create sysadmin user and add it to the sudoers group
 sudo useradd -m sysadmin -p dv8RCJruycKGyN
 sudo usermod -aG sudo sysadmin
 
-# 9. Set SSH configuration on the server
+# 10. Set SSH configuration on the server
 
-# 9.1 In sysadmin home: create SSH folder for public keys 
+# 10.1 In sysadmin home: create SSH folder for public keys 
 mkdir -p /home/sysadmin/.ssh && touch /home/sysadmin/.ssh/authorized_keys
 
-# 9.2 Copy sysadmin public key and set correct permissions
+# 10.2 Copy sysadmin public key and set correct permissions
 ssh-keygen -f $SYNCED_FOLDER/sysadmin-ssh.pub -i -m PKCS8 &>  /home/sysadmin/.ssh/authorized_keys
 sudo chmod -R go= /home/sysadmin/.ssh
 sudo chown -R sysadmin:sysadmin /home/sysadmin/.ssh
 
-# 9.3 Disable PermitRootLogin in /etc/ssh/sshd_config
+# 10.3 Disable PermitRootLogin in /etc/ssh/sshd_config
 sudo sed -i "s/.*PermitRootLogin.*/PermitRootLogin no/" /etc/ssh/sshd_config
 
-# 9.4 Allow PubkeyAuthentication in /etc/ssh/sshd_config
+# 10.4 Allow PubkeyAuthentication in /etc/ssh/sshd_config
 sudo sed -i "s/.*PubkeyAuthentication.*/PubkeyAuthentication yes/" /etc/ssh/sshd_config
 sudo sed -i "s/.*AuthorizedKeysFile.*/AuthorizedKeysFile .ssh\/authorized_keys/" /etc/ssh/sshd_config
 
-# 9.5 [TODO check if it works] Allow only sysadmin host to ssh to the machine
+# 10.5 Allow only sysadmin host to ssh to the machine
 sudo echo "AllowUsers sysadmin" >> /etc/ssh/sshd_config
 
-# 9.6 Restart sshd
+# 10.6 Restart sshd
 sudo systemctl restart sshd
-
-# [TODO] ssh client host pk
