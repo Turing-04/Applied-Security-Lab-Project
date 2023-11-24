@@ -202,6 +202,17 @@ sudo systemctl restart apache2
 # Check if server is up
 wget --no-check-certificate -O - https://10.0.0.3:443/ping
 
+#             _                      _               _               
+#  _ __   ___| |___      _____  _ __| | __  ___  ___| |_ _   _ _ __  
+# | '_ \ / _ \ __\ \ /\ / / _ \| '__| |/ / / __|/ _ \ __| | | | '_ \ 
+# | | | |  __/ |_ \ V  V / (_) | |  |   <  \__ \  __/ |_| |_| | |_) |
+# |_| |_|\___|\__| \_/\_/ \___/|_|  |_|\_\ |___/\___|\__|\__,_| .__/ 
+#                                                             |_|    
+
+echo "Network setup"
+# set default route via router
+sudo ip route change default via 10.0.0.1
+
 echo
 echo "Checking which machines are reachable"
 bash "$SYNCED_FOLDER/scripts/pingall.sh"
