@@ -38,6 +38,10 @@ echo "Host 10.0.0.4" >> $ssh_config
 echo -e "\tUser caserver" >> $ssh_config
 echo -e "\tIdentityFile /home/ca-server/.ssh/ca-server-ssh/ca-server-ssh" >> $ssh_config
 sudo chown --recursive ca-server /home/ca-server/.ssh
+# "Permissions 0644 for '/home/ca-server/.ssh/ca-server-ssh/ca-server-ssh' are too open.
+# It is required that your private key files are NOT accessible by others."
+# so the following is necessary
+sudo chmod 600 /home/ca-server/.ssh/ca-server-ssh/ca-server-ssh
 
 
 #                                               _           _       
@@ -196,7 +200,7 @@ sudo a2ensite ca-server
 sudo systemctl restart apache2
 
 # Check if server is up
-wget --no-check-certificate -O - https://localhost:443/ping
+wget --no-check-certificate -O - https://10.0.0.3:443/ping
 
 echo
 echo "Checking which machines are reachable"

@@ -9,9 +9,10 @@ from user_info import UserInfo, validate_user_info
 from cert_utils import build_subj_str, make_csr,\
     sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb
 from mysql_utils import mysql_update_certificate, mysql_connect
-from backup_utils import backup_pkcs12
+from backup_utils import backup_pkcs12, ssh_connect
 from logging.config import dictConfig
 from mysql.connector import MySQLConnection
+from fabric.connection import Connection
 
 CA_PATH="/etc/ssl/CA" 
 CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
@@ -36,15 +37,23 @@ dictConfig({
 app = Flask(__name__)
 
 global_mysql_cnx: MySQLConnection = None
+global_ssh_cnx: Connection = None
 
 @app.before_request
-def connect_mysql():
+def ensure_remote_cnxs():
     global global_mysql_cnx
     if global_mysql_cnx is None:
         global_mysql_cnx = mysql_connect(app.logger)
     elif not global_mysql_cnx.is_connected():
         global_mysql_cnx.close()
         global_mysql_cnx = mysql_connect(app.logger)
+
+    global global_ssh_cnx
+    if global_ssh_cnx is None:
+        global_ssh_cnx = ssh_connect(app.logger)
+    elif not global_ssh_cnx.is_connected:
+        global_ssh_cnx.close()
+        global_ssh_cnx = ssh_connect(app.logger)
 
 
 @app.post("/request-certificate")
@@ -97,18 +106,18 @@ def request_certificate():
         assert not cert_str is None
         mysql_update_certificate(global_mysql_cnx, user_info["uid"], cert_str, app.logger)
 
-    cert_and_key = export_pkcs12(cert_path, tmp_priv_key.name)
+    pkcs12 = export_pkcs12(cert_path, tmp_priv_key.name)
     # send cert.p12 encrypted to the backup server
-    # backup_pkcs12(ssh_cnx, cert_and_key.name, user_info["uid"], app.logger)
+    backup_pkcs12(global_ssh_cnx, pkcs12, user_info["uid"], app.logger)
 
     tmp_priv_key.close()
 
     @after_this_request
     def delete_pkcs12(response):
-        cert_and_key.close()
+        pkcs12.close()
         return response
 
-    response = send_file(cert_and_key.name, mimetype="application/x-pkcs12", max_age=0)
+    response = send_file(pkcs12.name, mimetype="application/x-pkcs12", max_age=0)
     return response
 
 

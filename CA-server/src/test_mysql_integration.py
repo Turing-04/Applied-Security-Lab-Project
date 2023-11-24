@@ -33,7 +33,7 @@ quh6za9q142cvEWtloBB34lI7ABy4mZPUpR9075LSv6u+Q1DlZCd2jOEuX12osR9
 def db_connection():
     # Set up and yield the database connection
     logger = Logger("TestLogger")
-    max_retries = 3
+    max_retries = 1
     connection = mysql_connect(logger, max_retries=max_retries)
     print(connection.is_connected())
     yield connection
