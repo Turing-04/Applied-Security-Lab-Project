@@ -4,6 +4,7 @@ from functools import wraps
 from time import sleep
 import requests
 from mysql_utils import db_auth, db_update_info, db_update_passwd
+from ca_server_utils import ca_get_admin_info, ca_revoke_cert, ca_download_cert
 
 #use flask sessions to handle users (pop once logout or problem)
 # session["uid"] = <uid fetched from DB for a given email/passwd
@@ -94,7 +95,8 @@ def home():
     user_info= "Firstname Lastname"
     
     #TODO: Fetch and show revocation list
-    #revoked = requests.get("http://"+CA_IP+"/revoked")
+    #revoked = ca_get_revoked_list()
+    # revoked is in PEM format - need to convert it to a list of revoked certificates
     revoked = "revoked list"
     return render_template('home.html', user=user_info, revoked=revoked)  
 
@@ -199,6 +201,7 @@ def admin_interface():
     
     #TODO: fetch administration info from CA server
     #resp = requests.get("http://"+CA_IP+"/admin")
+    # resp = ca_get_admin_info()
     
     resp = {'nb_issued_certs': 10, 'nb_revoked_certs': 2, 'serial_nb': 5}
     return render_template('admin_interface.html', info=resp)
@@ -221,32 +224,14 @@ def revoke_certificate():
 #TODO: check certificate
 def check_certificate():
     client_cert = request.environ.get('SSL_CLIENT_CERT')
-    #TODO: check if certificate is valid along with CA server ? 
+    #TODO: check if certificate is valid along with CA server ? Check Apache config ! 
     return True
 
 # TODO: check CA admin certificate
 def check_admin_certificate():
+    # TODO: query Admin CA certificate from DB ?
+    # TODO: check certificate - cf Apache config
     return True
-
-    
-#TODO: communication with DB and CA 
-def ca_revoke_cert():
-    payload = {'key': DB_KEY}
-    url = "http://"+DB_IP+"/revoke"
-    return True
-    
-    
-    
-    
-def ca_download_cert(username):
-    url = "http://"+CA_IP+"/download?username="+username
-    try:
-        r = requests.get(url)
-        return r.json()
-    except:
-        print("Could not download certificate")
-        return None
-
     
 
 

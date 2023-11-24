@@ -23,7 +23,7 @@ def db_auth(username, password):
     result = cursor.fetchone()
     cursor.close()
     conn.close()
-    return result
+    return result is not None
 
 
 def db_update_info(firstname, lastname, email, username):
