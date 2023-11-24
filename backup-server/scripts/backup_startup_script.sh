@@ -125,7 +125,7 @@ sudo chown -R backupusr:backupusr /backup/backupsrv/logs
 sudo chmod 700 /backup/backupsrv/logs
 
 
-# Step 3: configure sshd for uni-directional ssh connection: only from clients to backup server
+# Step 4: configure sshd for uni-directional ssh connection: only from clients to backup server
 #--------------------------------------------
 # disable root login
 sudo sed -i "s/.*PermitRootLogin.*/PermitRootLogin no/" /etc/ssh/sshd_config
@@ -146,7 +146,9 @@ sudo sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication no/" /etc/ssh/s
 # restart sshd
 sudo systemctl restart ssh
 
-
+# Step 5: set default route via router
+#--------------------------------------------
+bash "$SYNCED_FOLDER/scripts/router_setup.sh"
 
 # set up client agent backup - server cron job is no longer needed
 # # run backup setup script
