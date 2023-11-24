@@ -1,8 +1,5 @@
 #!/bin/bash
 
-sudo apt update
-sudo apt upgrade -y
-
 # Install syslog-ng
 sudo apt install syslog-ng -y
 
@@ -15,6 +12,12 @@ mkdir /etc/syslog-ng/ssl/private
 cp $SYNCED_FOLDER/SECRETS/ca-server/cacert.pem /etc/syslog-ng/ssl/certs
 sudo chmod 644 /etc/syslog-ng/ssl/certs/cacert.pem
 
+# Copy client key pair to enable client authentication
+# cp $SYNCED_FOLDER/SECRETS/<client>/<client.crt> /etc/syslog-ng/ssl/certs
+# sudo chmod 644 /etc/syslog-ng/ssl/certs/<client.crt>
+
+# cp $SYNCED_FOLDER/SECRETS/<client>/<client.key> /etc/syslog-ng/ssl/private
+# sudo chmod 640 /etc/syslog-ng/ssl/private/<client.key>
+
 sudo cp $SYNCED_FOLDER/syslog-ng.conf /etc/syslog-ng
 sudo systemctl restart syslog-ng
-
