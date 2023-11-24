@@ -4,24 +4,27 @@ sudo apt update
 sudo apt upgrade -y
 
 # 1. Install rsyslog
-sudo apt install -y rsyslog
-sudo apt install -y rsyslog-gnutls
-
+#sudo apt install rsyslog -y
+#sudo apt install rsyslog-gnutls -y
+sudo apt install syslog-ng -y 
+sudo apt install tcpdump -y
+sudo apt install vim -y
 # 2. Copy certificates and set permissions
-sudo mkdir /etc/rsyslog.d/ssl
-sudo mkdir /etc/rsyslog.d/ssl/certs
-sudo mkdir /etc/rsyslog.d/ssl/private
+sudo mkdir /etc/syslog-ng/ssl
+sudo mkdir /etc/syslog-ng/ssl/certs
+sudo mkdir /etc/syslog-ng/ssl/private
 
-sudo cp $SYNCED_FOLDER/SECRETS/logging-rsyslog/logging-rsyslog.crt /etc/rsyslog.d/ssl/certs
-sudo cp $SYNCED_FOLDER/SECRETS/ca-server/cacert.pem /etc/rsyslog.d/ssl/certs
-sudo chmod 644 /etc/rsyslog.d/ssl/certs/logging-rsyslog.crt /etc/rsyslog.d/ssl/certs/cacert.pem
+sudo cp $SYNCED_FOLDER/SECRETS/logging-rsyslog/logging-rsyslog.crt /etc/syslog-ng/ssl/certs
+sudo cp $SYNCED_FOLDER/SECRETS/ca-server/cacert.pem /etc/syslog-ng/ssl/certs
+sudo chmod 644 /etc/syslog-ng/ssl/certs/logging-rsyslog.crt /etc/syslog-ng/ssl/certs/cacert.pem
 
-cp $SYNCED_FOLDER/SECRETS/logging-rsyslog/logging-rsyslog.key /etc/rsyslog.d/ssl/private
-sudo chmod 640 /etc/rsyslog.d/ssl/private/logging-rsyslog.key
-#sudo chown root:mysql /etc/mysql/ssl/private/mysql-server.key
+cp $SYNCED_FOLDER/SECRETS/logging-rsyslog/logging-rsyslog.key /etc/syslog-ng/ssl/private
+sudo chmod 640 /etc/syslog-ng/ssl/private/logging-rsyslog.key
 
-# 3. Copy configuration file to the rsyslog.d
-sudo cp $SYNCED_FOLDER/rsyslog_server.cnf /etc/rsyslog.d
+# 3. Replace rsyslog configuration file
+#sudo rm /etc/rsyslog.conf
+#sudo cp $SYNCED_FOLDER/rsyslog-tls-new.conf /etc/syslog-ng
+#sudo systemctl restart rsyslog
 
 # 8 Create sysadmin user and add it to the sudoers group
 sudo useradd -m sysadmin -p dv8RCJruycKGyN
@@ -50,4 +53,3 @@ sudo echo "AllowUsers sysadmin" >> /etc/ssh/sshd_config
 # 9.6 Restart sshd
 sudo systemctl restart sshd
 
-# [TODO] ssh client host pk
