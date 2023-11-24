@@ -11,7 +11,6 @@
 # change default user vagrant and password to something else
 # or use vagrant for the setup phase then delete it and replace it with a special low privileged user
 
-# launch the pythonscript
 
 #########################################
 ## WHERE IS /etc/ssl/CA/cacert.pem ??? ##
@@ -47,6 +46,21 @@ sudo apt install -y apache2 apache2-dev libapache2-mod-wsgi-py3
 #############################################
 # TODO: setup sysadmin user
 #############################################
+
+# setup ssh
+echo "Install ssh private key for webserver"
+mkdir -p /home/webserver/.ssh
+#TODO: fix missing ssh key in SECRETS @niels
+cp -r "$SYNCED_FOLDER/SECRETS/webserver-ssh/" /home/webserver-server/.ssh
+ssh_config="/home/webserver/.ssh/config"
+echo "Host 10.0.0.4" >> $ssh_config
+echo -e "\tUser webserver" >> $ssh_config
+echo -e "\tIdentityFile /home/webserver/.ssh/webserver-ssh/webserver-ssh" >> $ssh_config
+sudo chown --recursive webserver /home/webserver/.ssh
+# It is required that your private key files are NOT accessible by others."
+# so the following is necessary
+sudo chmod 600 /home/webserver/.ssh/webserver-ssh/webserver-ssh
+
 
 
 # setup Apache2 
