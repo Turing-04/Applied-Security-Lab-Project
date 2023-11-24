@@ -2,7 +2,7 @@
 
 # setup flask webserver
 
-FLASK_DIR="/var/www/flaskapp"
+FLASK_DIR="/var/www/webserver"
 
 cd $FLASK_DIR/app
 

@@ -13,6 +13,9 @@
 
 # launch the pythonscript
 
+#########################################
+## WHERE IS /etc/ssl/CA/cacert.pem ??? ##
+#########################################
 
 #!/bin/bash
 
@@ -34,10 +37,11 @@ echo "webserver:$WEBSERVER_PASSWORD" | sudo chpasswd
 
 sudo apt update -y && sudo apt upgrade -y
 sudo apt install -y python3 python3-pip python3-venv python3-dev
+sudo apt install curl
 sudo ln -s /usr/bin/python3 /usr/bin/python # make python3 the default python
-sudo apt install -y apache2 apache2-dev
-sudo apt install -y openssl libssl-dev
-sudo apt install -y ssh
+sudo apt install -y apache2 apache2-dev libapache2-mod-wsgi-py3
+# sudo apt install -y openssl libssl-dev
+# sudo apt install -y ssh
 
 # TODO: setup SSH
 #############################################
@@ -46,7 +50,7 @@ sudo apt install -y ssh
 
 
 # setup Apache2 
-sudo a2enmode wsgi
+sudo a2enmod wsgi
 sudo a2enmod ssl
 
 echo "copy keys for certificate"
@@ -67,28 +71,31 @@ cp "$SYNCED_FOLDER/config/apache2.conf" /etc/apache2/apache2.conf
 cp "$SYNCED_FOLDER/config/envvars" /etc/apache2/envvars
 
 
-# config mysql client
-echo "Copy webserver-mysql crt and key"
-cp "$SYNCED_FOLDER/SECRETS/webserver-mysql/webserver-mysql.crt" /etc/ssl/certs/webserver-mysql.crt
-cp "$SYNCED_FOLDER/SECRETS/webserver-mysql/webserver-mysql.key" /etc/ssl/private/webserver-mysql.key
-chown webserver /etc/ssl/certs/webserver-mysql.crt
-chmod u=r,go= /etc/ssl/certs/webserver-mysql.crt
+
+# config mysql client - also allows communication with the CA-server
+echo "Copy webserver-intranet crt and key"
+cp "$SYNCED_FOLDER/SECRETS/webserver-intranet/webserver-intranet.crt" /etc/ssl/certs/webserver-intranet.crt
+cp "$SYNCED_FOLDER/SECRETS/webserver-intranet/webserver-intranet.key" /etc/ssl/private/webserver-intranet.key
+chown webserver /etc/ssl/certs/webserver-intranet.crt
+chmod u=r,go= /etc/ssl/certs/webserver-intranet.crt
 # set permissions for private key
 chown --recursive webserver /etc/ssl/private
 chmod u+x /etc/ssl/private
-chmod u=r,go= /etc/ssl/private/webserver-mysql.key
+chmod u=r,go= /etc/ssl/private/webserver-intranet.key
 
 # setup flask webserver
 echo "Copy src to $WEBSERVER_ROOT"
 mkdir -p "$WEBSERVER_ROOT"
-cp -r "$SYNCED_FOLDER/src/" "$WEBSERVER_ROOT/"
-rm -r "$WEBSERVER_ROOT/src/__pycache__" "$WEBSERVER_ROOT/src/.venv"
+cp -r "$SYNCED_FOLDER/app/" "$WEBSERVER_ROOT/"
+#rm -r "$WEBSERVER_ROOT/app/__pycache__" "$WEBSERVER_ROOT/app/.venv"
 cp "$SYNCED_FOLDER/scripts/setup_flask.sh" "$WEBSERVER_ROOT"
 
 sudo chown --recursive webserver "$WEBSERVER_ROOT"
 
 sudo chmod u+x "$WEBSERVER_ROOT/setup_flask.sh"
-sudo -u webserver "$WEBSERVER_ROOT/setup_flask.sh"
+#sudo -u webserver "$WEBSERVER_ROOT/setup_flask.sh"
+# TODO: server should be run as webserver user - pb with sudo permissions ?? 
+sudo "$WEBSERVER_ROOT/setup_flask.sh"
 
 # start apache2
 sudo a2ensite webserver
@@ -113,7 +120,7 @@ sudo systemctl enable ssh
 # sudo crontab -e
 
 # delete command history
-rm ~/.bash_history && history -c
+#rm ~/.bash_history && history -c
 
 echo $(whoami)
 
