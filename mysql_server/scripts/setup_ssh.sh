@@ -11,7 +11,7 @@ sudo chown backupusr:backupusr /home/backupusr/.ssh
 sudo chmod 700 /home/backupusr/.ssh
 
 touch /home/backupusr/.ssh/config && echo "Host 10.0.0.4" >> /home/backupusr/.ssh/config
-echo "IdentityFile /home/backupusr/.ssh/mysql-server.key" >> /home/backupusr/.ssh/config
+echo "IdentityFile /home/backupusr/.ssh/mysql-server-ssh" >> /home/backupusr/.ssh/config
 
 cp $SYNCED_FOLDER/SECRETS/mysql-server-ssh/mysql-server-ssh /home/backupusr/.ssh/mysql-server-ssh
 sudo chmod 600 /home/backupusr/.ssh/mysql-server-ssh
