@@ -208,38 +208,37 @@ def passwd_changed():
 @login_required
 def new_certificate():
     
-    # TODO: revoke old certificates
-    # for cert in getcertificatesfor(user_id)
-    #resp = requests.post("http://"+CA_IP+"/revoke?user_id="+cert)
+    # revoke old certificates
+    ca_revoke_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
     
-    #TODO: send request to CA to get new certificate
-    #resp = requests.post("http://"+CA_IP+"/new")
-    resp = {'status_code': 200, "bla": "bla"}
+        
+    sleep(1)
     
-    if resp['status_code'] == 200:
-        flash("Certificate should be downloaded automatically") # maybe add a link to download it manually 
-        
-        sleep(1)
-        # TODO: download certificate from CA + get temporary password
-        resp = ca_download_cert("bla")
-        # passwd = resp['password']
-        # cert = resp['cert']
-        
-        #cert = "certificate"
-        
-        #TODO: check format of download for pkcs12 + add a temporary password in flash message
-        flash("Certificate downloaded, your password is "+ "password")
-        
-        # TODO: create a temporary file to store certificate
-        cert = ca_download_cert("bla")
-        
+    #cert = "certificate"
+    
+    #TODO: check format of download for pkcs12 + add a temporary password in flash message
+    # flash("Certificate downloaded, your password is "+ "password")
+    # redirecting user to a specific page to display download message and password
+    
+    cert = ca_download_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
+    
+    if cert is not None:
         return send_file(cert.name, as_attachment=True, mimetype='application/x-pkcs12', download_name="certificate.p12")
     # TODO: delete temporary file and possibly redirect to home ?
-    # regarder @after_request qui return une page vers laquelle redirigier l'utilisateur
+    # regarder @after_request qui return une page vers laquelle rediriger l'utilisateur
     
     else:
         flash("Could not get new certificate")
         return redirect(url_for('home'))
+   
+   
+@app.route("/revoke", methods=['GET'])
+@login_required
+def revoke_certificate():
+    ca_revoke_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
+    
+    return redirect(url_for('home'))
+    
     
 @app.route("/admin-interface", methods=['GET'])
 def admin_interface():
@@ -260,14 +259,8 @@ def cert_login():
     resp = check_certificate()
     return "TODO"
 
-    
-#TODO: check if it's a good idea to have a separate route for downloading certificate
-    
-@app.route("/revoke", methods=['GET'])
-@login_required
-def revoke_certificate():
-    resp = ca_revoke_cert()
-    return "TODO"
+        
+
     
 #TODO: check certificate
 def check_certificate():

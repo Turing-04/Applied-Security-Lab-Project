@@ -17,33 +17,30 @@ def ca_get_admin_info():
         print("Could not fetch admin info")
         return None
     
-def ca_revoke_cert(username):
+def ca_revoke_cert(user_id, lastname, firstname, email):
     headers = {'Content-type': 'application/json'}
-    # TODO: Do I really need to send more than username ?
-    user_info = {'username': username}
+    
+    payload= { 'uid': user_id, 'lastname': lastname, 'firstname': firstname, 'email': email}
+
     url = "https://"+CA_IP+"/revoke-certificate"
     
-    user_info_json = json.dumps(user_info)
-    
-    response = requests.post(url, data=user_info_json, headers=headers, verify="/etc/ssl/certs/cacert.pem")
+    response = requests.post(url, data=json.dumps(payload), headers=headers, verify="/etc/ssl/certs/cacert.pem")
     if response.status_code == 200:
         return True
     else:
         return False
     
     
-def ca_download_cert(username):
+def ca_download_cert(user_id, lastname, firstname, email):
     headers = {'Content-type': 'application/json'}
     
-    user_info = {'username': username}
     
     #TODO: check that email with a dot like "john.doe@gmail" accepted by regex on CA server
-    dummy_info= { 'uid':'aa', 'firstname': "John", 'lastname': "Doe", 'email': 'johndoe@gmail.com'}
+    payload= { 'uid': user_id, 'lastname': lastname, 'firstname': firstname, 'email': email}
     
-    # TODO: again, do I really need to send more than username ?
     url = "https://"+CA_IP+"/request-certificate"
     
-    response = requests.post(url, data=json.dumps(dummy_info), headers=headers, verify="/etc/ssl/certs/cacert.pem")
+    response = requests.post(url, data=json.dumps(payload), headers=headers, verify="/etc/ssl/certs/cacert.pem")
     
     if response.status_code == 200 and response.headers['Content-Type'] == 'application/x-pkcs12':
         # store certificate in temp file
