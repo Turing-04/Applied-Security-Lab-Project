@@ -1,0 +1,4 @@
+10.0.0.5	mysql
+10.0.0.3	caserver
+10.0.1.2	webserver
+10.0.0.1	router
