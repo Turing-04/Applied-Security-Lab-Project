@@ -6,6 +6,7 @@ sudo apt install firefox
 # sudo sed -i 's/allowed_users=.*$/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
 cp /vagrant/SECRETS/cacert.pem /etc/ssl/certs/iMovies_root_cert.pem
+# TODO install root cert in firefox!!!!
 
 echo "Network setup"
 # set default route via router
