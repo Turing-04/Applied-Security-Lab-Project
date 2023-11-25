@@ -21,6 +21,11 @@ echo "Starting mysql setup"
 bash "$SYNCED_FOLDER/scripts/setup_mysql.sh"
 echo "DONE: mysql setup"
 
+# logging setup
+echo "Starting logging setup"
+bash "$SYNCED_FOLDER/scripts/setup_logging.sh"
+echo "DONE: logging setup"
+
 # backup setup
 echo "Starting mysql backup setup"
 bash "$SYNCED_FOLDER/scripts/setup_backup.sh"
