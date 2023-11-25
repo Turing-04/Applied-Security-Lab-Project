@@ -5,12 +5,12 @@ import sys
 MYSQL_HOST = "10.0.0.5"
 MYSQL_PORT = 3306
 # user/password from https://github.com/Turing-04/Applied-Security-Lab-Project/blob/bd1c55e4da94093188e3de841d928ffda9428224/mysql_server/scripts/setup_mysql.sh#L40
-MYSQL_USER = "caserver"
-MYSQL_PASSWORD = "cn9@1kbka;}=(iPgEMO1&{XW"
+MYSQL_USER = "webserver"
+MYSQL_PASSWORD = "}DqG3mZ8neKPp?#Uc?49K&W2"
 MYSQL_DATABASE = "imovies"
-MYSQL_CLIENT_CERT_PATH="/etc/ssl/certs/ca-server-mysql.crt"
-MYSQL_CLIENT_KEY_PATH="/etc/ssl/private/ca-server-mysql.key"
-CA_CERT_PATH="/etc/ssl/CA/cacert.pem"
+MYSQL_CLIENT_CERT_PATH="/etc/ssl/certs/webserver-intranet.crt"
+MYSQL_CLIENT_KEY_PATH="/etc/ssl/private/webserver-intranet.key"
+CA_CERT_PATH="/etc/ssl/certs/cacert.pem"
 
 def db_auth(username, password):
     try:

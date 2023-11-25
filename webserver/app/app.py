@@ -65,8 +65,8 @@ def login():
     error_msg = None
     if request.method == 'POST':
         # TODO: check credentials on DB side
-        # resp = db_auth(request.form['username'], request.form['password'])
-        resp = request.form['username'] == 'admin' and request.form['password'] == 'admin'
+        resp = db_auth(request.form['username'], request.form['password'])
+        #resp = request.form['username'] == 'admin' and request.form['password'] == 'admin'
         
         if not resp:
             error_msg = "incorrect username or password"
@@ -192,7 +192,7 @@ def new_certificate():
         # TODO: create a temporary file to store certificate
         cert = ca_download_cert("bla")
         
-        return send_file(cert.name, attachment_filename='certificate.p12', as_attachment=True, mimetype='application/x-pkcs12') 
+        return send_file(cert.name, as_attachment=True, mimetype='application/x-pkcs12', download_name="certificate.p12")
     
     else:
         flash("Could not get new certificate")

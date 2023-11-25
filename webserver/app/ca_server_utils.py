@@ -1,5 +1,7 @@
 import requests
 import json
+import tempfile
+
 import os
 
 
@@ -23,7 +25,7 @@ def ca_revoke_cert(username):
     
     user_info_json = json.dumps(user_info)
     
-    response = requests.post(url, data=user_info_json, headers=headers, verify=True)
+    response = requests.post(url, data=user_info_json, headers=headers, verify="/etc/ssl/certs/cacert.pem")
     if response.status_code == 200:
         return True
     else:
@@ -35,18 +37,20 @@ def ca_download_cert(username):
     
     user_info = {'username': username}
     
-    dummy_info= { 'uid':'aa', 'firstname': "John", 'lastname': "Doe", 'email': 'john.doe@gmail.com'}
+    #TODO: check that email with a dot like "john.doe@gmail" accepted by regex on CA server
+    dummy_info= { 'uid':'aa', 'firstname': "John", 'lastname': "Doe", 'email': 'johndoe@gmail.com'}
     
     # TODO: again, do I really need to send more than username ?
     url = "https://"+CA_IP+"/request-certificate"
     
-    response = requests.post(url, data=json.dumps(dummy_info), headers=headers, verify=True)
+    response = requests.post(url, data=json.dumps(dummy_info), headers=headers, verify="/etc/ssl/certs/cacert.pem")
     
-    if response.status_code == 200 and response.content_type == "application/x-pkcs12":
+    if response.status_code == 200 and response.headers['Content-Type'] == 'application/x-pkcs12':
         # store certificate in temp file
-        import tempfile
-        temp = tempfile.NamedTemporaryFile(delete=True)
+        
+        temp = tempfile.NamedTemporaryFile("w+b", delete=True)
         temp.write(response.content)
+        temp.flush()
         #temp.close()
         return temp
     else:
@@ -63,7 +67,5 @@ def ca_get_revoked_list():
         print("Could not fetch revoked list")
         return None
 
-    
-    
-    
-    
+
+  
