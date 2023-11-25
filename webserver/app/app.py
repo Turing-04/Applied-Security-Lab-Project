@@ -65,16 +65,16 @@ def login():
     error_msg = None
     if request.method == 'POST':
         # TODO: check credentials on DB side
-        resp = db_auth(request.form['username'], request.form['password'])
-        #resp = request.form['username'] == 'admin' and request.form['password'] == 'admin'
+        resp = db_auth(request.form['user_id'], request.form['password'])
+        #resp = request.form['user_id'] == 'admin' and request.form['password'] == 'admin'
         
         if not resp:
-            error_msg = "incorrect username or password"
+            error_msg = "incorrect user_id or password"
             sleep(1) # to prevent brute force
         else:
             session['uid'] = True
             # TODO: fetch user id from DB
-            #session['username'] = request.form['username']
+            #session['user_id'] = request.form['user_id']
             
             print("Succesfully logged in")
             return redirect(url_for('default'))
@@ -91,7 +91,7 @@ def login():
 @login_required
 def home():
     print("session uid", session.get('uid'))
-    #TODO: fetch username from DB
+    #TODO: fetch user_id from DB
     user_info= "Firstname Lastname"
     
     #TODO: Fetch and show revocation list
@@ -121,7 +121,7 @@ def modify_info():
         print("Updated info : ", firstname, lastname, email)
         
         #TODO: update info on DB
-        # resp = db_update_info(firstname, lastname, email, session['username'])
+        # resp = db_update_info(firstname, lastname, email, session['user_id'])
         resp= True
         
         if resp:
@@ -144,14 +144,14 @@ def modify_passwd():
         new_passwd_conf = request.form['new_passwd_conf']
         
         # TODO: check if old passwd is correct on DB side
-        # auth = db_auth(username, old_passwd)
+        # auth = db_auth(user_id, old_passwd)
         # perhaps don't have to fetch from DB if it's already in session
         auth = True
         if new_passwd != new_passwd_conf:
             flash('New password and confirmation password do not match')
         if auth and new_passwd == new_passwd_conf:
             # TODO: update passwd on DB side
-            #resp = db_update_passwd(new_passwd, session['username'])
+            #resp = db_update_passwd(new_passwd, session['user_id'])
             resp = True
             print("updated passwd", old_passwd, new_passwd)
             if resp:
@@ -168,8 +168,8 @@ def modify_passwd():
 def new_certificate():
     
     # TODO: revoke old certificates
-    # for cert in getcertificatesfor(username)
-    #resp = requests.post("http://"+CA_IP+"/revoke?username="+cert)
+    # for cert in getcertificatesfor(user_id)
+    #resp = requests.post("http://"+CA_IP+"/revoke?user_id="+cert)
     
     #TODO: send request to CA to get new certificate
     #resp = requests.post("http://"+CA_IP+"/new")

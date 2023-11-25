@@ -1,6 +1,7 @@
 from mysql.connector import MySQLConnection
 import mysql.connector
 import sys
+import hashlib
 
 MYSQL_HOST = "10.0.0.5"
 MYSQL_PORT = 3306
@@ -12,19 +13,27 @@ MYSQL_CLIENT_CERT_PATH="/etc/ssl/certs/webserver-intranet.crt"
 MYSQL_CLIENT_KEY_PATH="/etc/ssl/private/webserver-intranet.key"
 CA_CERT_PATH="/etc/ssl/certs/cacert.pem"
 
-def db_auth(username, password):
+def db_auth(user_id, password):
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
     except mysql.connector.Error as err:
         print("Something went wrong: {}".format(err))
         return None
+    
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+    cursor.execute("SELECT pwd FROM users WHERE uid = %s", (user_id))
     result = cursor.fetchone()
     cursor.close()
     conn.close()
-    return result is not None
-
+    
+    print("SQL result:", result)
+    
+    hashed_pwd = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    if result is not None and result[0] == hashed_pwd:
+        return True
+    else:
+        return False
+    
 
 def db_update_info(firstname, lastname, email, username):
     try:
