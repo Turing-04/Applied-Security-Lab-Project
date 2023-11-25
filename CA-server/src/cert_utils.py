@@ -26,6 +26,7 @@ def build_subj_str(user_info: UserInfo) -> str:
 
     email_regex = r"\w+@\w+\.\w+"
     email = user_info["email"]
+    # TODO improve regex john.doe@gmail.com
     assert bool(re.match(email_regex, email)), email
     out += f"/emailAddress={email}"
     
