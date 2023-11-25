@@ -23,27 +23,36 @@ sudo chmod 700 /home/backupusr/.ssh
 # create router user
 sudo useradd -m router -p jwFdSS0fYv9SuReXOk
 mkdir -p /home/router/.ssh && sudo chmod 700 /home/router/.ssh
+sudo chmod 700 /home/router
 
 # create caserver user
 sudo useradd -m caserver -p TUsZNJZR4Nlx9Du1nN
 mkdir -p /home/caserver/.ssh && sudo chmod 700 /home/caserver/.ssh
 touch /home/caserver/.ssh/authorized_keys && sudo chmod 600 /home/caserver/.ssh/authorized_keys
+sudo chown -R caserver:caserver /home/caserver/.ssh
+sudo chmod 700 /home/caserver
 
 # create webserver user
 sudo useradd -m webserver -p dFP9s2ohTsCSXBHTmt
 mkdir -p /home/webserver/.ssh && sudo chmod 700 /home/webserver/.ssh
 touch /home/webserver/.ssh/authorized_keys && sudo chmod 600 /home/webserver/.ssh/authorized_keys
+sudo chown -R webserver:webserver /home/webserver/.ssh
+sudo chmod 700 /home/webserver
 
 # create mysql user
 sudo useradd -m mysql -p bUDvwzw5cVaETMBrIo
 mkdir -p /home/mysql/.ssh && sudo chmod 700 /home/mysql/.ssh
 touch /home/mysql/.ssh/authorized_keys && sudo chmod 600 /home/mysql/.ssh/authorized_keys
+sudo chown -R mysql:mysql /home/mysql/.ssh
+sudo chmod 700 /home/mysql
 
 # create sysadmin user and add sysadmin to sudo group
 sudo useradd -m sysadmin -p RbNoH9BGxO1FcyTXc1
 sudo usermod -aG sudo sysadmin
 mkdir -p /home/sysadmin/.ssh && sudo chmod 700 /home/sysadmin/.ssh
 touch /home/sysadmin/.ssh/authorized_keys && sudo chmod 600 /home/sysadmin/.ssh/authorized_keys
+sudo chown -R sysadmin:sysadmin /home/sysadmin/.ssh
+sudo chmod 700 /home/sysadmin
 
 
 
