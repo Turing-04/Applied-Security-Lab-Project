@@ -5,6 +5,7 @@
 :OUTPUT ACCEPT [10:710]
 :POSTROUTING ACCEPT [10:710]
 -A PREROUTING -d 1.2.3.4/32 -i eth3 -p tcp -m tcp --dport 443 -j DNAT --to-destination 10.0.1.2:443
+-A PREROUTING -d 1.2.3.4/32 -i eth3 -p tcp -m tcp --dport 2002 -j DNAT --to-destination 10.0.1.2:22
 -A PREROUTING -d 1.2.3.4/32 -i eth3 -p tcp -m tcp --dport 2003 -j DNAT --to-destination 10.0.0.3:22
 -A PREROUTING -d 1.2.3.4/32 -i eth3 -p tcp -m tcp --dport 2004 -j DNAT --to-destination 10.0.0.4:22
 -A PREROUTING -d 1.2.3.4/32 -i eth3 -p tcp -m tcp --dport 2005 -j DNAT --to-destination 10.0.0.5:22
