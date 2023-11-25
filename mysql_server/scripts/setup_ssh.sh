@@ -1,13 +1,12 @@
 #  SYSADMIN
 mkdir -p /home/sysadmin/.ssh && touch /home/sysadmin/.ssh/authorized_keys
-sudo chown sysadmin:sysadmin /home/sysadmin/.ssh
 sudo chmod 700 /home/sysadmin/.ssh
 
 ssh-keygen -f $SYNCED_FOLDER/SECRETS/sysadmin-ssh/sysadmin-ssh.pub -i -m PKCS8 &>  /home/sysadmin/.ssh/authorized_keys
+sudo chown -R sysadmin:sysadmin /home/sysadmin/.ssh
 
 # BACKUPUSR
 mkdir -p /home/backupusr/.ssh
-sudo chown backupusr:backupusr /home/backupusr/.ssh
 sudo chmod 700 /home/backupusr/.ssh
 
 touch /home/backupusr/.ssh/config && echo "Host 10.0.0.4" >> /home/backupusr/.ssh/config
@@ -15,10 +14,12 @@ echo "IdentityFile /home/backupusr/.ssh/mysql-server-ssh" >> /home/backupusr/.ss
 
 cp $SYNCED_FOLDER/SECRETS/mysql-server-ssh/mysql-server-ssh /home/backupusr/.ssh/mysql-server-ssh
 sudo chmod 600 /home/backupusr/.ssh/mysql-server-ssh
-sudo chown backupusr:backupusr /home/backupusr/.ssh/mysql-server-ssh
+
+sudo chown -R backupusr:backupusr /home/backupusr/.ssh
 
 
 # SSH CONFIGURATION
+
 # Disable PermitRootLogin in /etc/ssh/sshd_config
 sudo sed -i "s/.*PermitRootLogin.*/PermitRootLogin no/" /etc/ssh/sshd_config
 
