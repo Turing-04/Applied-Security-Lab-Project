@@ -51,7 +51,7 @@ sudo apt install -y apache2 apache2-dev libapache2-mod-wsgi-py3
 echo "Install ssh private key for webserver"
 mkdir -p /home/webserver/.ssh
 #TODO: fix missing ssh key in SECRETS @niels
-cp -r "$SYNCED_FOLDER/SECRETS/webserver-ssh/" /home/webserver-server/.ssh
+cp -r "$SYNCED_FOLDER/SECRETS/webserver-ssh/" /home/webserver/.ssh
 ssh_config="/home/webserver/.ssh/config"
 echo "Host 10.0.0.4" >> $ssh_config
 echo -e "\tUser webserver" >> $ssh_config
@@ -61,6 +61,9 @@ sudo chown --recursive webserver /home/webserver/.ssh
 # so the following is necessary
 sudo chmod 600 /home/webserver/.ssh/webserver-ssh/webserver-ssh
 
+
+# add the CA certificate to the trusted certificates
+cp "$SYNCED_FOLDER/SECRETS/ca-server/cacert.pem" /etc/ssl/certs/cacert.pem
 
 
 # setup Apache2 
@@ -83,6 +86,7 @@ echo "Copy apache2 config file"
 cp "$SYNCED_FOLDER/config/webserver.conf" /etc/apache2/sites-available/
 cp "$SYNCED_FOLDER/config/apache2.conf" /etc/apache2/apache2.conf
 cp "$SYNCED_FOLDER/config/envvars" /etc/apache2/envvars
+
 
 
 
