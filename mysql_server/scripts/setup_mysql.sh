@@ -81,16 +81,6 @@ sudo systemctl restart mariadb
 sudo useradd -m sysadmin -p dv8RCJruycKGyN
 sudo usermod -aG sudo sysadmin
 
-# 9.2 Create backupusr user and set up permission
-sudo useradd -m backupusr -p vzO107Z4icPL15VhmB
-mkdir -p /home/backupusr/.ssh
-sudo chmod 700 /home/backupusr/.ssh
-touch /home/backupusr/.ssh/config && echo "IdentityFile /home/backupusr/.ssh/mysql-server.key" >> /home/backupusr/.ssh/config
-# Copy private key for ssh connection
-cp $SYNCED_FOLDER/SECRETS/mysql-server/mysql-server.key /home/backupusr/.ssh/mysql-server.key
-sudo chmod 600 /home/backupusr/.ssh/mysql-server.key
-sudo chown -R backupusr:backupusr /home/backupusr/.ssh
-
 # 10. Set SSH configuration on the server
 
 # 10.1 In sysadmin home: create SSH folder for public keys 
