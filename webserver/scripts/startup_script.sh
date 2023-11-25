@@ -27,6 +27,9 @@ WEBSERVER_PASSWORD="webserver"
 echo "Starting script for webserver setup"
 
 #sudo hostnamectl set-hostname webserver
+# add default gateway via the firewall
+sudo ip route change default via 10.0.1.1
+
 
 # need to handle user creation and rights
 # probably need to create a user with sudo rights and then delete the vagrant user

@@ -180,15 +180,20 @@ def new_certificate():
         
         sleep(1)
         # TODO: download certificate from CA + get temporary password
-        # resp = ca_download_cert(username)
+        resp = ca_download_cert("bla")
         # passwd = resp['password']
         # cert = resp['cert']
         
-        cert = "certificate"
+        #cert = "certificate"
         
-        #TODO: check format of download for pkcs12 + add a password in flash message
+        #TODO: check format of download for pkcs12 + add a temporary password in flash message
         flash("Certificate downloaded, your password is "+ "password")
-        return cert
+        
+        # TODO: create a temporary file to store certificate
+        cert = ca_download_cert("bla")
+        
+        return send_file(cert.name, attachment_filename='certificate.p12', as_attachment=True, mimetype='application/x-pkcs12') 
+    
     else:
         flash("Could not get new certificate")
         return redirect(url_for('home'))

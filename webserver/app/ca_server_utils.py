@@ -34,13 +34,21 @@ def ca_download_cert(username):
     headers = {'Content-type': 'application/json'}
     
     user_info = {'username': username}
+    
+    dummy_info= { 'uid':'aa', 'firstname': "John", 'lastname': "Doe", 'email': 'john.doe@gmail.com'}
+    
     # TODO: again, do I really need to send more than username ?
     url = "https://"+CA_IP+"/request-certificate"
     
-    response = requests.post(url, data=json.dumps(user_info), headers=headers, verify=True)
+    response = requests.post(url, data=json.dumps(dummy_info), headers=headers, verify=True)
     
     if response.status_code == 200 and response.content_type == "application/x-pkcs12":
-        return response.content
+        # store certificate in temp file
+        import tempfile
+        temp = tempfile.NamedTemporaryFile(delete=True)
+        temp.write(response.content)
+        #temp.close()
+        return temp
     else:
         print("Could not download certificate")
         return None
