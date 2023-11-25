@@ -15,6 +15,7 @@ echo "IdentityFile /home/backupusr/.ssh/mysql-server-ssh" >> /home/backupusr/.ss
 
 cp $SYNCED_FOLDER/SECRETS/mysql-server-ssh/mysql-server-ssh /home/backupusr/.ssh/mysql-server-ssh
 sudo chmod 600 /home/backupusr/.ssh/mysql-server-ssh
+sudo chown backupusr:backupusr /home/backupusr/.ssh/mysql-server-ssh
 
 
 # SSH CONFIGURATION
