@@ -160,6 +160,7 @@ def modify_info():
 @app.route("/modify_passwd", methods=['GET', 'POST'])
 @login_required
 def modify_passwd():
+    message = None
     form = request.form
     if request.method == 'POST':
         old_passwd = request.form['old_passwd']
@@ -171,6 +172,7 @@ def modify_passwd():
 
         if new_passwd != new_passwd_conf:
             flash('New password and confirmation password do not match')
+            print("Passwords don't match !")
         if auth and new_passwd == new_passwd_conf:
             new_passwd_hash = hashlib.sha256(new_passwd.encode('utf-8')).hexdigest()
             
@@ -178,13 +180,29 @@ def modify_passwd():
             print("updated passwd", old_passwd, new_passwd)
             
             if resp:
-                flash('Your password has been updated !')
+                print("password updated")
+                session['passwd_changed'] = True
                 sleep(1)
-                return redirect(url_for('home'))
+                return redirect(url_for('passwd_changed'))
             else:
-                flash('Could not update your password')
+                message = 'Could not update your password, problem with DB'
+        elif not auth:
+            message= "Incorrect password"
+        else:
+            message = "Passwords don't match"
+            
 
-    return render_template('modify_passwd.html', form=form)
+    return render_template('modify_passwd.html', form=form, message=message)
+
+@app.route("/passwd_changed", methods=['GET'])
+@login_required
+def passwd_changed():
+    if session.get('passwd_changed'):
+        session.pop('passwd_changed', None)
+        return render_template("passwd_changed.html")
+    else:
+        return redirect(url_for('home'))
+    
 
 @app.route("/new_certificate", methods=['GET'])
 @login_required

@@ -82,9 +82,9 @@
     </form>
     <br>
 
-    {% for message in get_flashed_messages() %}
-      {{ message }}
-    {% endfor %}
+    {% if message %}
+<p style="color: red;">{{ message }}</p>    
+    {% endif %}
 
     <p>Go back to <a href="{{ url_for('home') }}">home</a></p>
   </div>

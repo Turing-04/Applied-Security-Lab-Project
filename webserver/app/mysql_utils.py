@@ -61,7 +61,7 @@ def db_update_passwd(new_passwd, user_id):
         return None
     cursor = conn.cursor()
     cursor.execute("UPDATE users SET pwd = %s WHERE uid=%s" , (new_passwd, user_id))
-    result = cursor.fetchone().decode('utf-8')
+    result = cursor.fetchone()
     conn.commit()
     cursor.close()
     conn.close()
