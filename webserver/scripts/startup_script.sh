@@ -36,9 +36,10 @@ echo "webserver:$WEBSERVER_PASSWORD" | sudo chpasswd
 
 sudo apt update -y && sudo apt upgrade -y
 sudo apt install -y python3 python3-pip python3-venv python3-dev
-sudo apt install curl
 sudo ln -s /usr/bin/python3 /usr/bin/python # make python3 the default python
 sudo apt install -y apache2 apache2-dev libapache2-mod-wsgi-py3
+sudo apt install curl
+
 # sudo apt install -y openssl libssl-dev
 # sudo apt install -y ssh
 
