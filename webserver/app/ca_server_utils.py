@@ -51,6 +51,7 @@ def ca_download_cert(username):
         temp = tempfile.NamedTemporaryFile("w+b", delete=True)
         temp.write(response.content)
         temp.flush()
+        print("temp content", temp.read())
         #temp.close()
         return temp
     else:

@@ -13,6 +13,8 @@ MYSQL_CLIENT_CERT_PATH="/etc/ssl/certs/webserver-intranet.crt"
 MYSQL_CLIENT_KEY_PATH="/etc/ssl/private/webserver-intranet.key"
 CA_CERT_PATH="/etc/ssl/certs/cacert.pem"
 
+# Reminder SQL fields: uid, lastname, firstname, email, pwd
+
 def db_auth(user_id, password):
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
@@ -21,7 +23,7 @@ def db_auth(user_id, password):
         return None
     
     cursor = conn.cursor()
-    cursor.execute("SELECT pwd FROM users WHERE uid = %s", (user_id))
+    cursor.execute("SELECT pwd FROM users WHERE uid = %s", (user_id,))
     result = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -33,9 +35,9 @@ def db_auth(user_id, password):
         return True
     else:
         return False
-    
 
-def db_update_info(firstname, lastname, email, username):
+def db_update_info(firstname, lastname, email, user_id):
+    print("Updating info for user", user_id)
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
     except mysql.connector.Error as err:
@@ -43,21 +45,39 @@ def db_update_info(firstname, lastname, email, username):
         return None
     cursor = conn.cursor()
     cursor.execute("UPDATE users SET firstname = %s,\
-                   lastname = %s, email= = %s WHERE username=%s" , (firstname, lastname, email, username))
+                   lastname = %s, email = %s WHERE uid=%s" , (firstname, lastname, email, user_id))
     conn.commit()
     cursor.close()
     conn.close()
-    return True
+    return db_info(user_id)
+
+    
         
-def db_update_passwd(new_passwd, username):
+def db_update_passwd(new_passwd, user_id):
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
     except mysql.connector.Error as err:
         print("Something went wrong: {}".format(err))
         return None
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET password = %s WHERE username=%s" , (new_passwd, username))
+    cursor.execute("UPDATE users SET pwd = %s WHERE uid=%s" , (new_passwd, user_id))
+    result = cursor.fetchone().decode('utf-8')
     conn.commit()
     cursor.close()
     conn.close()
+    print("SQL result:", result)
+    print("updated passwd for user", user_id)
     return True
+
+def db_info(user_id):
+    try:
+        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
+    except mysql.connector.Error as err:
+        print("Something went wrong: {}".format(err))
+        return None
+    cursor = conn.cursor()
+    cursor.execute("SELECT firstname, lastname, email FROM users WHERE uid = %s", (user_id,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result

@@ -26,9 +26,7 @@ WEBSERVER_PASSWORD="webserver"
 
 echo "Starting script for webserver setup"
 
-#sudo hostnamectl set-hostname webserver
-# add default gateway via the firewall
-sudo ip route change default via 10.0.1.1
+
 
 
 # need to handle user creation and rights
@@ -145,6 +143,10 @@ sudo systemctl enable ssh
 #rm ~/.bash_history && history -c
 
 echo $(whoami)
+
+#sudo hostnamectl set-hostname webserver
+# add default gateway via the firewall
+sudo ip route change default via 10.0.1.1
 
 # TODO: setup firewall
 # TODO: setup encryption of the disk

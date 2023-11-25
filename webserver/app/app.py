@@ -3,8 +3,9 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from functools import wraps
 from time import sleep
 import requests
-from mysql_utils import db_auth, db_update_info, db_update_passwd
+from mysql_utils import db_auth, db_update_info, db_update_passwd, db_info
 from ca_server_utils import ca_get_admin_info, ca_revoke_cert, ca_download_cert
+import hashlib
 
 #use flask sessions to handle users (pop once logout or problem)
 # session["uid"] = <uid fetched from DB for a given email/passwd
@@ -65,14 +66,27 @@ def login():
     error_msg = None
     if request.method == 'POST':
         # TODO: check credentials on DB side
-        resp = db_auth(request.form['user_id'], request.form['password'])
-        #resp = request.form['user_id'] == 'admin' and request.form['password'] == 'admin'
+        user_id = request.form['user_id']
+        resp = db_auth(user_id, request.form['password'])
         
-        if not resp:
+        
+        if resp != True:
             error_msg = "incorrect user_id or password"
             sleep(1) # to prevent brute force
         else:
-            session['uid'] = True
+            # get info from DB
+            info = db_info(user_id)
+            
+            app.logger.info("User %s logged in", user_id)
+            
+            session['firstname'] = info[0]
+            session['lastname'] = info[1]
+            session['email'] = info[2]
+            
+            session['uid'] = user_id
+            
+            print("firstname, lastname, email", info[0], info[1], info[2])
+            
             # TODO: fetch user id from DB
             #session['user_id'] = request.form['user_id']
             
@@ -91,42 +105,51 @@ def login():
 @login_required
 def home():
     print("session uid", session.get('uid'))
-    #TODO: fetch user_id from DB
-    user_info= "Firstname Lastname"
+    
+    user = session.get('firstname') + " " + session.get('lastname')
     
     #TODO: Fetch and show revocation list
     #revoked = ca_get_revoked_list()
     # revoked is in PEM format - need to convert it to a list of revoked certificates
     revoked = "revoked list"
-    return render_template('home.html', user=user_info, revoked=revoked)  
+    
+    return render_template('home.html', user=user, revoked=revoked)  
 
     
 @app.route('/logout')
 @login_required
 def logout():
     session.pop('uid', None)
+    session.pop('firstname', None)
+    session.pop('lastname', None)
+    session.pop('email', None)
     return render_template('logout.html')  
+
 
 @app.route('/modify_info', methods=['GET', 'POST'])
 @login_required
 def modify_info():
-    #TODO: fetch user info from DB
-    user_info= {'firstname': 'Firstname', 'lastname': 'Lastname', 'email': 'admin@imovies.ch'}
+    user_info= {'firstname': session.get('firstname'), 'lastname': session.get('lastname'), 'email': session.get('email')}
     
     if request.method == 'POST':
         firstname = request.form['firstname']
         lastname = request.form['lastname']
         email = request.form['email']
         
-        print("Updated info : ", firstname, lastname, email)
+        print("Updated info : ", firstname, lastname, email, session.get('uid'))
         
-        #TODO: update info on DB
-        # resp = db_update_info(firstname, lastname, email, session['user_id'])
-        resp= True
+        updated = db_update_info(firstname, lastname, email, session.get('uid'))
         
-        if resp:
+        if updated is not None:
             flash('Your info have been updated !') # TODO: check how to display flash message on POST or create an alert
+            
+            #update data from DB
+            session['firstname'] = updated[0]
+            session['lastname'] = updated[1]
+            session['email'] = updated[2]
+            
             sleep(1)
+
             return redirect(url_for('home'))
         else:
             flash('Could not update your info')
@@ -143,17 +166,17 @@ def modify_passwd():
         new_passwd = request.form['new_passwd']
         new_passwd_conf = request.form['new_passwd_conf']
         
-        # TODO: check if old passwd is correct on DB side
-        # auth = db_auth(user_id, old_passwd)
-        # perhaps don't have to fetch from DB if it's already in session
-        auth = True
+        # authentify old password
+        auth = db_auth(session.get('uid'), old_passwd)
+
         if new_passwd != new_passwd_conf:
             flash('New password and confirmation password do not match')
         if auth and new_passwd == new_passwd_conf:
-            # TODO: update passwd on DB side
-            #resp = db_update_passwd(new_passwd, session['user_id'])
-            resp = True
+            new_passwd_hash = hashlib.sha256(new_passwd.encode('utf-8')).hexdigest()
+            
+            resp = db_update_passwd(new_passwd_hash, session.get('uid'))
             print("updated passwd", old_passwd, new_passwd)
+            
             if resp:
                 flash('Your password has been updated !')
                 sleep(1)
@@ -193,6 +216,8 @@ def new_certificate():
         cert = ca_download_cert("bla")
         
         return send_file(cert.name, as_attachment=True, mimetype='application/x-pkcs12', download_name="certificate.p12")
+    # TODO: delete temporary file and possibly redirect to home ?
+    # regarder @after_request qui return une page vers laquelle redirigier l'utilisateur
     
     else:
         flash("Could not get new certificate")
