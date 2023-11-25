@@ -62,9 +62,7 @@ sudo chmod 700 /backup/backupsrv/config
 sudo chown -R backupusr:backupusr /backup/backupsrv/logs
 sudo chmod 700 /backup/backupsrv/logs
 
-# Step 5: set default route via router
-#--------------------------------------------
-bash "$SYNCED_FOLDER/scripts/router_setup.sh"
+
 
 # set up client agent backup - server cron job is no longer needed
 # # run backup setup script
