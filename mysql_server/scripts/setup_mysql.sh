@@ -76,30 +76,3 @@ sudo systemctl restart mariadb
 
 # 7.5 Enable server authentication om the client side
 #ssl-verify-server-cert
-
-# 9. Create sysadmin user and add it to the sudoers group
-sudo useradd -m sysadmin -p dv8RCJruycKGyN
-sudo usermod -aG sudo sysadmin
-
-# 10. Set SSH configuration on the server
-
-# 10.1 In sysadmin home: create SSH folder for public keys 
-mkdir -p /home/sysadmin/.ssh && touch /home/sysadmin/.ssh/authorized_keys
-
-# 10.2 Copy sysadmin public key and set correct permissions
-ssh-keygen -f $SYNCED_FOLDER/sysadmin-ssh.pub -i -m PKCS8 &>  /home/sysadmin/.ssh/authorized_keys
-sudo chmod -R go= /home/sysadmin/.ssh
-sudo chown -R sysadmin:sysadmin /home/sysadmin/.ssh
-
-# 10.3 Disable PermitRootLogin in /etc/ssh/sshd_config
-sudo sed -i "s/.*PermitRootLogin.*/PermitRootLogin no/" /etc/ssh/sshd_config
-
-# 10.4 Allow PubkeyAuthentication in /etc/ssh/sshd_config
-sudo sed -i "s/.*PubkeyAuthentication.*/PubkeyAuthentication yes/" /etc/ssh/sshd_config
-sudo sed -i "s/.*AuthorizedKeysFile.*/AuthorizedKeysFile .ssh\/authorized_keys/" /etc/ssh/sshd_config
-
-# 10.5 Allow only sysadmin host to ssh to the machine
-sudo echo "AllowUsers sysadmin" >> /etc/ssh/sshd_config
-
-# 10.6 Restart sshd
-sudo systemctl restart sshd
