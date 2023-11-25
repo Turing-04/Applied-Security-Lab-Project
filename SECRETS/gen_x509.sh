@@ -11,13 +11,24 @@ generate_certificate() {
     tmp_csr=$(mktemp)
     
     mkdir -p "$entity"
+
+    # see for -addext https://security.stackexchange.com/a/183973
+    # SAN IP: https://superuser.com/a/1499403
     openssl req -new \
         -newkey rsa:2048 -nodes -keyout "$entity/$entity.key" \
         -out $tmp_csr \
-        -subj "/C=CH/ST=Zurich/O=iMovies/CN=$common_name/emailAddress=$entity@imovies.ch/"
+        -subj "/C=CH/ST=Zurich/O=iMovies/CN=$common_name/emailAddress=$entity@imovies.ch/"\
+        -addext "subjectAltName = IP:$common_name"
 
+    # see for subjectAltName https://stackoverflow.com/a/53826340
+    tmp_extfile=$(mktemp)
+    printf "[SAN]\nsubjectAltName=IP:$common_name" > $tmp_extfile
+    cat $tmp_extfile
     sudo openssl x509 -req -in $tmp_csr -out "$entity/$entity.crt" \
-        -CA $CACERT_PATH -CAkey $CAKEY_PATH -passin file:$ca_password_path -CAcreateserial -days 365
+        -CA $CACERT_PATH -CAkey $CAKEY_PATH \
+        -passin file:$ca_password_path -CAcreateserial -days 365\
+        -extfile $tmp_extfile\
+        -extensions SAN
 
     # display generated cert
     # openssl x509 -in "$entity/$entity.crt" -text
