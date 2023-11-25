@@ -4,6 +4,7 @@ echo "creating users and home directories..."
 
 # BACKUP SSH FOLDER
 mkdir -p /home/backupusr/.ssh && sudo chmod 700 /home/backupusr/.ssh
+sudo chown -R backupusr:backupusr /home/backupusr/.ssh
 
 # ROUTER SSH FOLDER
 mkdir -p /home/router/.ssh && sudo chmod 700 /home/router/.ssh
