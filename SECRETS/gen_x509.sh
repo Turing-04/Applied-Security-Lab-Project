@@ -61,8 +61,8 @@ case "$1" in
             -extensions v3_ca -keyout $CAKEY_PATH -out $CACERT_PATH -days 3650 \
             -subj "/C=CH/ST=Zurich/O=iMovies/CN=iMovies root cert/emailAddress=ca-admin@imovies.ch/"
 
-        entities=("webserver-mysql" "webserver-https" "ca-server-https" "ca-server-mysql" "mysql-server" "ca-admin")
-        common_names=("10.0.1.2" "1.2.3.4" "10.0.0.3" "10.0.0.3" "10.0.0.5" "ca-admin")
+        entities=("webserver-mysql" "webserver-https" "ca-server-https" "ca-server-mysql" "mysql-server")
+        common_names=("10.0.1.2" "1.2.3.4" "10.0.0.3" "10.0.0.3" "10.0.0.5")
 
         for ((i=0; i<${#entities[@]}; i++)); do
             entity="${entities[$i]}"
