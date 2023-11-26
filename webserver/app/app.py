@@ -64,7 +64,6 @@ def default():
 # Route for handling the login page logic
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error_msg = None
     if request.method == 'POST':
         # TODO: check credentials on DB side
         user_id = request.form['user_id']
@@ -72,7 +71,7 @@ def login():
         
         
         if resp != True:
-            error_msg = "incorrect user_id or password"
+            flash("incorrect user_id or password")
             sleep(1) # to prevent brute force
         else:
             # get info from DB
@@ -97,7 +96,7 @@ def login():
     # destroy session if user sends a GET request to /login
     session.pop('uid', None)
 
-    return render_template('login.html', error=error_msg)
+    return render_template('login.html')
 
 
 
@@ -234,7 +233,6 @@ def new_certificate():
             flash("Error: You can only request a new certificate once every minute")
             return redirect(url_for('home'))
     
-    
     # revoke old certificates
     ca_revoke_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
     
@@ -282,34 +280,74 @@ def revoke_certificate():
 def admin_interface():
     # CA Admin interface should only be accessible with admin certificate
     # TODO: check if user is admin
-    resp = check_admin_certificate()
+    check = check_admin_certificate()
     
     #TODO: fetch administration info from CA server
-    #resp = requests.get("http://"+CA_IP+"/admin")
-    # resp = ca_get_admin_info()
+    resp = ca_get_admin_info()
     
-    resp = {'nb_issued_certs': 10, 'nb_revoked_certs': 2, 'serial_nb': 5}
     return render_template('admin_interface.html', info=resp)
 
 @app.route("/cert-login", methods=['GET'])
 def cert_login():
     # TODO: check authentication with certificate
     resp = check_certificate()
-    return "TODO"
+    
+    if resp == "SUCCESS":
+        flash("Successfully logged in with certificate")
+        # add user info to session before redirecting to home
+        
+        return redirect(url_for('home'))
+    else: 
+        flash("Error: Could not authenticate with certificate")
+        return redirect(url_for('login'))
 
         
 
     
 #TODO: check certificate
 def check_certificate():
-    client_cert = request.environ.get('SSL_CLIENT_CERT')
-    #TODO: check if certificate is valid along with CA server ? Check Apache config ! 
-    return True
+    
+    client_cert = request.environ.get('SSL_CLIENT_CERT') # PEM-encoded client certificate
+    
+
+    print("Client certificate:", client_cert)
+          
+    # check that SSL_CLIENT_VERIFY exists and is SUCCESS
+    client_verify = request.environ.get('SSL_CLIENT_VERIFY')
+    
+    #what if several users at the same time ?
+    print("Client verification result:", client_verify)
+    print("#################")
+    
+    
+    # found user id in certificate
+    client_uid = request.environ.get('SSL_CLIENT_S_DN')
+    # TODO check if this is the right field
+    
+    print("Client uid:", client_uid)
+    
+    
+    # if user_id is admin, redirect to admin interface
+    
+    
+    # TODO: check that certificate not revoked
+    # QUery la DB et verifier que les certificats matchent bien
+    
+    # fetch user info from DB from user id
+    # redirect to home page or admin interface depending on user id
+    
+    
+    return client_verify
+
+
 
 # TODO: check CA admin certificate
 def check_admin_certificate():
     # TODO: query Admin CA certificate from DB ?
     # TODO: check certificate - cf Apache config
+    
+    client_cert = request.environ.get('SSL_CLIENT_CERT')
+    
     return True
     
 

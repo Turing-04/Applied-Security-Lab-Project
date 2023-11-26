@@ -10,12 +10,18 @@ CA_IP = "10.0.0.3"
 
 def ca_get_admin_info():
     url = "https://"+CA_IP+"/ca-state"
-    try:
-        r = requests.get(url)
-        return r.json()
-    except:
-        print("Could not fetch admin info")
+    
+    resp = requests.get(url, verify="/etc/ssl/certs/cacert.pem")
+    
+    if resp.status_code == 200:
+        print("CA state :", json.loads(resp.content))
+        print("CA state type:", type(json.loads(resp.content)))
+        return json.loads(resp.content)
+    else:
+        print("Could not get CA state")
         return None
+   
+    
     
 def ca_revoke_cert(user_id, lastname, firstname, email):
     headers = {'Content-type': 'application/json'}
