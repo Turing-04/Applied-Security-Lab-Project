@@ -27,6 +27,11 @@ bash "$SYNCED_FOLDER/scripts/setup_logging.sh"
 echo "DONE: logging setup"
 
 # backup setup
-echo "Starting mysql backup setup"
+echo "Starting backup setup"
 bash "$SYNCED_FOLDER/scripts/setup_backup.sh"
 echo "DONE: backup setup"
+
+# router setup
+echo "Starting router setup"
+bash "$SYNCED_FOLDER/scripts/setup_router.sh"
+echo "DONE: router setup"
