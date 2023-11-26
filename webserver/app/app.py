@@ -117,7 +117,7 @@ def download_last_cert():
         return response
     
     if cert is None:
-        flash("Error: Could not download certificate")
+        flash("Error: No valid certificate found")
         return redirect(url_for('home'))
     
     return send_file(cert.name, as_attachment=True, mimetype='application/x509-cert', download_name="certificate.crt")
