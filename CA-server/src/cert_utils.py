@@ -18,6 +18,8 @@ OPENSSL_KEY_PARAMS = "rsa:2048"
 def build_subj_str(user_info: UserInfo) -> str:
     out = "/C=CH/ST=Zurich/O=iMovies"
 
+    # TODO add UID field : https://www.ibm.com/docs/en/ibm-mq/7.5?topic=certificates-distinguished-names
+
     firstname = user_info["firstname"]
     lastname = user_info["lastname"]
     assert firstname.isalpha(), firstname
