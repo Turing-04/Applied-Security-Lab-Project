@@ -145,7 +145,7 @@ def revoke_certificate():
     assert isinstance(uid, str), user_info
 
     ca_db = CADatabase(CA_DATABASE_PATH)
-    serial_nbs = ca_db.get_serial_numbers(user_info, valid_only=True)
+    serial_nbs = ca_db.get_serial_numbers(uid, valid_only=True)
     if len(serial_nbs) == 0:
         abort(404, description=f"No valid certificate for {user_info}")
 
@@ -153,7 +153,7 @@ def revoke_certificate():
         revoke_cert(serial_nb)
 
     # update mysql db to revoke certificate
-    mysql_update_certificate(global_mysql_cnx, user_info["uid"], 
+    mysql_update_certificate(global_mysql_cnx, uid, 
         new_certificate=None, logger=app.logger)
     
     generate_crl()

@@ -6,7 +6,7 @@ import base64
 import secrets
 import string
 import json
-from cert_utils import build_subj_str
+from cert_utils import build_subj_str, get_current_serial_nb
 import os
 import subprocess
 from test_cert_utils import generate_random_string, decode_pkcs12
@@ -65,12 +65,10 @@ def test_request_certificate(client):
     assert pkcs12_str.endswith("-----END PRIVATE KEY-----\n")
 
 def test_revoke_non_existing_cert(client):
-    user_info = DUMMY_USER_INFO.copy()
-    user_info['firstname'] = "NEFirstname"
-    user_info['lastname'] = "NELastname"
+    uid_dict = {'uid': 'nonexistant'}
 
     headers = {'Content-Type': 'application/json'}
-    response = client.post("/revoke-certificate", data = json.dumps(user_info), headers=headers)
+    response = client.post("/revoke-certificate", data = json.dumps(uid_dict), headers=headers)
     assert response.status_code == 404
 
 def get_decoded_crl(client) -> str:
@@ -84,10 +82,7 @@ def get_decoded_crl(client) -> str:
     return decode_crl(crl_file.name)
 
 def test_revoke_existing_cert(client):
-    serial = ""
-    with open("/etc/ssl/CA/serial", "r", encoding='utf-8') as serial_file:
-        serial = serial_file.read().strip()
-    assert serial != ""
+    serial = get_current_serial_nb()
 
     user_info = DUMMY_USER_INFO.copy()
     user_info['firstname'] = generate_random_string(20)
@@ -97,7 +92,8 @@ def test_revoke_existing_cert(client):
     response = client.post("/request-certificate", data = user_info_json, headers=headers)
     assert response.status_code == 200
 
-    response = client.post("/revoke-certificate", data = user_info_json, headers=headers)
+    uid_dict = {'uid': user_info['uid']}
+    response = client.post("/revoke-certificate", data = json.dumps(uid_dict), headers=headers)
     assert response.status_code == 200
     
     decoded_crl = get_decoded_crl(client)
@@ -153,7 +149,8 @@ def test_ca_state_consistent(client):
     assert s2['nb_certs_issued'] - s1['nb_certs_issued'] == 1
     assert s2['nb_certs_revoked'] == s1['nb_certs_revoked']
 
-    client.post("/revoke-certificate", data = user_info_json, headers=headers)
+    uid_dict = {'uid': user_info['uid']}
+    client.post("/revoke-certificate", data = json.dumps(uid_dict), headers=headers)
     
     s3 = client.get("/ca-state").get_json()
 

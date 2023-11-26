@@ -5,6 +5,10 @@ CA_SERVER_ROOT="/var/www/ca-server"
 CA_USER_PASSWORD="LGiiyt8pQ^f!Nyew2t2UZCX7ID^aYiXmt#gNn3#4e&P0N4mA8K"
 
 echo "Startup script started"
+echo "change default route during setup to enable fetching software from internet"
+sudo ip route change default via 10.0.2.2
+ip route show
+ping -c 1 -w 1 8.8.8.8
 
 #  _   _ ___  ___ _ __    ___ __ _       ___  ___ _ ____   _____ _ __ 
 # | | | / __|/ _ \ '__|  / __/ _` |_____/ __|/ _ \ '__\ \ / / _ \ '__|
