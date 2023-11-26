@@ -24,9 +24,9 @@ def build_subj_str(user_info: UserInfo) -> str:
     assert lastname.isalpha(), lastname
     out += f"/CN={firstname} {lastname}"
 
-    email_regex = r"\w+@\w+\.\w+"
+    # https://emailregex.com/
+    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     email = user_info["email"]
-    # TODO improve regex john.doe@gmail.com
     assert bool(re.match(email_regex, email)), email
     out += f"/emailAddress={email}"
     

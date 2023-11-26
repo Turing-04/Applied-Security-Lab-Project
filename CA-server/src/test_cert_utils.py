@@ -7,8 +7,8 @@ import tempfile
 import subprocess
 
 DUMMY_USER_INFO = {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
-     "email": "lb@imovies.ch"}
-DUMMY_SUBJ_STR = "/C=CH/ST=Zurich/O=iMovies/CN=Lukas Bruegger/emailAddress=lb@imovies.ch"
+     "email": "lb.bla@imovies.ch"}
+DUMMY_SUBJ_STR = "/C=CH/ST=Zurich/O=iMovies/CN=Lukas Bruegger/emailAddress=lb.bla@imovies.ch"
 
 def test_build_subj_str():
     assert build_subj_str(DUMMY_USER_INFO) == DUMMY_SUBJ_STR
@@ -22,6 +22,13 @@ def test_build_subj_str():
     with pytest.raises(AssertionError):
         inj_attempt["lastname"] = "Bruegger/emailAddress=ca-admin.ch"
         build_subj_str(inj_attempt)
+
+    inj_attempt = DUMMY_USER_INFO.copy()
+    with pytest.raises(AssertionError):
+        inj_attempt["email"] = "bla/admin@ca-admin.ch"
+        build_subj_str(inj_attempt)
+
+    
 
 def test_make_csr():
     tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
