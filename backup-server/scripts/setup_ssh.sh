@@ -62,10 +62,12 @@ sudo sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication no/" /etc/ssh/s
 if sudo grep -q "AllowUsers" /etc/ssh/sshd_config; then
     sudo sed -i "s/.*AllowUsers.*/AllowUsers caserver mysql sysadmin/" /etc/ssh/sshd_config
 else
-    sudo echo "AllowUsers caserver mysql sysadmin" >> /etc/ssh/sshd_config
+    sudo echo "AllowUsers caserver mysql sysadmin debug" >> /etc/ssh/sshd_config
 fi
 
 sudo echo "Match User debug" >> /etc/ssh/sshd_config
 sudo echo "    PasswordAuthentication yes" >> /etc/ssh/sshd_config
+sudo echo "Match User debug" >> /etc/ssh/sshd_config
+sudo echo "    PubkeyAuthentication no" >> /etc/ssh/sshd_config
 
 sudo systemctl restart sshd
