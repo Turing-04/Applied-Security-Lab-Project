@@ -7,7 +7,8 @@ import os
 from ca_database import CADatabase
 from user_info import UserInfo, validate_user_info
 from cert_utils import build_subj_str, make_csr,\
-    sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb
+    sign_csr, export_pkcs12, revoke_cert, generate_crl, get_current_serial_nb,\
+    verify_cert_valid
 from mysql_utils import mysql_update_certificate, mysql_connect
 from backup_utils import backup_pkcs12, ssh_connect
 from logging.config import dictConfig
@@ -17,6 +18,7 @@ from fabric.connection import Connection
 CA_PATH="/etc/ssl/CA" 
 CA_DATABASE_PATH = f"{CA_PATH}/index.txt"
 CA_CRL_PATH = f"{CA_PATH}/crl.pem"
+MAX_CERT_LEN_BYTES = 6000
 
 dictConfig({
     'version': 1,
@@ -182,7 +184,13 @@ def is_certificate_valid():
     Response: {'is_valid': True} if the certificate is valid (not revoked)
         {'is_valid': False} if the certificate has been revoked
     """
-    pass # TODO
+    if request.content_length > MAX_CERT_LEN_BYTES:
+        HTTP_PAYLOAD_TOO_LARGE = 413
+        abort(HTTP_PAYLOAD_TOO_LARGE, description=f"Certificate too long: len(cert) > {MAX_CERT_LEN_BYTES}")
+    
+    cert_str = request.get_data(as_text=True)
+    is_valid = verify_cert_valid(cert_str)
+    return {'is_valid': is_valid}
 
 @app.get("/ca-state")
 def get_ca_state():

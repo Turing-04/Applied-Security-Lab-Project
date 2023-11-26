@@ -1,5 +1,5 @@
 # from ca_server import *
-from ca_server import make_csr, sign_csr, export_pkcs12, app
+from ca_server import make_csr, sign_csr, export_pkcs12, app, MAX_CERT_LEN_BYTES
 import pytest
 import tempfile
 import base64
@@ -160,3 +160,33 @@ def test_ca_state_consistent(client):
     assert s3['nb_certs_revoked'] - s2['nb_certs_revoked'] == 1
 
     # print(s3, s2)
+
+def test_is_certificate_valid_fails_if_request_too_large(client):
+    cert_str = "a" * (MAX_CERT_LEN_BYTES + 1)
+    headers = {'Content-Type': 'application/pkix-cert', 'Content-Length': len(cert_str)}
+    response = client.post("/is-certificate-valid", data = cert_str, headers=headers)
+    assert response.status_code == 413
+
+def test_is_certificate_valid(client):
+    tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+
+    curr_serial = get_current_serial_nb()
+
+    user_info = DUMMY_USER_INFO.copy()
+    user_info['firstname'] = generate_random_string(10)
+
+    make_csr(user_info, tmp_csr.name, tmp_priv_key.name)
+
+    csr = tmp_csr.read()
+    priv_key = tmp_priv_key.read()
+
+    cert_path = sign_csr(tmp_csr.name)
+
+    with open(cert_path, 'r', encoding='utf-8') as cert_file:
+        cert_str = cert_file.read()
+        headers = {'Content-Type': 'application/pkix-cert', 'Content-Length': len(cert_str)}
+        response = client.post("/is-certificate-valid", data = cert_str, headers=headers)
+        assert response.status_code == 200
+        resp_dict = response.get_json()
+        assert resp_dict['is_valid']
