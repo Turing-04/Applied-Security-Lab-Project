@@ -35,3 +35,5 @@ echo "DONE: backup setup"
 echo "Starting router setup"
 bash "$SYNCED_FOLDER/scripts/setup_router.sh"
 echo "DONE: router setup"
+
+# cron job of mysql databaselogical backup 
