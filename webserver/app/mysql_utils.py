@@ -2,6 +2,7 @@ from mysql.connector import MySQLConnection
 import mysql.connector
 import sys
 import hashlib
+import tempfile
 
 MYSQL_HOST = "10.0.0.5"
 MYSQL_PORT = 3306
@@ -81,3 +82,29 @@ def db_info(user_id):
     cursor.close()
     conn.close()
     return result
+    
+  
+
+def db_get_client_cert(user_id):
+    try:
+        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
+    except mysql.connector.Error as err:
+        print("Something went wrong: {}".format(err))
+        return None
+    
+    print("Getting client cert for user", user_id)
+    cursor = conn.cursor()
+    cursor.execute("SELECT certificate FROM certificates WHERE uid = %s", (user_id,))
+    result = cursor.fetchone()
+    #print("SQL result download cert:", result)
+    cursor.close()
+    conn.close()
+    if result[0] is None: # no cert in db
+        return None
+    # create temp file with certifcate
+    temp = tempfile.NamedTemporaryFile("w+b", delete=True)
+    temp.write(result[0].encode('utf-8'))
+    temp.write(b"\n")
+    temp.flush()
+    return temp
+    

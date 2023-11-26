@@ -3,8 +3,8 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from functools import wraps
 from time import sleep
 import requests
-from mysql_utils import db_auth, db_update_info, db_update_passwd, db_info
-from ca_server_utils import ca_get_admin_info, ca_revoke_cert, ca_download_cert, ca_get_revoked_list
+from mysql_utils import db_auth, db_update_info, db_update_passwd, db_info, db_get_client_cert
+from ca_server_utils import ca_get_admin_info, ca_revoke_cert, ca_download_cert, ca_get_revoked_list, ca_check_certificate
 import hashlib
 import time
 import os
@@ -20,7 +20,9 @@ import os
 
 # regarder @login required
 
-# TODO: differentiate between green and red flash messages
+
+
+# TODO: Allow user to download last certificate (from DB)
 # TODO: add some css to make it look better
 # TODO: setup HTTPS only
 # TODO: add logger
@@ -98,6 +100,26 @@ def login():
 
     return render_template('login.html')
 
+#TODO: download last certificate from DB
+@app.route('/download_last_cert', methods=['GET'])
+@login_required
+def download_last_cert():
+    # download for DB
+    cert = db_get_client_cert(session.get('uid'))
+    
+    @after_this_request
+    def remove_file(response):
+        try:
+            os.remove(cert.name)
+        except Exception as error:
+            app.logger.error("Error removing or closing downloaded certificate", error)
+        return response
+    
+    if cert is None:
+        flash("Error: Could not download certificate")
+        return redirect(url_for('home'))
+    
+    return send_file(cert.name, as_attachment=True, mimetype='application/x509-cert', download_name="certificate.crt")
 
 
 #make sure user is logged in before accessing this page
@@ -234,7 +256,7 @@ def new_certificate():
             return redirect(url_for('home'))
     
     # revoke old certificates
-    ca_revoke_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
+    ca_revoke_cert(session.get('uid'))
     
     sleep(1)
         
@@ -264,15 +286,14 @@ def new_certificate():
     else:
         flash("Error: Could not get new certificate")
         return redirect(url_for('home'))
-
    
    
 @app.route("/revoke", methods=['GET'])
 @login_required
 def revoke_certificate():
-    ca_revoke_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
-    
+    ca_revoke_cert(session.get('uid'))
     flash("All your certificates have been revoked")
+    sleep(1)
     return redirect(url_for('home'))
     
     
@@ -287,25 +308,24 @@ def admin_interface():
     
     return render_template('admin_interface.html', info=resp)
 
+
 @app.route("/cert-login", methods=['GET'])
 def cert_login():
     # TODO: check authentication with certificate
     resp = check_certificate()
     
-    if resp == "SUCCESS":
+    if resp:
         flash("Successfully logged in with certificate")
         # add user info to session before redirecting to home
         
         return redirect(url_for('home'))
     else: 
-        flash("Error: Could not authenticate with certificate")
         return redirect(url_for('login'))
 
-        
 
-    
 #TODO: check certificate
 def check_certificate():
+
     
     client_cert = request.environ.get('SSL_CLIENT_CERT') # PEM-encoded client certificate
     
@@ -313,33 +333,44 @@ def check_certificate():
     print("Client certificate:", client_cert)
           
     # check that SSL_CLIENT_VERIFY exists and is SUCCESS
-    client_verify = request.environ.get('SSL_CLIENT_VERIFY')
+    apache_verify = request.environ.get('SSL_CLIENT_VERIFY')
     
-    #what if several users at the same time ?
-    print("Client verification result:", client_verify)
-    print("#################")
+    if apache_verify != "SUCCESS":
+        return False
     
+    # TODO: fetch user id from SSL_CLIENT_S_DN
+    #client_uid = request.environ.get('SSL_CLIENT_S_DN')
     
-    # found user id in certificate
-    client_uid = request.environ.get('SSL_CLIENT_S_DN')
-    # TODO check if this is the right field
+    client_uid = "a3"
     
-    print("Client uid:", client_uid)
+    if client_uid is None:
+        flash("Error: Could not authenticate with certificate")
+        return False
     
-    
-    # if user_id is admin, redirect to admin interface
-    
+    if client_uid == "ca-admin":
+        flash("CA admin should authenticate through dedicated interface")
+        return False
+            
+    print("Client uid:", client_uid)    
     
     # TODO: check that certificate not revoked
     # QUery la DB et verifier que les certificats matchent bien
+    # db_client_cert = db_get_client_cert(client_uid)
+    # TODO : vraisemblablement le check CRL est fait par CA server
+    
+    #send request to ca server to check certificate not revoked
+    resp = ca_check_certificate(client_cert)
+    
+    if not resp:
+        flash("Error: Certificate revoked")
+        return False
+    else:
+        return True
     
     # fetch user info from DB from user id
     # redirect to home page or admin interface depending on user id
-    
-    
-    return client_verify
 
-
+#TODO: allow user to download last certificate (from DB)
 
 # TODO: check CA admin certificate
 def check_admin_certificate():

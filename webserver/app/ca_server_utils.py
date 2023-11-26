@@ -23,14 +23,15 @@ def ca_get_admin_info():
    
     
     
-def ca_revoke_cert(user_id, lastname, firstname, email):
+def ca_revoke_cert(user_id):
     headers = {'Content-type': 'application/json'}
     
-    payload= { 'uid': user_id, 'lastname': lastname, 'firstname': firstname, 'email': email}
+    payload= { 'uid': user_id}
 
     url = "https://"+CA_IP+"/revoke-certificate"
     
     response = requests.post(url, data=json.dumps(payload), headers=headers, verify="/etc/ssl/certs/cacert.pem")
+    # TODO: check that revokation was successful
     if response.status_code == 200:
         return True
     else:
@@ -76,6 +77,26 @@ def ca_get_revoked_list():
     else:
         print("Could not get revoked list")
         return None
+    
+def ca_check_certificate(cert):
+    # check if certificate is revoked
+    
+    url = "https://"+CA_IP+"/is-certificate-valid"
+    
+    headers = "TBD"
+    
+    # send POST request with certificate
+    response = requests.post(url, data=cert, headers=headers, verify="/etc/ssl/certs/cacert.pem")
+    
+    # make sure response is not 200 if certificate is revoked
+    # make sure response contains is_valid field set to true if certificate is valid
+    if response.status_code == 200 and json.loads(response.content)['is_valid'] == True:
+        return True
+    else:
+        return False
+    
+    
+    
     
     
     
