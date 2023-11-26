@@ -1,7 +1,22 @@
 sudo apt update
-sudo apt install firefox
 
-cp /vagrant/SECRETS/cacert.pem /etc/ssl/certs/iMovies_root_cert.pem
+#   __ _           __                              __ _       
+#  / _(_)_ __ ___ / _| _____  __   ___ ___  _ __  / _(_) __ _ 
+# | |_| | '__/ _ \ |_ / _ \ \/ /  / __/ _ \| '_ \| |_| |/ _` |
+# |  _| | | |  __/  _| (_) >  <  | (_| (_) | | | |  _| | (_| |
+# |_| |_|_|  \___|_|  \___/_/\_\  \___\___/|_| |_|_| |_|\__, |
+#                                                       |___/ 
+
+
+sudo apt install firefox
+# https://support.mozilla.org/en-US/kb/setting-certificate-authorities-firefox
+# /usr/lib/mozilla/certificates
+# /usr/lib64/mozilla/certificates 
+firefox_crts="/usr/lib/mozilla/certificates"
+mkdir -p $firefox_crts
+cp /vagrant/SECRETS/cacert.pem "$firefox_crts/iMovies_root_cert.pem"
+
+
 # TODO install root cert in firefox!!!!
 
 #                                                _           _       
@@ -50,4 +65,5 @@ echo "Network setup"
 sudo ip route change default via 1.2.3.4
 
 xrandr --output 'VGA-1' --mode '1440x900'
+setxkbmap ch fr
 
