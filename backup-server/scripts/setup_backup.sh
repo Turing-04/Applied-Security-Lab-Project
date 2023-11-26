@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# install duplicity
-sudo apt install duplicity -y 
-
-# Sprepare backup directory
+# Prepare backup directory
 #--------------------------------------------
 echo "preparing backup directory..."
 
