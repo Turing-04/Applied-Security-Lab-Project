@@ -42,6 +42,28 @@
       padding-bottom: 5px;
     }
 
+    .flash-messages {
+      margin-bottom: 20px;
+    }
+
+    .flash-message {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    .flash-success {
+      background-color: #d4edda; /* Light Green */
+      color: #155724; /* Dark Green */
+      border: 1px solid #c3e6cb; /* Border color for contrast */
+    }
+
+    .flash-error {
+      background-color: #f8d7da; /* Light Red */
+      color: #721c24; /* Dark Red */
+      border: 1px solid #f5c6cb; /* Border color for contrast */
+    }
+
     a {
       color: #0066cc; /* Medium Royal Blue */
       text-decoration: none;
@@ -65,6 +87,24 @@
 <body>
   <div class="container">
     <h1>Welcome, {{ user }}!</h1>
+  
+    <div class="flash-messages">
+      {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+          <div class="flash-message">
+            {% if message.startswith('Error') %}
+              <div class="flash-message flash-error">
+                <p>{{ message }}</p>
+              </div>
+            {% else %}
+              <div class="flash-message flash-success">
+                <p>{{ message }}</p>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% endwith %}
+    </div>
 
     <h2>Your Profile</h2>
     <p>Update your user information <a href="/modify_info">here</a>.</p>
@@ -75,9 +115,9 @@
     <p><strong>Note:</strong> Issuing a new certificate will revoke all previous certificates.</p>
 
     <h2>Revoke Certificates</h2>
-    <p>Revoke all certificates - this action cannot be undone.</p>
+    <p>Revoke all previously issued certificates <a href="/revoke">here</a>.</p>
     <p><strong>Current Revocation List:</strong></p>
-    <p>{{ revoked }}</p>
+    <p> Download the CRL <a href="/download_crl">here</a>.</p>
 
     <h2>Logout</h2>
     <p>Logout <a href="/logout">here</a>.</p>

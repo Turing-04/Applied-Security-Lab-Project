@@ -57,13 +57,22 @@ def ca_download_cert(user_id, lastname, firstname, email):
     
 def ca_get_revoked_list():
     url = "https://"+CA_IP+"/crl"
-    try:
-        r = requests.get(url)
-        # crl is encoded in PEM format
-        return r.content
-    except:
-        print("Could not fetch revoked list")
+    
+    headers = {'Content-type': 'application/json'}
+    
+    response = requests.get(url, headers=headers, verify="/etc/ssl/certs/cacert.pem")
+    
+    if response.status_code == 200:
+        temp = tempfile.NamedTemporaryFile("w+b", delete=True)
+        temp.write(response.content)
+        temp.flush()
+        return temp
+    else:
+        print("Could not get revoked list")
         return None
+    
+    
+    
 
 
   

@@ -1,11 +1,13 @@
 # import the Flask class from the flask module
-from flask import Flask, render_template, redirect, url_for, request, session, flash, send_file
+from flask import Flask, render_template, redirect, url_for, request, session, flash, send_file, after_this_request
 from functools import wraps
 from time import sleep
 import requests
 from mysql_utils import db_auth, db_update_info, db_update_passwd, db_info
-from ca_server_utils import ca_get_admin_info, ca_revoke_cert, ca_download_cert
+from ca_server_utils import ca_get_admin_info, ca_revoke_cert, ca_download_cert, ca_get_revoked_list
 import hashlib
+import time
+import os
 
 #use flask sessions to handle users (pop once logout or problem)
 # session["uid"] = <uid fetched from DB for a given email/passwd
@@ -18,7 +20,7 @@ import hashlib
 
 # regarder @login required
 
-# TODO: check how flash messages should be displayed
+# TODO: differentiate between green and red flash messages
 # TODO: add some css to make it look better
 # TODO: setup HTTPS only
 # TODO: add logger
@@ -46,7 +48,6 @@ def login_required(f):
         if 'uid' in session:
             return f(*args, **kwargs)
         else:
-            flash("You need to login first")
             return redirect(url_for('login'))
     return wrap
 
@@ -108,12 +109,29 @@ def home():
     
     user = session.get('firstname') + " " + session.get('lastname')
     
-    #TODO: Fetch and show revocation list
-    #revoked = ca_get_revoked_list()
-    # revoked is in PEM format - need to convert it to a list of revoked certificates
-    revoked = "revoked list"
+    return render_template('home.html', user=user)  
+
+
+@app.route('/download_crl', methods=['GET'])
+@login_required
+def download_crl():
+    # download CRL from CA server
+    revoked = ca_get_revoked_list()
     
-    return render_template('home.html', user=user, revoked=revoked)  
+    if revoked is None:
+        flash("Error: Could not download revoked list")
+        return redirect(url_for('home'))
+    else:
+        @after_this_request
+        def remove_file(response):
+            try:
+                os.remove(revoked.name)
+            except Exception as error:
+                app.logger.error("Error removing or closing downloaded CRL", error)
+            return response
+
+    return send_file(revoked.name, as_attachment=True, mimetype='application/pkix-crl', download_name="revoked_list.crl") 
+
 
     
 @app.route('/logout')
@@ -141,7 +159,7 @@ def modify_info():
         updated = db_update_info(firstname, lastname, email, session.get('uid'))
         
         if updated is not None:
-            flash('Your info have been updated !') # TODO: check how to display flash message on POST or create an alert
+            flash('User information successfully updated')
             
             #update data from DB
             session['firstname'] = updated[0]
@@ -152,7 +170,7 @@ def modify_info():
 
             return redirect(url_for('home'))
         else:
-            flash('Could not update your info')
+            flash('Error: Could not update your info')
     
     return render_template('modify_info.html', user_info=user_info)
 
@@ -171,13 +189,13 @@ def modify_passwd():
         auth = db_auth(session.get('uid'), old_passwd)
 
         if new_passwd != new_passwd_conf:
-            flash('New password and confirmation password do not match')
-            print("Passwords don't match !")
-        if auth and new_passwd == new_passwd_conf:
+            flash('Passwords do not match')
+            return redirect(url_for('modify_passwd'))
+        
+        if auth:
             new_passwd_hash = hashlib.sha256(new_passwd.encode('utf-8')).hexdigest()
             
             resp = db_update_passwd(new_passwd_hash, session.get('uid'))
-            print("updated passwd", old_passwd, new_passwd)
             
             if resp:
                 print("password updated")
@@ -185,11 +203,11 @@ def modify_passwd():
                 sleep(1)
                 return redirect(url_for('passwd_changed'))
             else:
-                message = 'Could not update your password, problem with DB'
-        elif not auth:
-            message= "Incorrect password"
+                flash('Error: Could not update your password, please try again later')
+                return redirect(url_for('home'))
         else:
-            message = "Passwords don't match"
+            flash("Incorrect password")
+            return redirect(url_for('modify_passwd'))
             
 
     return render_template('modify_passwd.html', form=form, message=message)
@@ -208,28 +226,47 @@ def passwd_changed():
 @login_required
 def new_certificate():
     
+    # add check to prevent user from requesting certificate too often
+    t = session.get('last_cert_request')
+    
+    if t is not None:
+        if time.time() - t < 60:
+            flash("Error: You can only request a new certificate once every minute")
+            return redirect(url_for('home'))
+    
+    
     # revoke old certificates
     ca_revoke_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
     
-        
     sleep(1)
-    
-    #cert = "certificate"
-    
+        
     #TODO: check format of download for pkcs12 + add a temporary password in flash message
     # flash("Certificate downloaded, your password is "+ "password")
+    # flash ("Watchout if you reload the page, you won't see this message again and will have to issue a new certificate"")
     # redirecting user to a specific page to display download message and password
     
     cert = ca_download_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
     
     if cert is not None:
+        session['last_cert_request'] = time.time()
+        #flash("Certificate downloaded")
+        
+        @after_this_request
+        def remove_file(response):
+            try:
+                os.remove(cert.name)
+            except Exception as error:
+                app.logger.error("Error removing or closing downloaded certificate", error)
+            return response
+        
         return send_file(cert.name, as_attachment=True, mimetype='application/x-pkcs12', download_name="certificate.p12")
     # TODO: delete temporary file and possibly redirect to home ?
     # regarder @after_request qui return une page vers laquelle rediriger l'utilisateur
     
     else:
-        flash("Could not get new certificate")
+        flash("Error: Could not get new certificate")
         return redirect(url_for('home'))
+
    
    
 @app.route("/revoke", methods=['GET'])
@@ -237,6 +274,7 @@ def new_certificate():
 def revoke_certificate():
     ca_revoke_cert(session.get('uid'), session.get('lastname'), session.get('firstname'), session.get('email'))
     
+    flash("All your certificates have been revoked")
     return redirect(url_for('home'))
     
     
