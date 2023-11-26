@@ -8,7 +8,7 @@ import subprocess
 
 DUMMY_USER_INFO = {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
      "email": "lb.bla@imovies.ch"}
-DUMMY_SUBJ_STR = "/C=CH/ST=Zurich/O=iMovies/CN=Lukas Bruegger/emailAddress=lb.bla@imovies.ch"
+DUMMY_SUBJ_STR = "/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=Lukas Bruegger/emailAddress=lb.bla@imovies.ch"
 
 def test_build_subj_str():
     assert build_subj_str(DUMMY_USER_INFO) == DUMMY_SUBJ_STR
@@ -68,6 +68,7 @@ def test_sign_csr():
         cert_str = cert.read()
         # print(len(bytes(cert_str.encode('utf-8'))))
         assert cert_str.startswith("Certificate")
+        assert "UID" in cert_str # to keep UID in signed cert: https://stackoverflow.com/a/70397430
         for v in user_info.values():
             assert v in cert_str
 

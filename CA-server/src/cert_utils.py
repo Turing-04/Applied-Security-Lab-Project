@@ -18,7 +18,8 @@ OPENSSL_KEY_PARAMS = "rsa:2048"
 def build_subj_str(user_info: UserInfo) -> str:
     out = "/C=CH/ST=Zurich/O=iMovies"
 
-    # TODO add UID field : https://www.ibm.com/docs/en/ibm-mq/7.5?topic=certificates-distinguished-names
+    # add UID field : https://www.ibm.com/docs/en/ibm-mq/7.5?topic=certificates-distinguished-names
+    out += f"/UID={user_info['uid']}"
 
     firstname = user_info["firstname"]
     lastname = user_info["lastname"]
@@ -78,7 +79,8 @@ def sign_csr(csr_path: str) -> str:
         '-in', csr_path,
         '-config', CA_CONFIG_PATH,
         '-passin', f'file:{CA_PASSWORD_PATH}',
-        '-out', signed_cert_path
+        '-out', signed_cert_path,
+        '-preserveDN' # to keep UID in signed cert: https://stackoverflow.com/a/70397430
     ]
 
     subprocess.run(openssl_cmd, check=False, input='y\n'*2, text=True)
