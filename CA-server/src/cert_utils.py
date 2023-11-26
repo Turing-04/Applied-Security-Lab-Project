@@ -7,7 +7,9 @@ import subprocess
 
 OPENSSL_CMD = "openssl"
 
-CA_PATH="/etc/ssl/CA" 
+CA_PATH="/etc/ssl/CA"
+CA_CERT_PATH=f"{CA_PATH}/cacert.pem"
+CA_CRL_PATH=f"{CA_PATH}/crl.pem"
 CA_PASSWORD_PATH = f"{CA_PATH}/private/ca_password.txt"
 CA_CONFIG_PATH = "/etc/ssl/openssl.cnf"
 CA_SERIAL_PATH = f"{CA_PATH}/serial"
@@ -39,8 +41,6 @@ def export_pkcs12(cert_path: str, key_path: str) -> tempfile.NamedTemporaryFile:
     """
     `openssl pkcs12 -export -in /etc/ssl/CA/newcerts/02.pem -inkey tmp.key 
         -out cert_key.p12 -passout pass:`
-    TODO this exports the private key WITHOUT encryption. Maybe we should encrypt
-    with the user password
     """
     assert os.path.exists(cert_path)
     assert os.path.exists(key_path)
@@ -138,3 +138,37 @@ def get_current_serial_nb() -> str:
     assert serial != "", "Empty /etc/ssl/CA/serial file!"
 
     return serial
+
+def verify_cert_valid(cert_str: str) -> bool:
+    """
+    Verifies if the certificate has been revoked according to the 
+    current CRL.
+    Returns True iff the given certificate has NOT been revoked
+    """
+    # openssl verify -CRLfile crl.pem -CAfile cacert.pem tmp_cert_fileq
+    assert not cert_str is None
+    assert cert_str != ""
+
+    tmp_cert = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    tmp_cert.write(cert_str)
+    tmp_cert.flush()
+
+    command = [
+        OPENSSL_CMD,
+        'verify',
+        '-CAfile', CA_CERT_PATH,
+        '-CRLfile', CA_CRL_PATH,
+        '-crl_check',
+        tmp_cert.name
+    ]
+
+    out = subprocess.run(command, check=False, capture_output=True)
+    ret_code = out.returncode
+    if ret_code == 0:
+        return True
+    elif ret_code == 2:
+        return False
+    else:
+        raise Exception(f"openssl verify had a weird return code {ret_code}: \
+            \n{out.stderr}\n{out.stdout}\
+            \nfor cert_str={cert_str}")

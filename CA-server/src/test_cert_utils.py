@@ -1,4 +1,4 @@
-from cert_utils import build_subj_str, make_csr, sign_csr, export_pkcs12, get_current_serial_nb
+from cert_utils import build_subj_str, make_csr, sign_csr, export_pkcs12, get_current_serial_nb, verify_cert_valid, revoke_cert, generate_crl
 import string
 import os
 import secrets
@@ -137,3 +137,34 @@ def test_get_current_serial_nb():
     serial = get_current_serial_nb()
     assert serial != ""
     print(serial)
+
+
+def test_verify_cert_valid():
+    tmp_csr = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+    tmp_priv_key = tempfile.NamedTemporaryFile("w+", encoding='utf-8')
+
+    curr_serial = get_current_serial_nb()
+
+    user_info = DUMMY_USER_INFO.copy()
+    user_info['firstname'] = generate_random_string(10)
+
+    make_csr(user_info, tmp_csr.name, tmp_priv_key.name)
+
+    csr = tmp_csr.read()
+    priv_key = tmp_priv_key.read()
+
+    cert_path = sign_csr(tmp_csr.name)
+
+    with open(cert_path, 'r', encoding='utf-8') as cert_file:
+        cert_str = cert_file.read()
+        # should be valid before revocation
+        assert verify_cert_valid(cert_str)
+
+        revoke_cert(curr_serial)
+        # should still be valid before generate_crl()
+        assert verify_cert_valid(cert_str)
+
+        generate_crl()
+
+        # should NOT be valid AFTER revocation (after generate_crl())
+        assert not verify_cert_valid(cert_str)
