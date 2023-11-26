@@ -127,13 +127,11 @@ def request_certificate():
 def revoke_certificate():
     """
     This endpoint allows for certificate revocation.
-    The body of the request contains a JSON object with the user info
+    The body of the request contains a JSON object with the uid
     of the user whose certificate must be revoked.
-    All the valid certificates who match the exact information given will
-    be revoked (should normally be exactly 1).
+    All the valid certificates for the uid will be revoked.
     E.g.:
-    {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
-     "email": "lb@imovies.ch"}
+    {"uid": "lb"}
     
     to revoke the certificate of Lukas Bruegger.
     Upon successful revocation, a response with status 200 OK is sent back.
@@ -143,7 +141,8 @@ def revoke_certificate():
     Docs: https://openssl-ca.readthedocs.io/en/latest/certificate-revocation-lists.html
     """
     user_info = request.get_json()
-    validate_user_info(user_info)
+    uid = user_info['uid']
+    assert isinstance(uid, str), user_info
 
     ca_db = CADatabase(CA_DATABASE_PATH)
     serial_nbs = ca_db.get_serial_numbers(user_info, valid_only=True)
@@ -174,6 +173,16 @@ def get_crl():
     # see https://flask.palletsprojects.com/en/3.0.x/api/#flask.send_file
     
     return send_file(CA_CRL_PATH, mimetype="application/pkix-crl")
+
+@app.post("/is-certificate-valid")
+def is_certificate_valid():
+    """
+    Request: POST with Content-Type: application/pkix-cert
+     body: PEM encoded certificate x509
+    Response: {'is_valid': True} if the certificate is valid (not revoked)
+        {'is_valid': False} if the certificate has been revoked
+    """
+    pass # TODO
 
 @app.get("/ca-state")
 def get_ca_state():

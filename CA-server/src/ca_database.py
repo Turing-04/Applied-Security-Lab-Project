@@ -20,7 +20,7 @@ class CADatabase:
     def __init__(self, ca_db_path: str) -> None:
         self.raw_db = CADatabase.read_ca_database(ca_db_path)
 
-    def get_serial_numbers(self, user_info: UserInfo, valid_only: bool) -> List[str]:
+    def get_serial_numbers(self, uid: str, valid_only: bool) -> List[str]:
         """
         Retrieve a list of serial numbers from the certificate database based on user information.
 
@@ -35,13 +35,15 @@ class CADatabase:
             The function searches the certificate database for entries with the provided user information.
             If 'valid_only' is set to True, only valid certificates are considered.
         """
+        assert isinstance(uid, str)
+
         numbers = []
-        subj_str = build_subj_str(user_info)
         for entry in self.raw_db:
             if valid_only and entry['status'] != "V":
                 continue
 
-            if entry['distinguished_name'] == subj_str:
+            # TODO continue and test!
+            if f"UID={uid}" in entry['distinguished_name']:
                 numbers.append(entry['serial_number'])
         return numbers
 
