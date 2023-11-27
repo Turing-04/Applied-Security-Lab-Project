@@ -1,13 +1,12 @@
 #!/bin/bash
 
-# switch user
-su backupusr
-
 # create database logical backup dump
 mysqldump --databases imovies -uroot -pH6Mue92MeNNnvFRpJ67V > /home/backupusr/mysql/imovies-$(date '+%Y-%m-%d').sql
 chown backupusr:backupusr /home/backupusr/mysql/imovies-$(date '+%Y-%m-%d').sql
 chmod 600 /home/backupusr/mysql/imovies-$(date '+%Y-%m-%d').sql
 
+# switch user
+su backupusr
 
 # variables
 REMOTE_USER='mysql'
@@ -23,4 +22,5 @@ cd $REMOTE_DIR
 put $LOCAL_FILE_PATH
 EOF
 
+exit
 exit
