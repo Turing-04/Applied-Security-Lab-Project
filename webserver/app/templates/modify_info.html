@@ -66,6 +66,15 @@
       text-decoration: none;
     }
 
+    .flash-message {
+      background-color: #f8d7da; /* Light Red */
+      color: #721c24; /* Dark Red */
+      padding: 10px;
+      border: 1px solid #f5c6cb; /* Border color for contrast */
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
     a:hover {
       text-decoration: underline;
     }
@@ -83,9 +92,17 @@
     </form>
     <br>
 
-    {% for message in get_flashed_messages() %}
-      {{ message }}
-    {% endfor %}
+    <div class="flash-messages">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-message">
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    </div>
 
     <p>Go back to <a href="{{ url_for('home') }}">home</a></p>
   </div>

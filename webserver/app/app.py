@@ -8,6 +8,7 @@ from ca_server_utils import ca_get_admin_info, ca_revoke_cert, ca_download_cert,
 import hashlib
 import time
 import os
+import re
 
 #use flask sessions to handle users (pop once logout or problem)
 # session["uid"] = <uid fetched from DB for a given email/passwd
@@ -67,11 +68,18 @@ def default():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # TODO: check credentials on DB side
+
         user_id = request.form['user_id']
-        resp = db_auth(user_id, request.form['password'])
         
+        # user_id is 2 characters long and can't be modified at any point
+        if len(user_id) != 2:
+            resp = False
+            # To prevent timing side channel attacks
+            db_auth("dummy", "dummy")
+        else:
+            resp = db_auth(user_id, request.form['password'])
         
+
         if resp != True:
             flash("incorrect user_id or password")
             sleep(1) # to prevent brute force
@@ -176,10 +184,19 @@ def modify_info():
         lastname = request.form['lastname']
         email = request.form['email']
         
-        print("Updated info : ", firstname, lastname, email, session.get('uid'))
         
-        updated = db_update_info(firstname, lastname, email, session.get('uid'))
+        max_length = 50
         
+        if not is_valid_input(firstname, max_length) or not is_valid_input(lastname, max_length):
+            flash("Error: Invalid firstname or lastname")
+            return redirect(url_for('modify_info'))
+        elif not is_valid_email(email, max_length):
+            flash("Error: Invalid email")
+            return redirect(url_for('modify_info'))
+        else:
+            # update info in DB
+            updated = db_update_info(firstname, lastname, email, session.get('uid'))
+                
         if updated is not None:
             flash('User information successfully updated')
             
@@ -187,6 +204,8 @@ def modify_info():
             session['firstname'] = updated[0]
             session['lastname'] = updated[1]
             session['email'] = updated[2]
+            
+            print("updated firstname, lastname, email", updated[0], updated[1], updated[2])
             
             sleep(1)
 
@@ -388,7 +407,17 @@ def check_admin_certificate():
         return False
     else:
         return True
+    
 
+
+def is_valid_input(value, max_length):
+    # Check if the input value is not empty and doesn't contain special characters
+    return bool(value) and re.match("^[a-zA-Z0-9 ]+$", value) and len(value) <= max_length
+
+
+def is_valid_email(email, max_length):
+    # Check if the email is valid
+    return bool(email) and re.match("r'^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email) and len(email) <= max_length
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
