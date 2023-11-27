@@ -8,7 +8,7 @@ sudo chown -R backupusr:backupusr /home/backupusr/.ssh
 
 # ROUTER SSH FOLDER
 mkdir -p /home/router/.ssh && sudo chmod 700 /home/router/.ssh
-
+touch /home/router/.ssh/authorized_keys && sudo chmod 600 /home/router/.ssh/authorized_keys
 sudo chown -R router:router /home/router/.ssh
 
 # CASERVER SSH FOLDER
@@ -40,13 +40,16 @@ echo "copying public keys to authorized_keys files..."
 cat $SYNCED_FOLDER/SECRETS/ca-server-ssh/ca-server-ssh.pub >> /home/caserver/.ssh/authorized_keys
 
 # WEBSERVER KEYS
-# cat $SYNCED_FOLDER/SECRETS/web-server-ssh/web-server-ssh.pub >> /home/webserver/.ssh/authorized_keys
+cat $SYNCED_FOLDER/SECRETS/web-server-ssh/web-server-ssh.pub >> /home/webserver/.ssh/authorized_keys
 
 # MYSQL KEYS
 cat $SYNCED_FOLDER/SECRETS/mysql-server-ssh/mysql-server-ssh.pub >> /home/mysql/.ssh/authorized_keys
 
 # SYSADMIN KEYS
 cat $SYNCED_FOLDER/SECRETS/sysadmin-ssh/sysadmin-ssh.pub >> /home/sysadmin/.ssh/authorized_keys
+
+# FIREWALL KEYS
+cat $SYNCED_FOLDER/SECRETS/firewall-ssh/firewall-ssh.pub >> /home/router/.ssh/authorized_keys
 
 # SSH CONFIGURATION
 #--------------------------------------------
