@@ -9,6 +9,8 @@ sudo chown -R backupusr:backupusr /home/backupusr/.ssh
 # ROUTER SSH FOLDER
 mkdir -p /home/router/.ssh && sudo chmod 700 /home/router/.ssh
 
+sudo chown -R router:router /home/router/.ssh
+
 # CASERVER SSH FOLDER
 mkdir -p /home/caserver/.ssh && sudo chmod 700 /home/caserver/.ssh
 touch /home/caserver/.ssh/authorized_keys && sudo chmod 600 /home/caserver/.ssh/authorized_keys
