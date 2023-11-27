@@ -25,6 +25,7 @@ def ssh_connect(logger: Logger) -> Connection:
     - Connection
     A Fabric Connection object representing the SSH connection.
     """
+    # TODO add try catch!!!
     cnx = Connection(BKP_SERVER_IP, user=BKP_SERVER_USER, port=22,
         connect_kwargs={
             'key_filename': SSH_KEY_FILENAME
