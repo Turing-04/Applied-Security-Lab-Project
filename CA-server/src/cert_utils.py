@@ -17,22 +17,43 @@ CA_NEWCERTS_PATH = f"{CA_PATH}/newcerts"
 
 OPENSSL_KEY_PARAMS = "rsa:2048"
 
+def validate_subj_str_field(field: str) -> bool:
+    """
+    -subj arg
+           When a certificate is created set its subject name to the given value.  When the certificate is self-signed the issuer name is set to the same value.
+
+           The arg must be formatted as "/type0=value0/type1=value1/type2=...".  Special characters may be escaped by "\" (backslash), whitespace is retained.  Empty values are permitted, but the
+           corresponding type will not be included in the certificate.  Giving a single "/" will lead to an empty sequence of RDNs (a NULL-DN).  Multi-valued RDNs can be formed by placing a "+" character
+           instead of a "/" between the AttributeValueAssertions (AVAs) that specify the members of the set.  Example:
+
+           "/DC=org/DC=OpenSSL/DC=users/UID=123456+CN=John Doe"
+
+           This option can be used in conjunction with the -force_pubkey option to create a certificate even without providing an input certificate or certificate request.
+
+    See `man openssl x509`
+    """
+    for c in field:
+        if c in ['/', '=', '+', '\\']:
+            print(f'Field {field} is invalid for a x509 subject string ({c})')
+            return False
+    return True
+
 def build_subj_str(user_info: UserInfo) -> str:
     out = "/C=CH/ST=Zurich/O=iMovies"
 
     # add UID field : https://www.ibm.com/docs/en/ibm-mq/7.5?topic=certificates-distinguished-names
-    out += f"/UID={user_info['uid']}"
+    uid = user_info['uid']
+    assert validate_subj_str_field(uid)
+    out += f"/UID={uid}"
 
     firstname = user_info["firstname"]
     lastname = user_info["lastname"]
-    assert firstname.isalpha(), firstname
-    assert lastname.isalpha(), lastname
+    assert validate_subj_str_field(firstname)
+    assert validate_subj_str_field(lastname)
     out += f"/CN={firstname} {lastname}"
 
-    # https://emailregex.com/
-    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     email = user_info["email"]
-    assert bool(re.match(email_regex, email)), email
+    assert validate_subj_str_field(email)
     out += f"/emailAddress={email}"
     
     return out

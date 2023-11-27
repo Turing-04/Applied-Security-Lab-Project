@@ -6,9 +6,9 @@ import pytest
 import tempfile
 import subprocess
 
-DUMMY_USER_INFO = {"uid": "lb", "lastname": "Bruegger", "firstname": "Lukas", 
-     "email": "lb.bla@imovies.ch"}
-DUMMY_SUBJ_STR = "/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=Lukas Bruegger/emailAddress=lb.bla@imovies.ch"
+DUMMY_USER_INFO = {"uid": "a3", "lastname": "Anderson", "firstname": "Andres Alan", 
+     "email": "and@imovies.ch"}
+DUMMY_SUBJ_STR = "/C=CH/ST=Zurich/O=iMovies/UID=a3/CN=Andres Alan Anderson/emailAddress=and@imovies.ch"
 
 def test_build_subj_str():
     assert build_subj_str(DUMMY_USER_INFO) == DUMMY_SUBJ_STR
@@ -26,6 +26,16 @@ def test_build_subj_str():
     inj_attempt = DUMMY_USER_INFO.copy()
     with pytest.raises(AssertionError):
         inj_attempt["email"] = "bla/admin@ca-admin.ch"
+        build_subj_str(inj_attempt)
+
+    inj_attempt = DUMMY_USER_INFO.copy()
+    with pytest.raises(AssertionError):
+        inj_attempt["email"] = "bla.admin@ca-admin.ch+CN=iMovies Admin"
+        build_subj_str(inj_attempt)
+
+    inj_attempt = DUMMY_USER_INFO.copy()
+    with pytest.raises(AssertionError):
+        inj_attempt["email"] = "bla.admin@ca-admin.ch\/CN=iMovies Admin"
         build_subj_str(inj_attempt)
 
     
