@@ -12,7 +12,7 @@ chmod 600 /home/backupusr/mysql/imovies-$(date '+%Y-%m-%d').sql
 # variables
 REMOTE_USER='mysql'
 REMOTE_HOST='10.0.0.4'
-HOST_NAME='backupuser'
+HOST_NAME='backupserver'
 REMOTE_DIR='/backup/mysql/mariadb'
 LOCAL_FILE_PATH=/home/backupusr/mysql/imovies-$(date '+%Y-%m-%d').sql
 
