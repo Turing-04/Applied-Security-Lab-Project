@@ -71,6 +71,7 @@ cp "$SYNCED_FOLDER/SECRETS/ca-server/cacert.pem" /etc/ssl/certs/cacert.pem
 # setup Apache2 
 sudo a2enmod wsgi
 sudo a2enmod ssl
+sudo a2enmod headers
 
 echo "copy keys for certificate"
 
