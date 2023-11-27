@@ -12,7 +12,7 @@ echo "finishing creating mysql logical backup..."
 su backupusr<<REALEND
 # sftp command
 echo "starting sftp >>>"
-sftp backupserver:/backup/mysql/mariadb <<EOF
+sftp -o StrictHostKeyChecking=no backupserver:/backup/mysql/mariadb <<EOF
 cd /backup/mysql/mariadb
 put /home/backupusr/mysql/imovies-$(date '+%Y-%m-%d').sql
 EOF
