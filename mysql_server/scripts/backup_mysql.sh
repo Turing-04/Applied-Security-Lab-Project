@@ -19,7 +19,6 @@ EOF
 echo "finishing sftp file transfer..."
 REALEND
 
-echo "first exit"
 exit
 
 

@@ -32,6 +32,12 @@ sudo sed -i "s/.*AuthorizedKeysFile.*/AuthorizedKeysFile .ssh\/authorized_keys/"
 # Allow only sysadmin host to ssh to the machine
 sudo echo "AllowUsers sysadmin" >> /etc/ssh/sshd_config
 
+# # Disable hostkeychecking for backup server
+# sudo echo "Host 10.0.0.4" >> /etc/ssh/sshd_config
+# sudo echo "    StrictHostKeyChecking no"
+# sudo echo "    UserKnownHostsFile=/dev/null"
+
+
 # Restart sshd
 sudo systemctl restart sshd
 
