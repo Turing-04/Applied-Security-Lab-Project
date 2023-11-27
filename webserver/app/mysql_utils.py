@@ -16,11 +16,11 @@ CA_CERT_PATH="/etc/ssl/certs/cacert.pem"
 
 # Reminder SQL fields: uid, lastname, firstname, email, pwd
 
-def db_auth(user_id, password):
+def db_auth(user_id, password, logger):
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
     except mysql.connector.Error as err:
-        print("Something went wrong: {}".format(err))
+        logger.error("Connection to DB for authentification failed: {}".format(err))
         return None
     
     cursor = conn.cursor()
@@ -54,11 +54,11 @@ def db_update_info(firstname, lastname, email, user_id):
 
     
         
-def db_update_passwd(new_passwd, user_id):
+def db_update_passwd(new_passwd, user_id, logger):
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
     except mysql.connector.Error as err:
-        print("Something went wrong: {}".format(err))
+        logger.error("Connection to DB for password update failed: {}".format(err))
         return None
     cursor = conn.cursor()
     cursor.execute("UPDATE users SET pwd = %s WHERE uid=%s" , (new_passwd, user_id))
@@ -70,11 +70,11 @@ def db_update_passwd(new_passwd, user_id):
     print("updated passwd for user", user_id)
     return True
 
-def db_info(user_id):
+def db_info(user_id, logger):
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
     except mysql.connector.Error as err:
-        print("Something went wrong: {}".format(err))
+        logger.error("Connection to DB for user info retrieval failed: {}".format(err))
         return None
     cursor = conn.cursor()
     cursor.execute("SELECT firstname, lastname, email FROM users WHERE uid = %s", (user_id,))
@@ -85,21 +85,21 @@ def db_info(user_id):
     
   
 
-def db_get_client_cert(user_id):
+def db_get_client_cert(user_id, logger):
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
     except mysql.connector.Error as err:
-        print("Something went wrong: {}".format(err))
+        logger.error("Connection to DB for client cert retrieval failed: {}".format(err))
         return None
     
-    print("Getting client cert for user", user_id)
+    logger.info("Connected to DB for client cert retrieval")
     cursor = conn.cursor()
     cursor.execute("SELECT certificate FROM certificates WHERE uid = %s", (user_id,))
     result = cursor.fetchone()
-    #print("SQL result download cert:", result)
     cursor.close()
     conn.close()
     if result[0] is None: # no cert in db
+        logger.info("No certificate found in DB for user {}".format(user_id))
         return None
     # create temp file with certifcate
     temp = tempfile.NamedTemporaryFile("w+b", delete=True)
