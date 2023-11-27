@@ -3,17 +3,15 @@ from fabric.connection import Connection
 from pgpy import PGPKey, PGPMessage
 import tempfile
 from datetime import datetime
+from paramiko.ssh_exception import SSHException, NoValidConnectionsError
 
 BKP_SERVER_IP="10.0.0.4"
-BKP_SERVER_USER="caserver"
+# BKP_SERVER_USER="caserver"
+# SSH_KEY_FILENAME="/home/ca-server/.ssh/ca-server-ssh/ca-server-ssh"
 BKP_CERTS_PATH="/backup/caserver/keys_certs"
-# ENCRYPT_KEY_ID = "master-backup-key@imovies.ch"
-# GPG_HOMEDIR="/home/ca-server/.gnupg/"
-# GPG_KEYRING="pubring.kbx"
 BKP_MASTER_PUBLIC_KEY="/home/ca-server/gpg-public/bkp-master-key-public.gpg"
-SSH_KEY_FILENAME="/home/ca-server/.ssh/ca-server-ssh/ca-server-ssh"
 
-def ssh_connect(logger: Logger) -> Connection:
+def ssh_connect(logger: Logger, max_retries = 2) -> Connection:
     """
     This function establishes an SSH connection to the backup server using Fabric's Connection class.
 
@@ -25,15 +23,27 @@ def ssh_connect(logger: Logger) -> Connection:
     - Connection
     A Fabric Connection object representing the SSH connection.
     """
-    # TODO add try catch!!!
-    cnx = Connection(BKP_SERVER_IP, user=BKP_SERVER_USER, port=22,
-        connect_kwargs={
-            'key_filename': SSH_KEY_FILENAME
-        })
+    cnx = None
+    is_connected = False
+    retries = 0
+    while not is_connected and retries < max_retries:
+        try:
+            # everything is already configured in ~/.ssh/config
+            # can set low connect timeout in local net with RTT ~ 1ms
+            cnx = Connection(host=BKP_SERVER_IP, connect_timeout=2)
+            cnx.open()
+            is_connected = cnx.is_connected
+            logger.info(f"SSH: connect retry {retries} success? {is_connected} ({BKP_SERVER_IP})")
+        except (SSHException, NoValidConnectionsError) as e:
+            logger.error(f"SSH: {e} while trying to establish a connection\
+                to {BKP_SERVER_IP}. retries={retries}")
+            if cnx:
+                cnx.close()
+        finally:
+            retries += 1
+    
     if cnx.is_connected:
         logger.info(f"SSH: Successfully connected to backup server ({BKP_SERVER_IP})")
-    else:
-        logger.error(f"SSH: Error connecting to backup server ({BKP_SERVER_IP})")
     return cnx
 
 def pgp_encrypt(data: str) -> str:
@@ -54,7 +64,7 @@ def pgp_encrypt(data: str) -> str:
     return str(ciphertext)
 
 
-def backup_pkcs12(ssh_cnx: Connection, pkcs12_file: tempfile.TemporaryFile, uid: str, logger: Logger):
+def backup_pkcs12(ssh_cnx: Connection, pkcs12_file: tempfile.TemporaryFile, uid: str, logger: Logger) -> str:
     """
     This function securely backs up a PKCS12 file to a remote server using PGP encryption.
 
@@ -71,6 +81,7 @@ def backup_pkcs12(ssh_cnx: Connection, pkcs12_file: tempfile.TemporaryFile, uid:
     assert uid != ""
     assert not pkcs12_file is None
     assert not ssh_cnx is None
+    assert ssh_cnx.is_connected, "backup_pkcs12: ssh_cnx not connected, better fail"
     time = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
     dst_file_name = f"{time}_{uid}.p12.gpg"
     destination_path = f"{BKP_CERTS_PATH}/{dst_file_name}"
@@ -82,3 +93,4 @@ def backup_pkcs12(ssh_cnx: Connection, pkcs12_file: tempfile.TemporaryFile, uid:
     ssh_cnx.put(encrypted_file, remote=destination_path)
 
     logger.info(f"Successfully backed up temp pkcs12 to {destination_path} on {BKP_SERVER_IP}")
+    return destination_path

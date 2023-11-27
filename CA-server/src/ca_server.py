@@ -52,10 +52,10 @@ def ensure_remote_cnxs():
 
     global global_ssh_cnx
     if global_ssh_cnx is None:
-        global_ssh_cnx = ssh_connect(app.logger)
+        global_ssh_cnx = ssh_connect(app.logger, max_retries=5)
     elif not global_ssh_cnx.is_connected:
         global_ssh_cnx.close()
-        global_ssh_cnx = ssh_connect(app.logger)
+        global_ssh_cnx = ssh_connect(app.logger, max_retries=3)
 
 
 @app.post("/request-certificate")
