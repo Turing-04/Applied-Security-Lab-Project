@@ -84,7 +84,7 @@ def ca_check_certificate(cert):
     
     url = "https://"+CA_IP+"/is-certificate-valid"
     
-    headers = {'Content-type': 'application/pkix-cert'}
+    headers = {'Content-type': 'application/pkix-cert', 'Content-length': len(cert)}
     
     # send POST request with certificate
     response = requests.post(url, data=cert, headers=headers, verify="/etc/ssl/certs/cacert.pem")
