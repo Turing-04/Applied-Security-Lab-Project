@@ -42,8 +42,10 @@ def ca_revoke_cert(user_id, logger):
         return False
     
     if response.status_code == 200:
+        flash("Certificate successfully revoked")
+        logger.info("User {} successfully revoked certificate".format(user_id))
         return True
-    elif response.status_code == 404 and "No valid ceritificate" in response.content.decode('utf-8'):
+    elif response.status_code == 404 and b'No valid certificate for' in response.content:
         flash("No valid certificate to revoke")
         logger.info("User {} tried to revoke a certificate but no valid certificate was found".format(user_id))
         return True

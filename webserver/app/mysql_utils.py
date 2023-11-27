@@ -37,12 +37,11 @@ def db_auth(user_id, password, logger):
     else:
         return False
 
-def db_update_info(firstname, lastname, email, user_id):
-    print("Updating info for user", user_id)
+def db_update_info(firstname, lastname, email, user_id, logger):
     try:
         conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
     except mysql.connector.Error as err:
-        print("Something went wrong: {}".format(err))
+        logger.error("Connection to DB for user info update failed: {}".format(err))
         return None
     cursor = conn.cursor()
     cursor.execute("UPDATE users SET firstname = %s,\
@@ -50,7 +49,7 @@ def db_update_info(firstname, lastname, email, user_id):
     conn.commit()
     cursor.close()
     conn.close()
-    return db_info(user_id)
+    return db_info(user_id, logger)
 
     
         

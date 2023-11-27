@@ -133,7 +133,7 @@ def download_last_cert():
             app.logger.info("Error removing or closing downloaded certificate")
         return response
 
-    
+    app.logger.info("User %s downloaded last certificate", session.get('uid'))
     return send_file(cert.name, as_attachment=True, mimetype='application/x509-cert', download_name="certificate.crt")
 
 
@@ -164,7 +164,8 @@ def download_crl():
             except:
                 app.logger.error("Error removing or closing downloaded CRL")
             return response
-
+        
+    app.logger.info("User %s downloaded CRL", session.get('uid'))
     return send_file(revoked.name, as_attachment=True, mimetype='application/pkix-crl', download_name="revoked_list.crl") 
 
 
@@ -190,7 +191,6 @@ def modify_info():
         lastname = request.form['lastname']
         email = request.form['email']
         
-        
         max_length = 50
         
         if not is_valid_input(firstname, max_length) or not is_valid_input(lastname, max_length):
@@ -203,7 +203,7 @@ def modify_info():
             return redirect(url_for('modify_info'))
         else:
             # update info in DB
-            updated = db_update_info(firstname, lastname, email, session.get('uid'))
+            updated = db_update_info(firstname, lastname, email, session.get('uid'), app.logger)
                 
         if updated is not None:
             app.logger.info("User %s updated his info", session.get('uid'))
@@ -290,6 +290,8 @@ def new_certificate():
     
     # revoke old certificates
     ca_revoke_cert(session.get('uid'), app.logger)
+    # delete flash messages
+    session.pop('_flashes', None)
     
     sleep(1)
             
@@ -318,13 +320,10 @@ def new_certificate():
 @app.route("/revoke", methods=['GET'])
 @login_required
 def revoke_certificate():
-    revoked = ca_revoke_cert(session.get('uid'))
+    revoked = ca_revoke_cert(session.get('uid'), app.logger)
     if not revoked:
-        flash("Error: Could not revoke certificate")
         return redirect(url_for('home'))
     
-    flash("All your certificates have been revoked")
-    app.logger.info("User %s revoked his certificates", session.get('uid'))
     sleep(1)
     return redirect(url_for('home'))
     
@@ -371,8 +370,6 @@ def cert_login():
         
         return redirect(url_for('home'))
     else: 
-        flash("Error: Could not authenticate with certificate")
-        app.logger.error("User could not authenticate with certificate")
         return redirect(url_for('login'))
 
 
@@ -411,7 +408,6 @@ def check_certificate():
         flash("Error: Certificate revoked")
         return False, None
     else:
-        app.logger.info("User %s successfully authenticated with certificate", client_uid)
         return True, client_uid
     
     
