@@ -46,9 +46,9 @@
     <div class="row">
       <div class="col-md-12">
         <h1>CA's current state:</h1>
-        <p>Number of issued certificates: {{ info['current_serial_nb'] }}</p>
-        <p>Number of revoked certificates: {{ info['nb_certs_issued'] }}</p>
-        <p>Current serial number: {{ info['nb_certs_revoked'] }}</p>
+        <p>Number of issued certificates: {{ info['nb_certs_issued'] }}</p>
+        <p>Number of revoked certificates: {{ info['nb_certs_revoked'] }}</p>
+        <p>Current serial number: 0x{{info['current_serial_nb'] }}</p>
       </div>
     </div>
   </div>

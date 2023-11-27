@@ -304,10 +304,11 @@ def admin_interface():
     # TODO: check if user is admin
     check = check_admin_certificate()
     
-    #TODO: fetch administration info from CA server
-    resp = ca_get_admin_info()
-    
-    return render_template('admin_interface.html', info=resp)
+    if check:
+        resp = ca_get_admin_info()
+        return render_template('admin_interface.html', info=resp)
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route("/cert-login", methods=['GET'])
@@ -377,13 +378,16 @@ def check_certificate():
 
 # TODO: check CA admin certificate
 def check_admin_certificate():
-    # TODO: query Admin CA certificate from DB ?
-    # TODO: check certificate - cf Apache config
     
-    client_cert = request.environ.get('SSL_CLIENT_CERT')
+    apache_verify = request.environ.get('SSL_CLIENT_VERIFY')
     
-    return True
+    client_uid = request.environ.get('SSL_CLIENT_S_DN_UID')
     
+    if client_uid != "ca-admin" or apache_verify != "SUCCESS":
+        flash("Error: You are not the CA admin")
+        return False
+    else:
+        return True
 
 
 # start the server with the 'run()' method
