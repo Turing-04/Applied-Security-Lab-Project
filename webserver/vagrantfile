@@ -8,9 +8,9 @@ Vagrant.configure("2") do |config|
       vb.cpus = "2"
     end
 
-
-    config.vm.provision "shell", path: "scripts/startup_script.sh"
+    
     config.vm.provision "file", source: "../SECRETS", destination: "/vagrant/SECRETS"
+    config.vm.provision "shell", path: "scripts/startup_script.sh"
 
     
     # also need to provision the flask files ? 
