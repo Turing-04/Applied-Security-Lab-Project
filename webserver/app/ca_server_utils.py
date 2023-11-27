@@ -1,6 +1,7 @@
 import requests
 import json
 import tempfile
+from flask import flash
 
 import os
 
@@ -83,7 +84,7 @@ def ca_check_certificate(cert):
     
     url = "https://"+CA_IP+"/is-certificate-valid"
     
-    headers = "TBD"
+    headers = {'Content-type': 'application/pkix-cert'}
     
     # send POST request with certificate
     response = requests.post(url, data=cert, headers=headers, verify="/etc/ssl/certs/cacert.pem")
@@ -91,12 +92,11 @@ def ca_check_certificate(cert):
     # make sure response is not 200 if certificate is revoked
     # make sure response contains is_valid field set to true if certificate is valid
     if response.status_code == 200 and json.loads(response.content)['is_valid'] == True:
+        print("Certificate is not in the revoked list")
         return True
     else:
+        print("Certificate has been revoked")
         return False
-    
-    
-    
     
     
     

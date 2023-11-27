@@ -75,6 +75,7 @@ def login():
         if resp != True:
             flash("incorrect user_id or password")
             sleep(1) # to prevent brute force
+            return redirect(url_for('login'))
         else:
             # get info from DB
             info = db_info(user_id)
@@ -339,6 +340,7 @@ def check_certificate():
         return False
     
     # TODO: fetch user id from SSL_CLIENT_S_DN
+    # Need the new certificates for that to work
     #client_uid = request.environ.get('SSL_CLIENT_S_DN')
     
     client_uid = "a3"
@@ -354,8 +356,6 @@ def check_certificate():
     print("Client uid:", client_uid)    
     
     # TODO: check that certificate not revoked
-    # QUery la DB et verifier que les certificats matchent bien
-    # db_client_cert = db_get_client_cert(client_uid)
     # TODO : vraisemblablement le check CRL est fait par CA server
     
     #send request to ca server to check certificate not revoked
