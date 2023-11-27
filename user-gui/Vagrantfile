@@ -11,10 +11,7 @@ Vagrant.configure("2") do |config|
     config.vm.network "private_network", ip: "1.2.3.42",
         virtualbox__intnet: "internet"
 
-    config.trigger.before [:up, :provision] do |trigger|
-      trigger.info = "Copying global secrets into local folder..."
-      trigger.run = {path: "./scripts/copy_global_secrets.sh"}
-    end
+    config.vm.provision "file", source: "../SECRETS", destination: "/vagrant/SECRETS"
 
     config.vm.provision "shell", path: "scripts/startup_script.sh"
   end
