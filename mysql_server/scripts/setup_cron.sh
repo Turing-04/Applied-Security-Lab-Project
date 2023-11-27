@@ -13,3 +13,5 @@ SCHEDULE="45 22 * * *"
 
 # add cron job
 (crontab -l 2>/dev/null; echo "$SCHEDULE $SCRIPT") | crontab -
+
+
