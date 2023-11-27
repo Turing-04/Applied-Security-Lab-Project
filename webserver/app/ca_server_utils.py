@@ -48,6 +48,7 @@ def ca_download_cert(user_id, lastname, firstname, email):
     
     url = "https://"+CA_IP+"/request-certificate"
     
+    # TODO: try except block
     response = requests.post(url, data=json.dumps(payload), headers=headers, verify="/etc/ssl/certs/cacert.pem")
     
     if response.status_code == 200 and response.headers['Content-Type'] == 'application/x-pkcs12':
@@ -84,7 +85,7 @@ def ca_check_certificate(cert):
     
     url = "https://"+CA_IP+"/is-certificate-valid"
     
-    headers = {'Content-type': 'application/pkix-cert', 'Content-length': len(cert)}
+    headers = {'Content-type': 'application/pkix-cert', 'Content-length': str(len(cert))}
     
     # send POST request with certificate
     response = requests.post(url, data=cert, headers=headers, verify="/etc/ssl/certs/cacert.pem")

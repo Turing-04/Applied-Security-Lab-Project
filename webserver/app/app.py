@@ -313,14 +313,22 @@ def admin_interface():
 @app.route("/cert-login", methods=['GET'])
 def cert_login():
     # TODO: check authentication with certificate
-    resp = check_certificate()
+    resp, client_uid = check_certificate()
     
     if resp:
         flash("Successfully logged in with certificate")
         # add user info to session before redirecting to home
         
+        session['uid'] = client_uid
+        
+        info = db_info(client_uid)
+        session['firstname'] = info[0]
+        session['lastname'] = info[1]
+        session['email'] = info[2]
+        
         return redirect(url_for('home'))
     else: 
+        #flash("Error: Could not authenticate with certificate")
         return redirect(url_for('login'))
 
 
@@ -337,35 +345,30 @@ def check_certificate():
     apache_verify = request.environ.get('SSL_CLIENT_VERIFY')
     
     if apache_verify != "SUCCESS":
-        return False
+        flash ("Error: Could not authenticate with certificate")
+        return False, None
     
-    # TODO: fetch user id from SSL_CLIENT_S_DN
-    # Need the new certificates for that to work
-    #client_uid = request.environ.get('SSL_CLIENT_S_DN')
-    
-    client_uid = "a3"
+    # fetch client uid from certificate
+    client_uid = request.environ.get('SSL_CLIENT_S_DN_UID')
     
     if client_uid is None:
-        flash("Error: Could not authenticate with certificate")
-        return False
+        flash("Error: Certificate does not contain user id")
+        return False, None
     
     if client_uid == "ca-admin":
         flash("CA admin should authenticate through dedicated interface")
-        return False
+        return False, None
             
     print("Client uid:", client_uid)    
-    
-    # TODO: check that certificate not revoked
-    # TODO : vraisemblablement le check CRL est fait par CA server
-    
+        
     #send request to ca server to check certificate not revoked
     resp = ca_check_certificate(client_cert)
     
     if not resp:
         flash("Error: Certificate revoked")
-        return False
+        return False, None
     else:
-        return True
+        return True, client_uid
     
     # fetch user info from DB from user id
     # redirect to home page or admin interface depending on user id
