@@ -21,5 +21,5 @@ sudo chmod 644 /etc/syslog-ng/ssl/certs/cacert.pem
 # cp $SYNCED_FOLDER/SECRETS/<client>/<client.key> /etc/syslog-ng/ssl/private
 # sudo chmod 640 /etc/syslog-ng/ssl/private/<client.key>
 
-cp $SYNCED_FOLDER/syslog-ng.conf /etc/syslog-ng
+cp $SYNCED_FOLDER/config/syslog-ng.conf /etc/syslog-ng
 sudo systemctl restart syslog-ng
