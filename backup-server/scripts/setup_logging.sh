@@ -30,3 +30,6 @@ SCRIPT="/etc/syslog-ng/scripts/cron_log_clean.sh"
 SCHEDULE="45 12 * * *"
 (crontab -l 2>/dev/null; echo "$SCHEDULE $SCRIPT") | crontab -
 
+# restart cron
+sudo systemctl restart cron
+
