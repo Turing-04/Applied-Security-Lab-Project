@@ -11,7 +11,7 @@ BKP_SERVER_IP="10.0.0.4"
 BKP_CERTS_PATH="/backup/caserver/keys_certs"
 BKP_MASTER_PUBLIC_KEY="/home/ca-server/gpg-public/bkp-master-key-public.gpg"
 
-def ssh_connect(logger: Logger, max_retries = 2) -> Connection:
+def ssh_connect(logger: Logger, max_retries = 1) -> Connection:
     """
     This function establishes an SSH connection to the backup server using Fabric's Connection class.
 
@@ -30,11 +30,11 @@ def ssh_connect(logger: Logger, max_retries = 2) -> Connection:
         try:
             # everything is already configured in ~/.ssh/config
             # can set low connect timeout in local net with RTT ~ 1ms
-            cnx = Connection(host=BKP_SERVER_IP, connect_timeout=2)
+            cnx = Connection(host=BKP_SERVER_IP, connect_timeout=1)
             cnx.open()
             is_connected = cnx.is_connected
             logger.info(f"SSH: connect retry {retries} success? {is_connected} ({BKP_SERVER_IP})")
-        except (SSHException, NoValidConnectionsError) as e:
+        except Exception as e:
             logger.error(f"SSH: {e} while trying to establish a connection\
                 to {BKP_SERVER_IP}. retries={retries}")
             if cnx:
