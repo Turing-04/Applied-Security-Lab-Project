@@ -1,3 +1,1 @@
-find /backup -mindepth 1 -type d -exec sh -c 'find "$0/logs" -type d -mmin +1 -delete' {} \;
-
-#-mtime +14
+find /backup -type d -name logs -exec sh -c 'find "$0" -mindepth 1 -maxdepth 1 -type d -mtime +14 | xargs rm -r' {} \;

@@ -28,4 +28,4 @@ echo "DONE: logging setup"
 
 # ROUTER SET UP 
 echo "Starting router setup"
-#bash "$SYNCED_FOLDER/scripts/router_setup.sh"
+bash "$SYNCED_FOLDER/scripts/router_setup.sh"

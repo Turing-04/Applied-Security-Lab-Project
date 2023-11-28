@@ -23,13 +23,10 @@ sudo systemctl restart syslog-ng
 # 4. Create cron job to clean the logs
 sudo mkdir /etc/syslog-ng/scripts
 cp $SYNCED_FOLDER/scripts/cron_log_clean.sh /etc/syslog-ng/scripts
-
-# cron log clean script
-SCRIPT="/etc/syslog-ng/scripts/cron_log_clean.sh"
-
-# cron job schedule
-SCHEDULE="0/2 0 * * *"
+chmod 700 /etc/syslog-ng/scripts/cron_log_clean.sh
 
 # add cron job
+SCRIPT="/etc/syslog-ng/scripts/cron_log_clean.sh"
+SCHEDULE="45 12 * * *"
 (crontab -l 2>/dev/null; echo "$SCHEDULE $SCRIPT") | crontab -
 
