@@ -48,6 +48,25 @@ sudo chown --recursive ca-server /home/ca-server/.ssh
 sudo chmod 600 /home/ca-server/.ssh/ca-server-ssh/ca-server-ssh
 
 
+#           _                 _                _                
+#  ___  ___| |_ _   _ _ __   | |__   __ _  ___| | ___   _ _ __  
+# / __|/ _ \ __| | | | '_ \  | '_ \ / _` |/ __| |/ / | | | '_ \ 
+# \__ \  __/ |_| |_| | |_) | | |_) | (_| | (__|   <| |_| | |_) |
+# |___/\___|\__|\__,_| .__/  |_.__/ \__,_|\___|_|\_\\__,_| .__/ 
+#                    |_|                                 |_|    
+echo "Starting setup backup"
+echo "Copying backup script"
+mkdir -p /home/ca-server/scripts
+cp "$SYNCED_FOLDER/scripts/backup_ca_config.sh" /home/ca-server/scripts/
+cp "$SYNCED_FOLDER/scripts/cron_setup_backup.sh" /home/ca-server/scripts/
+chown --recursive ca-server /home/ca-server/scripts/
+chmod 500 /home/ca-server/scripts/backup_ca_config.sh
+chmod 500 /home/ca-server/scripts/cron_setup_backup.sh
+
+sudo -u ca-server "/home/ca-server/scripts/cron_setup_backup.sh"
+echo "Done setup backup"
+
+
 #                                               _           _       
 #                                               | |         (_)      
 #  _   _ ___  ___ _ __   ___ _   _ ___  __ _  __| |_ __ ___  _ _ __  
