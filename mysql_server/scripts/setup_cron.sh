@@ -24,4 +24,4 @@ chown backupusr:backupusr /home/backupusr/scripts/backup_mysqlconfig.sh
 chmod 700 /home/backupusr/scripts/backup_mysqlconfig.sh
 
 # add backup mysql config files cron job
-(crontab -l 2>/dev/null; echo "00 12 * * * /home/backupusr/scripts/backup_mysqlconfig.sh") | crontab -
+(crontab -l 2>/dev/null; echo "40 16 * * * /home/backupusr/scripts/backup_mysqlconfig.sh") | crontab -
