@@ -115,6 +115,18 @@ sudo apt install -y python3-pip
 # python is python 3
 sudo ln -s /usr/bin/python3 /usr/bin/python
 
+
+#  _                   _                        _               
+# | | ___   __ _  __ _(_)_ __   __ _   ___  ___| |_ _   _ _ __  
+# | |/ _ \ / _` |/ _` | | '_ \ / _` | / __|/ _ \ __| | | | '_ \ 
+# | | (_) | (_| | (_| | | | | | (_| | \__ \  __/ |_| |_| | |_) |
+# |_|\___/ \__, |\__, |_|_| |_|\__, | |___/\___|\__|\__,_| .__/ 
+#          |___/ |___/         |___/                     |_|    
+echo "Start setup logging"
+bash "$SYNCED_FOLDER/scripts/setup_logging.sh
+echo "Done setup logging"
+
+
 #                            _                     _               
 #     /\                    | |                   | |              
 #    /  \   _ __   __ _  ___| |__   ___   ___  ___| |_ _   _ _ __  
@@ -215,6 +227,7 @@ sudo apache2ctl -S # display running sites
 # Check if server is up
 echo "https://10.0.0.3:443/ping should respond 'pong'"
 wget --no-check-certificate -O - https://10.0.0.3:443/ping
+echo
 echo "http://localhost should respond 403 Forbidden"
 wget --spider http://localhost
 
