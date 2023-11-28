@@ -60,11 +60,16 @@ cp $SYNCED_FOLDER/SECRETS/mysql-server/mysql-server.key /etc/mysql/ssl/private
 sudo chmod 640 /etc/mysql/ssl/private/mysql-server.key
 sudo chown root:mysql /etc/mysql/ssl/private/mysql-server.key
 
-# 7.3 Set TLS configuration in MariaDB
-cp $SYNCED_FOLDER/mariadb-server-tls.cnf /etc/mysql/mariadb.conf.d
+# 7.3 Add custom configuration in MariaDB
+cp $SYNCED_FOLDER/mariadb-server.cnf /etc/mysql/mariadb.conf.d
 
-# 8. Restart mysql
+# 8. Set logging
+sudo mkdir /var/log/mysql
+sudo chown mysql:mysql /var/log/mysql
+
+# 9. Restart mysql and mariadb
 sudo systemctl restart mariadb
+sudo systemctl restart mysql
 
 # 7.4 [TODO on WEBSERVER and CASERVER] Set Client certificate authentication on the client machine
 # To enable client authentication, parameters below should be set in the clients:
