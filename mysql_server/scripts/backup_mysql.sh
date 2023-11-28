@@ -17,7 +17,6 @@ echo "starting sftp >>>"
 sftp -o StrictHostKeyChecking=no backupserver:/backup/mysql/mariadb <<EOF
 cd /backup/mysql/mariadb
 put /home/backupusr/mysql/imovies-$(date '+%Y-%m-%d').sql
-rm /home/backupusr/mysql/imovies-$(date -d 'yesterday' '+%Y-%m-%d').sql
 EOF
 echo "finishing sftp file transfer..."
 REALEND
@@ -39,3 +38,4 @@ exit
 # cd $REMOTE_DIR
 # put #LOCAL_FILE_PATH
 # EOFÍ
+# rm /backup/mysql/mariadb/imovies-$(date -d 'yesterday' '+%Y-%m-%d').sql
