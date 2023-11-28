@@ -30,10 +30,9 @@ mysql -u root -proot imovies -e "INSERT INTO certificates (uid) SELECT uid FROM 
 # 4. Create users in MySQL and set privileges
 # webserver with read/write access to table "users" and read access to table "certificate";
 # caserver with read/write access to the "certificates" table.
-# [TODO] update ip address of web server
-mysql -u root -proot imovies -e "CREATE USER 'webserver'@'%' IDENTIFIED BY '}DqG3mZ8neKPp?#Uc?49K&W2' REQUIRE X509;"
-mysql -u root -proot imovies -e "GRANT SELECT, INSERT, UPDATE, DELETE ON users TO 'webserver'@'%';"
-mysql -u root -proot imovies -e "GRANT SELECT ON certificates TO 'webserver'@'%';"
+mysql -u root -proot imovies -e "CREATE USER 'webserver'@'10.0.1.2' IDENTIFIED BY '}DqG3mZ8neKPp?#Uc?49K&W2' REQUIRE X509;"
+mysql -u root -proot imovies -e "GRANT SELECT, INSERT, UPDATE, DELETE ON users TO 'webserver'@'10.0.1.2';"
+mysql -u root -proot imovies -e "GRANT SELECT ON certificates TO 'webserver'@'10.0.1.2';"
 
 mysql -u root -proot imovies -e "CREATE USER 'caserver'@'10.0.0.3' IDENTIFIED BY 'cn9@1kbka;}=(iPgEMO1&{XW' REQUIRE X509;"
 mysql -u root -proot imovies -e "GRANT SELECT, INSERT, UPDATE, DELETE ON certificates TO 'caserver'@'10.0.0.3';"
