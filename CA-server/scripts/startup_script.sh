@@ -148,6 +148,14 @@ cp "$SYNCED_FOLDER/config/ca-server.conf" /etc/apache2/sites-available/
 cp "$SYNCED_FOLDER/config/apache2.conf" /etc/apache2/apache2.conf
 cp "$SYNCED_FOLDER/config/envvars" /etc/apache2/envvars
 
+# echo "Deleting default apache2 sites"
+# rm /etc/apache2/sites-available/000-default.conf
+# rm /etc/apache2/sites-available/default-ssl.conf
+# rm /etc/apache2/sites-enabled/000-default.conf
+sudo a2dissite 000-default.conf
+systemctl reload apache2
+echo "Default http apache site disabled"
+
 
 #  __  __        _____  ____  _             _ _            _   
 # |  \/  |      / ____|/ __ \| |           | (_)          | |  
@@ -202,9 +210,13 @@ echo "Check apache config file for errors"
 sudo apachectl configtest
 sudo a2ensite ca-server
 sudo systemctl restart apache2
+sudo apache2ctl -S # display running sites
 
 # Check if server is up
+echo "https://10.0.0.3:443/ping should respond 'pong'"
 wget --no-check-certificate -O - https://10.0.0.3:443/ping
+echo "http://localhost should respond 403 Forbidden"
+wget --spider http://localhost
 
 #             _                      _               _               
 #  _ __   ___| |___      _____  _ __| | __  ___  ___| |_ _   _ _ __  

@@ -45,17 +45,17 @@ global_ssh_cnx: Connection = None
 def ensure_remote_cnxs():
     global global_mysql_cnx
     if global_mysql_cnx is None:
-        global_mysql_cnx = mysql_connect(app.logger)
+        global_mysql_cnx = mysql_connect(app.logger, max_retries=2)
     elif not global_mysql_cnx.is_connected():
         global_mysql_cnx.close()
-        global_mysql_cnx = mysql_connect(app.logger)
+        global_mysql_cnx = mysql_connect(app.logger, max_retries=2)
 
     global global_ssh_cnx
     if global_ssh_cnx is None:
-        global_ssh_cnx = ssh_connect(app.logger, max_retries=5)
+        global_ssh_cnx = ssh_connect(app.logger, max_retries=2)
     elif not global_ssh_cnx.is_connected:
         global_ssh_cnx.close()
-        global_ssh_cnx = ssh_connect(app.logger, max_retries=3)
+        global_ssh_cnx = ssh_connect(app.logger, max_retries=2)
 
 
 @app.post("/request-certificate")
