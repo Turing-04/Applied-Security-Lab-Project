@@ -11,7 +11,6 @@ echo "finishing creating mysql logical backup..."
 rm /home/backupusr/mysql/imovies-$(date -d 'yesterday' '+%Y-%m-%d').sql
 
 # switch user
-# echo "change backupuser profile again???"
 su backupusr<<REALEND
 # sftp command
 echo "starting sftp >>>"
