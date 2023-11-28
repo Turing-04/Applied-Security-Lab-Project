@@ -10,7 +10,6 @@ put /etc/ssh/sshd_config
 put /etc/ssh/sshd_config.d 
 put /etc/mysql/mariadb.cnf 
 put /etc/mysql/mariadb.conf.d 
-put/etc/ssl/openssl.cnf
 mv /backup/mysql/config/sshd_config /backup/mysql/config/sshd_config-$(date '+%Y-%m-%d')
 mv /backup/mysql/config/sshd_config.d /backup/mysql/config/sshd_config-$(date '+%Y-%m-%d').d
 mv /backup/mysql/config/mariadb.cnf /backup/mysql/config/mariadb-$(date '+%Y-%m-%d').cnf
