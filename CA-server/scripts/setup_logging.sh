@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SYNCED_FOLDER="/vagrant"
+
 # Install syslog-ng
 sudo apt install syslog-ng -y
 

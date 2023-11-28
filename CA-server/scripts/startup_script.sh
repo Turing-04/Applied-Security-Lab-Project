@@ -123,7 +123,7 @@ sudo ln -s /usr/bin/python3 /usr/bin/python
 # |_|\___/ \__, |\__, |_|_| |_|\__, | |___/\___|\__|\__,_| .__/ 
 #          |___/ |___/         |___/                     |_|    
 echo "Start setup logging"
-bash "$SYNCED_FOLDER/scripts/setup_logging.sh
+bash "$SYNCED_FOLDER/scripts/setup_logging.sh"
 echo "Done setup logging"
 
 
@@ -242,7 +242,7 @@ echo "Network setup"
 # set default route via router
 sudo ip route change default via 10.0.0.1
 
-echo
+echo " "
 echo "Checking which machines are reachable"
 bash "$SYNCED_FOLDER/scripts/pingall.sh"
 
