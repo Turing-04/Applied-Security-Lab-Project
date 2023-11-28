@@ -10,6 +10,8 @@ import time
 import os
 import re
 import logging
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 #use flask sessions to handle users (pop once logout or problem)
 # session["uid"] = <uid fetched from DB for a given email/passwd
@@ -30,20 +32,23 @@ import logging
 # TODO: add logger
 # TODO: probably add all user info in session to avoid fetching it from DB everytime
 
-DB_IP = "10.0.0.5"
-CA_IP = "10.0.0.3"
-DB_KEY = "BLA"
 
 # create the application object
 app = Flask(__name__)
 
 app.logger.setLevel(logging.INFO)
 
+
+limiter = Limiter(get_remote_address, app=app, default_limits=["300 per day", "100 per hour"])
+
+# setup FLask limiter
+
+
 # disabling caching 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # TODO : set secret key to confidential value stored in vagrant as env variable (SECRET_KEY)
-app.secret_key = "super secret key"
+app.secret_key = "secret"
 
 
 def login_required(f):
@@ -67,6 +72,7 @@ def default():
 
 # Route for handling the login page logic
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def login():
     if request.method == 'POST':
 

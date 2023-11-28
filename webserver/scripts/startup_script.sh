@@ -90,7 +90,9 @@ cp "$SYNCED_FOLDER/config/webserver.conf" /etc/apache2/sites-available/
 cp "$SYNCED_FOLDER/config/apache2.conf" /etc/apache2/apache2.conf
 cp "$SYNCED_FOLDER/config/envvars" /etc/apache2/envvars
 
-
+# call logging setup script
+echo "Launch setup logging script"
+sudo bash "$SYNCED_FOLDER/scripts/setup_logging.sh"
 
 
 # config mysql client - also allows communication with the CA-server
