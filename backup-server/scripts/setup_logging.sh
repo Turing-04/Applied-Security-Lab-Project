@@ -19,3 +19,17 @@ sudo chmod 600 /etc/syslog-ng/ssl/private/logging-rsyslog.key
 sudo cp $SYNCED_FOLDER/syslog-ng.conf /etc/syslog-ng
 sudo cat $SYNCED_FOLDER/hosts >> /etc/hosts
 sudo systemctl restart syslog-ng
+
+# 4. Create cron job to clean the logs
+sudo mkdir /etc/syslog-ng/scripts
+cp $SYNCED_FOLDER/scripts/cron_log_clean.sh /etc/syslog-ng/scripts
+
+# cron log clean script
+SCRIPT="/etc/syslog-ng/scripts/cron_log_clean.sh"
+
+# cron job schedule
+SCHEDULE="0/2 0 * * *"
+
+# add cron job
+(crontab -l 2>/dev/null; echo "$SCHEDULE $SCRIPT") | crontab -
+
