@@ -62,7 +62,8 @@ sudo chmod 600 "$home_folder/.ssh/sysadmin-ssh/sysadmin-ssh"
 
 echo "Network setup"
 # set default route via router
-sudo ip route change default via 1.2.3.4
+sudo ip route delete default via 10.0.2.2
+sudo ip route add default via 1.2.3.4
 
 xrandr --output 'VGA-1' --mode '1440x900'
 setxkbmap ch fr
