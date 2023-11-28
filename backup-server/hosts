@@ -2,3 +2,4 @@
 10.0.0.3	caserver
 10.0.1.2	webserver
 10.0.0.1	router
+10.0.0.4	backupsrv
