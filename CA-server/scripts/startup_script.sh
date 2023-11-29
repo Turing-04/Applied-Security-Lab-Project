@@ -59,11 +59,10 @@ echo "Copying backup script"
 mkdir -p /home/ca-server/scripts
 cp "$SYNCED_FOLDER/scripts/backup_ca_config.sh" /home/ca-server/scripts/
 cp "$SYNCED_FOLDER/scripts/cron_setup_backup.sh" /home/ca-server/scripts/
-chown --recursive ca-server /home/ca-server/scripts/
+chown --recursive root /home/ca-server/scripts/
 chmod 500 /home/ca-server/scripts/backup_ca_config.sh
-chmod 500 /home/ca-server/scripts/cron_setup_backup.sh
 
-sudo -u ca-server "/home/ca-server/scripts/cron_setup_backup.sh"
+sudo "/home/ca-server/scripts/cron_setup_backup.sh"
 echo "Done setup backup"
 
 

@@ -8,7 +8,10 @@ sftp -o StrictHostKeyChecking=no 10.0.0.4:/backup/caserver/config <<EOF
 cd /backup/caserver/config
 put /etc/ssh/sshd_config 
 put -r /etc/ssh/sshd_config.d 
-put -r /var/www/ca-server/
+put /var/www/ca-server/src/*.py
+put /var/www/ca-server/src/app.wsgi
+put /var/www/ca-server/src/requirements.txt
+put -r /var/www/ca-server/src/test_data/
 put -r /etc/apache2/
 put /etc/ssl/CA/index.txt
 put /etc/ssl/CA/crl.pem
