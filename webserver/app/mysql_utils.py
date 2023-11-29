@@ -16,7 +16,11 @@ CA_CERT_PATH="/etc/ssl/certs/cacert.pem"
 
 def db_auth(user_id, password, logger):
     try:
-        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
+        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, 
+                               host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, 
+                               ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, 
+                               ssl_key=MYSQL_CLIENT_KEY_PATH,
+                               ssl_verify_cert=True)
     except mysql.connector.Error as err:
         logger.error("Connection to DB for authentification failed: {}".format(err))
         return None
@@ -37,7 +41,7 @@ def db_auth(user_id, password, logger):
 
 def db_update_info(firstname, lastname, email, user_id, logger):
     try:
-        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
+        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH, ssl_verify_cert=True)
     except mysql.connector.Error as err:
         logger.error("Connection to DB for user info update failed: {}".format(err))
         return None
@@ -53,7 +57,7 @@ def db_update_info(firstname, lastname, email, user_id, logger):
         
 def db_update_passwd(new_passwd, user_id, logger):
     try:
-        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
+        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH, ssl_verify_cert=True)
     except mysql.connector.Error as err:
         logger.error("Connection to DB for password update failed: {}".format(err))
         return None
@@ -69,7 +73,7 @@ def db_update_passwd(new_passwd, user_id, logger):
 
 def db_info(user_id, logger):
     try:
-        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
+        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH, ssl_verify_cert=True)
     except mysql.connector.Error as err:
         logger.error("Connection to DB for user info retrieval failed: {}".format(err))
         return None
@@ -84,7 +88,7 @@ def db_info(user_id, logger):
 
 def db_get_client_cert(user_id, logger):
     try:
-        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH)
+        conn = MySQLConnection(user=MYSQL_USER, password=MYSQL_PASSWORD, host=MYSQL_HOST, port=MYSQL_PORT, database=MYSQL_DATABASE, ssl_ca=CA_CERT_PATH, ssl_cert=MYSQL_CLIENT_CERT_PATH, ssl_key=MYSQL_CLIENT_KEY_PATH, ssl_verify_cert=True)
     except mysql.connector.Error as err:
         logger.error("Connection to DB for client cert retrieval failed: {}".format(err))
         return None

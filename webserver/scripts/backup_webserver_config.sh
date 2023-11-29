@@ -10,7 +10,7 @@ put /etc/ssh/sshd_config
 put /etc/syslog-ng/syslog-ng.conf
 put -r /etc/ssh/sshd_config.d 
 put -r /etc/apache2/
-mkdir -p webserver
+mkdir webserver
 cd webserver
 put /var/www/webserver/app/*.py
 put /var/www/webserver/app/*.wsgi

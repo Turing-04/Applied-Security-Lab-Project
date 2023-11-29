@@ -389,7 +389,6 @@ def check_certificate():
         return True, client_uid
     
     
-
 def check_admin_certificate():
     
     apache_verify = request.environ.get('SSL_CLIENT_VERIFY')

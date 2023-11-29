@@ -195,6 +195,7 @@ sudo ufw default deny incoming
 sudo ufw default deny outgoing
 
 sudo ufw allow ssh
+sudo ufw allow out ssh
 
 sudo ufw allow 443/tcp
 sudo ufw allow out 443/tcp
@@ -210,13 +211,9 @@ sudo ufw allow out 3306/tcp
 sudo ufw allow 6514/tcp
 sudo ufw allow out 6514/tcp
 
-# allow ping
-sudo ufw allow in proto icmp
-sudo ufw allow out proto icmp
 
 # disable confirmation
-sudo ufw enable
-sudo ufw status verbose 
+
 
 
 echo $(whoami)
@@ -226,6 +223,11 @@ echo $(whoami)
 # add default gateway via the firewall
 echo "Changing default gateway"
 sudo ip route change default via 10.0.1.1
+
+
+# enable firewall
+echo "y" | sudo ufw enable
+sudo ufw status verbose 
 
 
 
