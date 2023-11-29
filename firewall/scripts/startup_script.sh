@@ -5,6 +5,32 @@ echo "Start setup"
 echo "Install packages"
 sudo apt update
 
+
+#                                               _           _       
+#                                               | |         (_)      
+#  _   _ ___  ___ _ __   ___ _   _ ___  __ _  __| |_ __ ___  _ _ __  
+# | | | / __|/ _ \ '__| / __| | | / __|/ _` |/ _` | '_ ` _ \| | '_ \ 
+# | |_| \__ \  __/ |    \__ \ |_| \__ \ (_| | (_| | | | | | | | | | |
+#  \__,_|___/\___|_|    |___/\__, |___/\__,_|\__,_|_| |_| |_|_|_| |_|
+#                             __/ |                                  
+#                            |___/                                   
+
+
+# add user sysadmin
+SYSADMIN_PASSWORD="FQTE:-4R)+KJ5&#MxzN~k@"
+
+echo "add sysadmin user"
+sudo useradd sysadmin --create-home
+echo "sysadmin:$SYSADMIN_PASSWORD" | sudo chpasswd
+sudo usermod -aG sudo sysadmin # give admin sudo permission
+
+home_folder="/home/sysadmin"
+echo "setup ssh for sysadmin"
+mkdir -p "$home_folder/.ssh"
+cp "$SYNCED_FOLDER/SECRETS/sysadmin-ssh/sysadmin-ssh.pub" "$home_folder/.ssh/authorized_keys"
+sudo chown --recursive sysadmin "$home_folder/.ssh"
+
+
 echo "Setup network interfaces"
 cp /vagrant/config/interfaces /etc/network/interfaces
 sudo chown root /etc/network/interfaces
