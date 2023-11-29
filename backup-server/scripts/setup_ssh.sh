@@ -65,9 +65,9 @@ sudo sed -i "s/.*PasswordAuthentication.*/PasswordAuthentication no/" /etc/ssh/s
 
 # # 9.5 Allow only sysadmin host to ssh to the machine
 if sudo grep -q "AllowUsers" /etc/ssh/sshd_config; then
-    sudo sed -i "s/.*AllowUsers.*/AllowUsers caserver mysql sysadmin/" /etc/ssh/sshd_config
+    sudo sed -i "s/.*AllowUsers.*/AllowUsers caserver mysql sysadmin debug webserver/" /etc/ssh/sshd_config
 else
-    sudo echo "AllowUsers caserver mysql sysadmin debug" >> /etc/ssh/sshd_config
+    sudo echo "AllowUsers caserver mysql sysadmin debug webserver" >> /etc/ssh/sshd_config
 fi
 
 sudo echo "Match User debug" >> /etc/ssh/sshd_config
