@@ -40,6 +40,7 @@ sudo ln -s /usr/bin/python3 /usr/bin/python # make python3 the default python
 sudo apt install -y apache2 apache2-dev libapache2-mod-wsgi-py3
 sudo apt install curl
 sudo apt install -y ssh
+sudo apt install -y ufw
 
 
 ####################### setup SSH ############################
@@ -152,7 +153,7 @@ chmod u+x /etc/ssl/private
 chmod u=r,go= /etc/ssl/private/webserver-intranet.key
 
 
-####################### setup Fmask ############################
+####################### setup Flask ############################
 echo "Copy src to $WEBSERVER_ROOT"
 mkdir -p "$WEBSERVER_ROOT"
 cp -r "$SYNCED_FOLDER/app/" "$WEBSERVER_ROOT/"
@@ -187,9 +188,36 @@ sudo systemctl start ssh
 sudo systemctl enable ssh
 
 
+####################### setup Firewall ############################
 
-# delete command history
-#rm ~/.bash_history && history -c
+sudo apt install ufw
+sudo ufw default deny incoming
+sudo ufw default deny outgoing
+
+sudo ufw allow ssh
+
+sudo ufw allow 443/tcp
+sudo ufw allow out 443/tcp
+
+sudo ufw allow 80/tcp
+sudo ufw allow out 80/tcp
+
+# talk to mysql
+sudo ufw allow 3306/tcp
+sudo ufw allow out 3306/tcp
+
+# talk to syslog
+sudo ufw allow 6514/tcp
+sudo ufw allow out 6514/tcp
+
+# allow ping
+sudo ufw allow in proto icmp
+sudo ufw allow out proto icmp
+
+# disable confirmation
+sudo ufw enable
+sudo ufw status verbose 
+
 
 echo $(whoami)
 
@@ -198,6 +226,9 @@ echo $(whoami)
 # add default gateway via the firewall
 echo "Changing default gateway"
 sudo ip route change default via 10.0.1.1
+
+
+
 
 # TODO: setup firewall
 # TODO: setup encryption of the disk
