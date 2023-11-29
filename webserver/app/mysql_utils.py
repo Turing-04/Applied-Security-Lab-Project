@@ -6,7 +6,6 @@ import tempfile
 
 MYSQL_HOST = "10.0.0.5"
 MYSQL_PORT = 3306
-# user/password from https://github.com/Turing-04/Applied-Security-Lab-Project/blob/bd1c55e4da94093188e3de841d928ffda9428224/mysql_server/scripts/setup_mysql.sh#L40
 MYSQL_USER = "webserver"
 MYSQL_PASSWORD = "}DqG3mZ8neKPp?#Uc?49K&W2"
 MYSQL_DATABASE = "imovies"
@@ -14,7 +13,6 @@ MYSQL_CLIENT_CERT_PATH="/etc/ssl/certs/webserver-intranet.crt"
 MYSQL_CLIENT_KEY_PATH="/etc/ssl/private/webserver-intranet.key"
 CA_CERT_PATH="/etc/ssl/certs/cacert.pem"
 
-# Reminder SQL fields: uid, lastname, firstname, email, pwd
 
 def db_auth(user_id, password, logger):
     try:
@@ -100,7 +98,6 @@ def db_get_client_cert(user_id, logger):
     if result[0] is None: # no cert in db
         logger.info("No certificate found in DB for user {}".format(user_id))
         return None
-    # create temp file with certifcate
     temp = tempfile.NamedTemporaryFile("w+b", delete=True)
     temp.write(result[0].encode('utf-8'))
     temp.write(b"\n")

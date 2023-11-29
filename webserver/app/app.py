@@ -13,42 +13,18 @@ import logging
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-#use flask sessions to handle users (pop once logout or problem)
-# session["uid"] = <uid fetched from DB for a given email/passwd
-
-# par defaut page de login
-# option pour rediriger vers login avec un certificat qui est une autre page
-# and so on pour admin interface et tout le tralala. 
-
-# regarder comment gérer les forms pour vérifier si forme des email est correcte / sanitization des inputs !
-
-# regarder @login required
-
-
-
-# TODO: Allow user to download last certificate (from DB)
-# TODO: add some css to make it look better
-# TODO: setup HTTPS only
-# TODO: add logger
-# TODO: probably add all user info in session to avoid fetching it from DB everytime
-
 
 # create the application object
 app = Flask(__name__)
 
 app.logger.setLevel(logging.INFO)
+app.secret_key = "secret"
 
 
 limiter = Limiter(get_remote_address, app=app, default_limits=["300 per day", "100 per hour"])
 
-# setup FLask limiter
-
-
 # disabling caching 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-
-# TODO : set secret key to confidential value stored in vagrant as env variable (SECRET_KEY)
-app.secret_key = "secret"
 
 
 def login_required(f):
@@ -61,14 +37,12 @@ def login_required(f):
             return redirect(url_for('login'))
     return wrap
 
-# use decorators to link the function to a url
 @app.route('/')
 def default():
     if not session.get('uid'):
         return redirect(url_for('login'))
     else:
         return redirect(url_for('home'))
-
 
 # Route for handling the login page logic
 @app.route('/login', methods=['GET', 'POST'])
@@ -120,11 +94,9 @@ def login():
 
     return render_template('login.html')
 
-#TODO: download last certificate from DB
 @app.route('/download_last_cert', methods=['GET'])
 @login_required
 def download_last_cert():
-    # download for DB
     cert = db_get_client_cert(session.get('uid'), app.logger)
     
     if cert is None:
@@ -134,7 +106,7 @@ def download_last_cert():
     @after_this_request
     def remove_file(response):
         try:
-            os.remove(cert.name)
+            cert.close()
         except:
             app.logger.info("Error removing or closing downloaded certificate")
         return response
@@ -166,7 +138,7 @@ def download_crl():
         @after_this_request
         def remove_file(response):
             try:
-                os.remove(revoked.name)
+                revoked.close()
             except:
                 app.logger.error("Error removing or closing downloaded CRL")
             return response
@@ -230,23 +202,26 @@ def modify_info():
     
     return render_template('modify_info.html', user_info=user_info)
 
-#TODO: enforce password policy
 @app.route("/modify_passwd", methods=['GET', 'POST'])
 @login_required
 def modify_passwd():
-    message = None
     form = request.form
     if request.method == 'POST':
         old_passwd = request.form['old_passwd']
         new_passwd = request.form['new_passwd']
         new_passwd_conf = request.form['new_passwd_conf']
         
-        # authentify old password
         auth = db_auth(session.get('uid'), old_passwd, app.logger)
 
         if new_passwd != new_passwd_conf:
             flash('Passwords do not match')
             return redirect(url_for('modify_passwd'))
+        
+        # enfore password policy
+        if len(new_passwd) < 8:
+            flash("New passwords must be at least 8 characters long")
+            return redirect(url_for('modify_passwd'))
+        
         
         if auth:
             new_passwd_hash = hashlib.sha256(new_passwd.encode('utf-8')).hexdigest()
@@ -268,7 +243,7 @@ def modify_passwd():
             sleep(1) # prevent password brute force if hijacked session
             return redirect(url_for('modify_passwd'))
 
-    return render_template('modify_passwd.html', form=form, message=message)
+    return render_template('modify_passwd.html', form=form)
 
 
 @app.route("/passwd_changed", methods=['GET'])
@@ -310,7 +285,7 @@ def new_certificate():
         @after_this_request
         def remove_file(response):
             try:
-                os.remove(cert.name)
+                cert.close()
             except:
                 app.logger.info("Error removing or closing downloaded certificate")
             return response
@@ -337,7 +312,6 @@ def revoke_certificate():
 @app.route("/admin-interface", methods=['GET'])
 def admin_interface():
     # CA Admin interface should only be accessible with admin certificate
-    # TODO: check if user is admin
     check = check_admin_certificate()
     
     if check:
@@ -355,7 +329,6 @@ def admin_interface():
 
 @app.route("/cert-login", methods=['GET'])
 def cert_login():
-    # TODO: check authentication with certificate
     resp, client_uid = check_certificate()
     
     if resp:
@@ -379,7 +352,6 @@ def cert_login():
         return redirect(url_for('login'))
 
 
-#TODO: check certificate
 def check_certificate():
 
     client_cert = request.environ.get('SSL_CLIENT_CERT') # PEM-encoded client certificate
@@ -447,9 +419,7 @@ def is_valid_email(email, max_length):
     # Check if the email is valid
     return bool(email) and re.match("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email) and len(email) <= max_length
 
-# start the server with the 'run()' method
+
 if __name__ == '__main__':
-    # TODO: add ssl_context='adhoc' to use HTTPS
-    app.run(debug=True)
-    
+    app.run(debug=False)
     
