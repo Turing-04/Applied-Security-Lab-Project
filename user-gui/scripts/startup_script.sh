@@ -33,6 +33,7 @@ SYSADMIN_PASSWORD="tulip-evident-theft"
 echo "add sysadmin user"
 sudo useradd sysadmin --create-home
 echo "sysadmin:$SYSADMIN_PASSWORD" | sudo chpasswd
+sudo usermod -aG sudo sysadmin
 
 home_folder="/home/sysadmin"
 echo "setup ssh for sysadmin"
