@@ -5,6 +5,8 @@ echo "Start setup"
 echo "Install packages"
 sudo apt update
 
+SYNCED_FOLDER="/vagrant"
+
 
 #                                               _           _       
 #                                               | |         (_)      
