@@ -24,6 +24,11 @@ echo "*            CURRENT IPTABLES RULES              *"
 echo "*************************************************"
 sudo iptables-save # to display the rules
 
+# see https://lxr.linux.no/#linux+v3.0.4/Documentation/networking/ip-sysctl.txt#L667
+echo "Current icmp rate limit:"
+cat /proc/sys/net/ipv4/icmp_ratelimit
+
+
 echo "Enable ipv4 forwarding"
 echo "# FROM startup_script.sh" | sudo tee -a /etc/sysctl.conf
 echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
