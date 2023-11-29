@@ -45,8 +45,11 @@ sudo ifup -a # restart interfaces
 mkdir -p /etc/iptables
 touch /etc/iptables/rules.v4
 touch /etc/iptables/rules.v6
-sudo apt install iptables-persistent
-sudo iptables-restore /vagrant/config/rules.v4
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
+sudo apt-get install -y iptables-persistent
+sudo cp /vagrant/config/rules.v4 /etc/iptables/rules.v4
+sudo iptables-restore < /etc/iptables/rules.v4
 echo "*************************************************"
 echo "*            CURRENT IPTABLES RULES              *"
 echo "*************************************************"
