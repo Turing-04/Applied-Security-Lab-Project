@@ -2,8 +2,9 @@
 mkdir -p /home/sysadmin/.ssh && touch /home/sysadmin/.ssh/authorized_keys
 sudo chmod 700 /home/sysadmin/.ssh
 
-ssh-keygen -f $SYNCED_FOLDER/SECRETS/sysadmin-ssh/sysadmin-ssh.pub -i -m PKCS8 &>  /home/sysadmin/.ssh/authorized_keys
+cp "/vagrant/SECRETS/sysadmin-ssh/sysadmin-ssh.pub" "/home/sysadmin/.ssh/authorized_keys"
 sudo chown -R sysadmin:sysadmin /home/sysadmin/.ssh
+sudo chmod 400 /home/sysadmin/.ssh/authorized_keys
 
 # BACKUPUSR
 mkdir -p /home/backupusr/.ssh
