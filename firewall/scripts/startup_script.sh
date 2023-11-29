@@ -55,6 +55,11 @@ echo "*            CURRENT IPTABLES RULES              *"
 echo "*************************************************"
 sudo iptables-save # to display the rules
 
+echo "Installing fail2ban"
+sudo apt -y install fail2ban
+sudo systemctl enable fail2ban
+echo "End install fail2ban"
+
 # see https://lxr.linux.no/#linux+v3.0.4/Documentation/networking/ip-sysctl.txt#L667
 echo "Current icmp rate limit:"
 cat /proc/sys/net/ipv4/icmp_ratelimit
