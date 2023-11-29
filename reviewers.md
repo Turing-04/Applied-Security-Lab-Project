@@ -6,6 +6,12 @@ When you import the .ova files in virtualbox, make sure to select the option to 
 # sysadmin
 On the user-gui machine, there is a user called sysadmin.
 The local password is: `tulip-evident-theft`
+
+To enable ssh connection, please use the following commands (didn't manage to automate, sorry):
+```
+sudo ip link set eth0 down
+```
+
 This user can ssh into the firewall/router, the ca-server, the backup-server and the mysql-server.
 To ssh use the following commands (from the sysadmin user):
 ```
@@ -36,3 +42,8 @@ To connect to the web interface, open Firefox and go to https://1.2.3.4 . When F
 
 The certificate for the ca-admin is at /home/vagrant/Documents/ca-admin.p12
 The password to import the certificate is `Er+vcqM9Q&;=.f4*:2eY8G`.
+(by default the certificate should already be imported)
+
+# Source codes for whitebox review
+- ca-server backend: on machine ca-server, in /var/www/ca-server/src
+- webserver server code: on machine webserver, in /var/www/webserver/app
