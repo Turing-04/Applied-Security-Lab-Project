@@ -6,7 +6,13 @@ When you import the .ova files in virtualbox, make sure to select the option to 
 # Launching the VMs
 When launching the VMs, it's important to wait until one machine is fully booted before booting the next one.
 Don't launch all the machines at once, IT WON'T WORK. (There seems to be some non-determinism on the virtualbox side with the managing of virtual network interfaces).
-It probably doesn't matter, but the boot order we tested was: user-gui, firewall, webserver, mysql-server and backup-server.
+
+- First, boot the user-gui machine. Verify that you can login to the vagrant user using the password `vagrant` (difficult to login directly to sysadmin due to keyboard config). If the screen remains black very long, it's a graphical issue, try resizing the virtual screen to force refreshes.
+- Then, boot the firewall machine. Try to ping 1.2.3.4. If it does not work, there was a network config issue, so reboot the firewall machine.
+- Then boot the webserver machine. Try to open firefox to https://1.2.3.4 . You should see the web interface login page. If not reboot webserver.
+- Then boot the mysql-server machine. Try to login on https://1.2.3.4 with user id `a3` and password `Astrid`. You should land on the home page. If not, reboot the mysql-server machine.
+- Then boot the ca-server machine. Try to download the CRL from the web interface home page. This should download a file called `revoked_list.crl`. If not, reboot the ca-server machine.
+- Finally, boot the backup-server machine. Try requesting a new certificate from the home page. This should download a file called `certificate.p12`. If not, reboot the backup-server machine.
 
 # sysadmin
 On the user-gui machine, there is a user called sysadmin.
