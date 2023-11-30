@@ -3,6 +3,11 @@
 # Importing the .ova
 When you import the .ova files in virtualbox, make sure to select the option to import ALL the network interfaces (not selected by default).
 
+# Launching the VMs
+When launching the VMs, it's important to wait until one machine is fully booted before booting the next one.
+Don't launch all the machines at once, IT WON'T WORK. (There seems to be some non-determinism on the virtualbox side with the managing of virtual network interfaces).
+It probably doesn't matter, but the boot order we tested was: user-gui, firewall, webserver, mysql-server and backup-server.
+
 # sysadmin
 On the user-gui machine, there is a user called sysadmin.
 The local password is: `tulip-evident-theft`
@@ -47,3 +52,4 @@ The password to import the certificate is `Er+vcqM9Q&;=.f4*:2eY8G`.
 # Source codes for whitebox review
 - ca-server backend: on machine ca-server, in /var/www/ca-server/src
 - webserver server code: on machine webserver, in /var/www/webserver/app
+- backups and centralized logs are stored in /backup on the backup-server
