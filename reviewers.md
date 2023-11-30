@@ -29,7 +29,7 @@ ssh mysql-server
 The password to decrypt the ssh key for sysadmin is `flail-dandelion-concierge`.
 
 Sysadmin password on the machines (with sudo rights):
-- firewall: `FQTE:-4R)+KJ5&#MxzN~k@`
+- firewall: `pyACm3GbmBV4d1UY`
 - ca-server: `FQTE:-4R)+KJ5&#MxzN~k@`
 - mysql-server: `dv8RCJruycKGyN`
 - backup-server: `RbNoH9BGxO1FcyTXc1`
