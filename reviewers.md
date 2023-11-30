@@ -17,7 +17,7 @@ To enable ssh connection, please use the following commands (didn't manage to au
 sudo ip link set eth0 down
 ```
 
-This user can ssh into the firewall/router, the ca-server, the backup-server and the mysql-server.
+This user can ssh into the firewall/router, the webserver, the ca-server, the backup-server and the mysql-server.
 To ssh use the following commands (from the sysadmin user):
 ```
 ssh firewall
