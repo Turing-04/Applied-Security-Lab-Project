@@ -1,0 +1,17 @@
+R	241125161537Z	991125161537Z	01	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=TYOkLTZSbI Bruegger/emailAddress=lb@imovies.ch
+V	241125161607Z		02	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=NlKYYynnoRhudutZsgKA Bruegger/emailAddress=lb@imovies.ch
+V	241125161708Z		03	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=UMJZcONVDGKCvxvzTVxc Bruegger/emailAddress=lb@imovies.ch
+V	241125161709Z		04	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=vgXuHeXZxPUtkRvocmJXHfXWAoiPVPuSyAcFBMIUpdDWeTKPep Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161710Z		05	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=XfIDzaPkYW Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161711Z		06	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=FHNxvaGjJx Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161711Z		07	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=vvnlAqXblh Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161712Z		08	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=rFsqxwNUux Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161712Z		09	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=cRzpanSvLE Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161712Z		0A	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=gMDaUfzYdd Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161714Z		0B	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=cjThjFIZaB Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161714Z		0C	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=DRRAFiuzDS Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161715Z		0D	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=FjjWbCYLlV Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161716Z		0E	unknown	/C=CH/ST=Zurich/O=iMovies/UID=aa/CN=rjluCBDRJR Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161717Z		0F	unknown	/C=CH/ST=Zurich/O=iMovies/UID=aa/CN=zkrhoiIoeb Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161717Z		10	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=YTvFHbognJ Bruegger/emailAddress=lb.bla@imovies.ch
+V	241125161718Z		11	unknown	/C=CH/ST=Zurich/O=iMovies/UID=lb/CN=YAxcvCBsmA Bruegger/emailAddress=lb.bla@imovies.ch

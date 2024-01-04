@@ -1,0 +1,5 @@
+pytest==7.4.3
+flask==3.0.0
+mysql-connector-python==8.2.0
+fabric==3.2.2
+PGPy==0.6.0
