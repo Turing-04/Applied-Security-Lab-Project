@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!-- "Look beyond what you see." -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate Manager - Login Page</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    .flash-message {
+      background-color: #f8d7da; /* Light Red */
+      color: #721c24; /* Dark Red */
+      padding: 10px;
+      border: 1px solid #f5c6cb; /* Border color for contrast */
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .btn {
+      width: 100%; /* Set the width to 100% for both buttons */
+      background-color: #4caf50;
+      color: white;
+      padding: 12px 0; /* Adjusted padding to center text vertically */
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+
+    p {
+      margin-top: 20px;
+      color: #666;
+    }
+
+    a {
+      color: #1e90ff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="../static/images/imovies_logo.png" alt="Company Logo">
+    <h1>Please Login</h1>
+    <br>
+    <form action="" method="post">
+      <input type="text" placeholder="user ID" name="user_id" value="{{ request.form.user_id }}">
+      <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}">
+      <button class="btn" type="submit">Login</button>
+    </form>
+
+    <div class="flash-messages">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-message">
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <br> 
+    <p>To connect using a certificate, please import your certificate in your browser and click the button below:</p>
+    <p> If you just imported your certificate, you might need to restart your browser.</p>
+    <a href="/cert-login"><button class="btn">Login with certificate</button></a>
+    <br>
+    <p>Administrator login with certificate: <a href="/admin-interface">here.</a></p>
+  </div>
+</body>
+</html>

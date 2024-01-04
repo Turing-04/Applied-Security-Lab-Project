@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa; /* Light Gray */
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .container:hover {
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h1, h2, h4 {
+      color: #343a40; /* Dark Gray */
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    h2, h4 {
+      margin-top: 20px;
+      color: #0056b3; /* Dark Royal Blue */
+      border-bottom: 2px solid #0056b3; /* Dark Royal Blue */
+      padding-bottom: 5px;
+    }
+
+    .flash-messages {
+      margin-bottom: 20px;
+    }
+
+    .flash-message {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    .flash-success {
+      background-color: #d4edda; /* Light Green */
+      color: #155724; /* Dark Green */
+      border: 1px solid #c3e6cb; /* Border color for contrast */
+    }
+
+    .flash-error {
+      background-color: #f8d7da; /* Light Red */
+      color: #721c24; /* Dark Red */
+      border: 1px solid #f5c6cb; /* Border color for contrast */
+    }
+
+    a {
+      color: #0066cc; /* Medium Royal Blue */
+      text-decoration: none;
+      transition: color 0.3s ease-in-out;
+    }
+
+    a:hover {
+      color: #0056b3; /* Dark Royal Blue */
+    }
+
+    p {
+      margin: 10px 0;
+      color: #555;
+    }
+
+    strong {
+      color: #343a40;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome, {{ user }} !</h1>
+  
+    <div class="flash-messages">
+      {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+          <div class="flash-message">
+            {% if message.startswith('Error') %}
+              <div class="flash-message flash-error">
+                <p>{{ message }}</p>
+              </div>
+            {% else %}
+              <div class="flash-message flash-success">
+                <p>{{ message }}</p>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% endwith %}
+    </div>
+
+    <h2>Your Profile</h2>
+    <p>Update your user information <a href="/modify_info">here</a>.</p>
+    <p>Change your password <a href="/modify_passwd">here</a>.</p>
+
+    <h2>Manage Certificates</h2>
+    <p>Receive a new certificate <a href="/new_certificate">here</a>.</p>
+    <p><strong>Note:</strong> Issuing a new certificate will revoke all previous certificates.</p>
+
+    <p> if you where issued a certificate in the past, you can retrieve it <a href="/download_last_cert">here</a>.</p>
+
+    <h2>Revoke Certificates</h2>
+    <p>Revoke all previously issued certificates <a href="/revoke">here</a>.</p>
+    <p><strong>Current Revocation List:</strong></p>
+    <p> Download the CRL <a href="/download_crl">here</a>.</p>
+
+    <h2>Logout</h2>
+    <p>Logout <a href="/logout">here</a>.</p>
+  </div>
+</body>
+</html>
