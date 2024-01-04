@@ -1,0 +1,17 @@
+[mariadb]
+# TLS configuration
+ssl_ca = /etc/mysql/ssl/certs/cacert.pem 
+ssl_cert = /etc/mysql/ssl/certs/mysql-server.crt 
+ssl_key = /etc/mysql/ssl/private/mysql-server.key
+require_secure_transport = on
+tls_version = TLSv1.3
+
+# Set logging
+log_error = /var/log/mysql/error.log
+
+general_log_file = /var/log/mysql/general.log
+general_log = 1
+
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/slow.log
+long_query_time = 5
