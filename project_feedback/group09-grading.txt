@@ -1,0 +1,72 @@
+ASLab Grading
+Group 09:
+Kamila Babayeva
+Marin Cornuot
+Niels Marco Lachat
+Lin Zhang
+
+-------------------------------------------------
+System Description & Implementation (15/20pt)
+
+- solid overall network layout
+- mostly good and detailed security design
+
+System design & description (SD, 4.5/7pt):
+- CA private key on live system [e.g., no intermediate CA used] (-1)
+- user private key unencrypted in PKCS12 archive? unclear whether these are stored on CA server or can be downloaded only once (-.5)
+- unclear whether additional password authentication of CA server and web server to DB server adds any security (both private key and password must be stored on the former servers)
+- session management: unclear whether any cookie attributes are set (-.5)
+- components: their interfaces are hardly described (-.5)
+
+Implementation (IMP, 6.5/9pt):
+- system apparently somewhat unstable and very slow
+- SSH into backup machine does not work (-.5)
+- unclear whether CRL is signed (-1)
+- logout does not invalidate cookie (-.5)
+- DB server password hard-coded in script (-.5)
+
+Presentation (P, 4/4pt):
+- fine, but only relative sparse use of security principles
+
+-------------------------------------------------
+Risk Analysis (15/20pt)
+
+Assets (A, 1/3pt):
+- missing logical assets: users' private keys, passwords (should be listed separately, as thy have different properties), server private keys, certificates, public keys, CRL, logs, configuration, backup (-1)
+- security properties are missing for most assets; some given security properties concern different assets (e.g., how can a safe or server be confidential?) (-1)
+- missing assets: intangible goods (reputation, confidence etc.)
+
+Threat Sources (TS, 3/3pt):
+- fairly comprehensive list of threat sources
+- could include investigations targets, which could subsume gov agencies and organized crime
+
+Risk definitions (RD, 2/2pt):
+- fine
+
+Risk evaluation (RE, 4/7pt):
+- no risk evaluations for missing logical assets and intangible goods (-1.5)
+- web server: what about other common web app vulnerabilities (CSRF, session hijacking, XSS, SSTI, path traversal, ....) (-1)
+- CA server and backup server SW: other threats? (-.5)
+- risk acceptance, #6: how can Tor help if physical Internet access is blocked?
+
+Presentation (P, 5/5pt):
+- fine
+
+-------------------------------------------------
+Review of other group (19/20pt):
+
+System Description (3.5/4pt)
+- review of security design a bit brief
+
+Risk Analysis (4/4pt)
+- fine
+
+Implementation (3.5/4pt)
+- good
+- unclear how you you used Chrome to launch a CSRF attack (-.5)
+
+Comparison (3/3pt)
+- fine
+
+Presentation (5/5pt)
+- fine
